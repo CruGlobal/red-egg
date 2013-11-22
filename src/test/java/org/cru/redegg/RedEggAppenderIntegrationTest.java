@@ -130,6 +130,8 @@ public class RedEggAppenderIntegrationTest
 
         public void reset()
         {
+            // we use Mockito.reset() instead of building new mocks, because the servlet listener is only initialized
+            // once for this test class, and there is no easy way to modify its reference to a new mock
             Mockito.reset(recorder, factory);
             when(factory.getRecorder()).thenReturn(recorder);
         }
