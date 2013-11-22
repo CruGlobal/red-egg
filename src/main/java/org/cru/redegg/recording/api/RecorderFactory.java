@@ -3,5 +3,7 @@ package org.cru.redegg.recording.api;
 /**
  * @author Matt Drees
  */
-public class RecorderFactory {
+public interface RecorderFactory {
+
+    public ErrorRecorder getRecorder() ;
 }
