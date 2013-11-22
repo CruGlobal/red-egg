@@ -60,19 +60,31 @@ public class RedEggAppenderIntegrationTest
     @Inject
     WebErrorRecorder recorder;
 
+
+    @Inject Mocks mocks;
+
     @Before
     public void setup()
     {
-        MockitoAnnotations.initMocks(this);
+        mocks.reset();
     }
 
     @Test
     public void testLog4jErrorLogging() throws Exception {
-        Logger.getRootLogger().error("error from test");
+        org.apache.log4j.Logger.getRootLogger().error("error from test");
 
         verify(recorder).recordLogRecord(any(LogRecord.class));
         verify(recorder).error();
     }
+
+    @Test
+    public void testJulErrorLogging() throws Exception {
+        java.util.logging.Logger.getLogger(null).severe("error from test");
+
+        verify(recorder).recordLogRecord(any(LogRecord.class));
+        verify(recorder).error();
+    }
+
 
 
 
@@ -113,6 +125,12 @@ public class RedEggAppenderIntegrationTest
         {
             MockitoAnnotations.initMocks(this);
             recorder = mock(WebErrorRecorder.class, new AnswerWithSelf(WebErrorRecorder.class));
+            reset();
+        }
+
+        public void reset()
+        {
+            Mockito.reset(recorder, factory);
             when(factory.getRecorder()).thenReturn(recorder);
         }
 
