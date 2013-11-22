@@ -1,11 +1,13 @@
 package org.cru.redegg.recording.api;
 
 import javax.enterprise.context.RequestScoped;
+import java.net.InetAddress;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
 /**
  * Used to programmatically record an application error
+ * or contextual information that would be useful in an error report
  *
  * @author Matt Drees
  */
@@ -15,12 +17,8 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordUser(Object user);
 
-
-//    void addThrowable(Throwable thrown);
-
     /** will not, under any circumstances, throw an exception */
-    ErrorRecorder recordError(Throwable message);
-//    void recordError(String message, Throwable thrown);
+    ErrorRecorder recordThrown(Throwable thrown);
 
     ErrorRecorder recordLogRecord(LogRecord record);
 
@@ -28,6 +26,7 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordEnvironmentVariables(Properties properties);
 
+    ErrorRecorder recordLocalHost(InetAddress localHost);
 
     void error();
 }
