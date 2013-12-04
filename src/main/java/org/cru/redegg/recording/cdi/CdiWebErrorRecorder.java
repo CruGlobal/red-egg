@@ -18,6 +18,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
@@ -172,9 +173,9 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
-    public ErrorRecorder recordEnvironmentVariables(Properties properties) {
+    public ErrorRecorder recordEnvironmentVariables(Map<String, String> variables) {
         checkState(!completed);
-        defaultRecorder.recordEnvironmentVariables(properties);
+        defaultRecorder.recordEnvironmentVariables(variables);
         return this;
     }
 
