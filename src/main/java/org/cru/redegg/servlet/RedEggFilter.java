@@ -1,6 +1,7 @@
 package org.cru.redegg.servlet;
 
 import org.cru.redegg.recording.api.WebErrorRecorder;
+import org.cru.redegg.util.Log;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -22,6 +23,9 @@ public class RedEggFilter implements Filter {
     @Inject
     Provider<WebErrorRecorder> errorRecorder;
 
+    @Inject
+    Log log;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
@@ -42,22 +46,45 @@ public class RedEggFilter implements Filter {
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
+        RecordingResponse recordingResponse = new RecordingResponse(response);
+        RecordingRequest recordingRequest = new RecordingRequest(request, log, getRecorder());
         try {
-            chain.doFilter(request, response);
+            chain.doFilter(recordingRequest, recordingResponse);
         } catch (IOException e) {
-            throw record(request, e);
+            throw record(e);
         } catch (ServletException e) {
-            throw record(request, e);
+            throw record(e);
         } catch (RuntimeException e) {
-            throw record(request, e);
+            throw record(e);
         } catch (Error e) {
-            throw record(request, e);
+            throw record(e);
+        }
+        finally
+        {
+            int statusCode = recordingResponse.getStatusCode();
+            if (statusCode != -1)
+            {
+                getRecorder().recordResponseStatus(statusCode);
+            }
         }
 
     }
 
-    private <E extends Throwable> E record(HttpServletRequest request, E e) throws E {
-        errorRecorder.get().recordThrown(e);
+    private WebErrorRecorder getRecorder()
+    {
+        try
+        {
+            return errorRecorder.get();
+        }
+        catch (Throwable throwable)
+        {
+            log.error("unable to get web recorder", throwable);
+            return WebErrorRecorder.NULL_RECORDER;
+        }
+    }
+
+    private <E extends Throwable> E record(E e) throws E {
+        getRecorder().recordThrown(e);
         throw e;
     }
 

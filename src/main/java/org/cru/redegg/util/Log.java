@@ -18,7 +18,10 @@ public class Log {
         this.log = Logger.getLogger(getClass());
     }
 
+    /**
+     * will not trigger an exception, and will log the info if possible.
+     */
     public void error(String s, Throwable t) {
-        throw new UnsupportedOperationException();
+
     }
 }

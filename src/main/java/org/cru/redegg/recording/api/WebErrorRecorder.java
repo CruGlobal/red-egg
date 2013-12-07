@@ -11,6 +11,9 @@ import java.net.URL;
  */
 public interface WebErrorRecorder extends ErrorRecorder{
 
+    public static final WebErrorRecorder NULL_RECORDER = new NullWebErrorRecorder();
+
+
     WebErrorRecorder recordRequestUrl(String url);
     WebErrorRecorder recordRequestUrl(URL url);
     WebErrorRecorder recordRequestUrl(URI uri);
