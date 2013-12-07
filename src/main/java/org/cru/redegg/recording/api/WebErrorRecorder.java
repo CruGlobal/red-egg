@@ -27,6 +27,7 @@ public interface WebErrorRecorder extends ErrorRecorder{
 
     WebErrorRecorder recordEntityRepresentation(String entityRepresentation);
 
+    WebErrorRecorder recordResponseStatus(int responseStatus);
 
 
     void recordRequestComplete(DateTime dateTime);

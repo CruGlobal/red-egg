@@ -1,6 +1,5 @@
 package org.cru.redegg.recording.cdi;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorQueue;
 import org.cru.redegg.reporting.ErrorReport;
@@ -122,6 +121,15 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
         return this;
     }
 
+    @Override
+    public WebErrorRecorder recordResponseStatus(int responseStatus)
+    {
+        checkState(!completed);
+        webContext.setResponseStatus(responseStatus);
+        return this;
+    }
+
+    @Override
     public void recordRequestComplete(DateTime finish) {
         checkState(!completed);
         completed = true;
