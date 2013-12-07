@@ -116,6 +116,12 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public WebErrorRecorder recordEntityRepresentation(String entityRepresentation) {
+        checkState(!completed);
+        webContext.setEntityRepresentation(checkNotNull(entityRepresentation));
+        return this;
+    }
+
     public void recordRequestComplete(DateTime finish) {
         checkState(!completed);
         completed = true;

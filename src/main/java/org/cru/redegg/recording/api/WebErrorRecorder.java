@@ -25,7 +25,7 @@ public interface WebErrorRecorder extends ErrorRecorder{
 
     WebErrorRecorder recordRequestPostParameters(Multimap<String, String> postParameters);
 
-    // record Body Content
+    WebErrorRecorder recordEntityRepresentation(String entityRepresentation);
 
 
 
