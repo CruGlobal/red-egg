@@ -1,4 +1,4 @@
-package org.cru.redegg.org.cru.redegg.reporting;
+package org.cru.redegg.reporting;
 
 /**
  * @author Matt Drees

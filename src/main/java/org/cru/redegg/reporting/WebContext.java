@@ -1,4 +1,4 @@
-package org.cru.redegg.org.cru.redegg.reporting;
+package org.cru.redegg.reporting;
 
 import com.google.common.collect.Multimap;
 import org.joda.time.DateTime;
@@ -17,7 +17,9 @@ public class WebContext {
     private String method;
     private Multimap<String, String> queryParameters;
     private Multimap<String, String> postParameters;
+    private String entityRepresentation;
     private DateTime finish;
+    private int responseStatus;
 
     public void setUrl(URI url) {
         this.url = url;
@@ -73,5 +75,25 @@ public class WebContext {
 
     public DateTime getFinish() {
         return finish;
+    }
+
+    public String getEntityRepresentation()
+    {
+        return entityRepresentation;
+    }
+
+    public void setEntityRepresentation(String entityRepresentation)
+    {
+        this.entityRepresentation = entityRepresentation;
+    }
+
+    public int getResponseStatus()
+    {
+        return responseStatus;
+    }
+
+    public void setResponseStatus(int responseStatus)
+    {
+        this.responseStatus = responseStatus;
     }
 }

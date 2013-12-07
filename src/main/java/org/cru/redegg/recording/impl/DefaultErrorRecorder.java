@@ -4,16 +4,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import org.cru.redegg.org.cru.redegg.reporting.ErrorQueue;
-import org.cru.redegg.org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.ErrorQueue;
+import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.recording.api.ErrorRecorder;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 

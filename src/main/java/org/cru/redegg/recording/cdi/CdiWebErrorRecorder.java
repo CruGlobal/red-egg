@@ -2,9 +2,9 @@ package org.cru.redegg.recording.cdi;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.org.cru.redegg.reporting.ErrorQueue;
-import org.cru.redegg.org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.ErrorQueue;
+import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
