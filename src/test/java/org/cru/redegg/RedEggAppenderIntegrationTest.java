@@ -34,8 +34,10 @@ import java.util.List;
 import java.util.logging.LogRecord;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,16 +75,16 @@ public class RedEggAppenderIntegrationTest
     public void testLog4jErrorLogging() throws Exception {
         org.apache.log4j.Logger.getRootLogger().error("error from test");
 
-        verify(recorder).recordLogRecord(any(LogRecord.class));
-        verify(recorder).error();
+        verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
+        verify(recorder, atLeast(1)).error();
     }
 
     @Test
     public void testJulErrorLogging() throws Exception {
         java.util.logging.Logger.getLogger(null).severe("error from test");
 
-        verify(recorder).recordLogRecord(any(LogRecord.class));
-        verify(recorder).error();
+        verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
+        verify(recorder, atLeast(1)).error();
     }
 
 

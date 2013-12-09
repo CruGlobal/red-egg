@@ -16,6 +16,8 @@
 
   <properties>
     <version.arquillian_core>1.1.2.Final</version.arquillian_core>
+    <wildfly.arquillian.version>8.0.0.Beta1</wildfly.arquillian.version>
+    <jboss.as.arquillian.version>7.2.0.Final</jboss.as.arquillian.version>
   </properties>
 
   <dependencyManagement>
@@ -147,12 +149,24 @@
       <!-- An optional Arquillian testing profile that executes tests
           in a remote JBoss AS instance -->
       <!-- Run with: mvn clean test -Parq-jbossas-remote -->
-      <id>arq-jbossas-remote</id>
+      <id>arq-jbossas-remote-as7</id>
       <dependencies>
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-remote</artifactId>
-          <version>7.1.1.Final</version>
+          <version>${jboss.as.arquillian.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>jbossas-remote-wildfly-8</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-arquillian-container-remote</artifactId>
+          <version>${wildfly.arquillian.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
