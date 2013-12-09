@@ -67,7 +67,7 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
             return defaultGuess;
 
         String[] pieces = contentType.split("; charset=");
-        if (pieces.length == 0)
+        if (pieces.length < 2)
             return defaultGuess;
 
         return Charset.forName(pieces[1]);
