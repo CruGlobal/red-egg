@@ -115,6 +115,7 @@ public class JaxrsRecordingIntegrationTest
         Multimap<String, String> expected = LinkedHashMultimap.create();
         expected.put("color", "red");
         verify(recorder).recordRequestQueryParameters(expected);
+        verify(recorder).recordResponseStatus(200);
     }
 
 
