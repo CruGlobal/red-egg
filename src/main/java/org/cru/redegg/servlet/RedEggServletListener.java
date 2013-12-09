@@ -1,5 +1,6 @@
 package org.cru.redegg.servlet;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.Logger;
@@ -40,6 +41,9 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Inject
     Clock clock;
+
+    @Inject
+    ParameterSorter sorter;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -97,7 +101,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));
 
-        ParameterSorter.Sort sort = new ParameterSorter().sort(request);
+        ParameterSorter.Sort sort = sorter.sort(request);
 
         recorder
             .recordRequestQueryParameters(sort.queryParameters)
@@ -121,7 +125,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             String headerName = headerNames.nextElement();
             @SuppressWarnings("unchecked")
             Enumeration<String> values = request.getHeaders(headerName);
-            while (headerNames.hasMoreElements())
+            while (values.hasMoreElements())
             {
                 httpHeaders.put(headerName, values.nextElement());
             }
