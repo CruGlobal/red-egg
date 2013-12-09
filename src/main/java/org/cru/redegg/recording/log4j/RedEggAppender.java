@@ -25,7 +25,6 @@ public class RedEggAppender extends AppenderSkeleton {
 
     @Override
     protected void append(LoggingEvent event) {
-        System.err.println("Got a log4j event");
 
         ErrorRecorder recorder = factory.getRecorder();
 

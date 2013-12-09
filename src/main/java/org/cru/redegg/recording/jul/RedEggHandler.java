@@ -26,7 +26,6 @@ public class RedEggHandler extends Handler {
     public void publish(LogRecord record) {
         if (record.getLevel().intValue() >= getLevel().intValue())
         {
-//            System.out.println("Got a j.u.l error record: " + record.getMessage());
             ErrorRecorder recorder = factory.getRecorder();
             recorder
                 .recordLogRecord(record)
