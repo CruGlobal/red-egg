@@ -9,6 +9,7 @@ import org.cru.redegg.recording.api.ParameterSanitizer;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,21 +55,24 @@ public class ParameterSorter
             String queryString = request.getQueryString();
             if (queryString != null && isQueryParameter(param, queryString))
             {
+                List<String> sanitized = sanitizer.sanitizeQueryStringParameter(
+                    param,
+                    Arrays.asList(parameterMap.get(param)));
                 sort.queryParameters.putAll(
                     param,
-                    sanitizer.sanitizeQueryStringParameter(
-                        param,
-                        Arrays.asList(parameterMap.get(param))));
+                    sanitized);
             }
             else
             {
                 if (request.getMethod().equals("POST")) {
+                    List<String> sanitized = sanitizer.sanitizePostBodyParameter(
+                        param,
+                        Arrays.asList(parameterMap.get(param)));
                     sort.postParameters.putAll(
                         param,
-                        sanitizer.sanitizePostBodyParameter(
-                            param,
-                            Arrays.asList(parameterMap.get(param))));
-                } else
+                        sanitized);
+                }
+                else
                 {
                     log.warn(String.format("parameter not in query string in %s request: %s", request.getMethod(), param));
                 }
