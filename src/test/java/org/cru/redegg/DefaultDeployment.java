@@ -16,7 +16,10 @@ public class DefaultDeployment {
     private WebArchive webArchive;
 
     public DefaultDeployment() {
+        this(null);
+    }
 
+    public DefaultDeployment(String archiveName) {
         try
         {
             resolver = Maven.resolver().offline().loadPomFromFile("pom.xml");
@@ -29,18 +32,26 @@ public class DefaultDeployment {
             throw new RuntimeException(e);
         }
 
-        webArchive = ShrinkWrap.create(WebArchive.class)
-            .addAsWebInfResource("beans.xml");
+        webArchive = getWebArchive(archiveName)
+           .addAsWebInfResource("beans.xml");
 
         addLibraries(
-            "org.mockito:mockito-core",
-            "com.google.guava:guava",
-            "joda-time:joda-time"
+           "org.mockito:mockito-core",
+           "uk.co.datumedge:hamcrest-json",
+           "com.google.guava:guava",
+           "joda-time:joda-time"
 //            "org.ccci:atlassian-hamcrest",
 //            "org.hamcrest:hamcrest-library"
         );
+
     }
 
+    private WebArchive getWebArchive(String archiveName)
+    {
+        return archiveName == null ?
+            ShrinkWrap.create(WebArchive.class) :
+            ShrinkWrap.create(WebArchive.class, archiveName);
+    }
 
     private void addLibraries(String... libraryCoordinates)
     {
