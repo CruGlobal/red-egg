@@ -15,6 +15,9 @@ import java.util.logging.LogRecord;
  */
 class NullWebErrorRecorder implements WebErrorRecorder
 {
+    //not a CDI bean
+    NullWebErrorRecorder(Object ignored){}
+
     @Override
     public WebErrorRecorder recordRequestUrl(String url)
     {
