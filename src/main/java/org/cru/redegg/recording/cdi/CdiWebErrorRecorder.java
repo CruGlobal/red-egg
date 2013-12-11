@@ -1,7 +1,8 @@
 package org.cru.redegg.recording.cdi;
 
 import com.google.common.collect.Multimap;
-import org.cru.redegg.reporting.ErrorQueue;
+import org.cru.redegg.recording.api.Serializer;
+import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.recording.api.ErrorRecorder;
@@ -30,24 +31,21 @@ import static com.google.common.base.Preconditions.checkState;
 @RequestScoped
 public class CdiWebErrorRecorder implements WebErrorRecorder {
 
+    @Inject
     DefaultErrorRecorder defaultRecorder;
 
-    WebContext webContext;
-
-    @Inject
-    Log log;
 
     @Inject
     ErrorQueue queue;
 
+    @Inject
+    Log log;
+
+
+    WebContext webContext = new WebContext();
+
     private boolean error;
     private boolean completed;
-
-    @PostConstruct
-    public void init()
-    {
-        defaultRecorder = new DefaultErrorRecorder(queue);
-    }
 
     @Override
     public WebErrorRecorder recordRequestUrl(String url) {

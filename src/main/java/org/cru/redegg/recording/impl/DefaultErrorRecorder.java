@@ -2,41 +2,52 @@ package org.cru.redegg.recording.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.reporting.ErrorQueue;
+import com.google.common.collect.Sets;
+import org.cru.redegg.recording.api.Serializer;
+import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.recording.api.ErrorRecorder;
 
+import javax.inject.Inject;
 import java.net.InetAddress;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 /**
  * @author Matt Drees
  */
 public class DefaultErrorRecorder implements ErrorRecorder {
 
-    ErrorQueue queue;
+    private ErrorQueue queue;
+    private Serializer serializer;
 
-
-    Multimap<String, Object> context;
-    Object user;
-    private LinkedList<Object> thrown;
+    private Multimap<String, Object> context;
+    private Object user;
+    private LinkedHashSet<Throwable> thrown;
     private LinkedList<LogRecord> logRecords;
-
-    boolean error;
     private InetAddress localHost;
     private Map<String, String> environmentVariables;
     private Properties systemProperties;
 
+    boolean error;
     boolean sentError;
 
-    public DefaultErrorRecorder(ErrorQueue queue) {
+    @Inject
+    public DefaultErrorRecorder(ErrorQueue queue, Serializer serializer) {
         this.queue = queue;
+        this.serializer = serializer;
     }
 
     @Override
@@ -63,7 +74,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     public ErrorRecorder recordThrown(Throwable throwable) {
         checkNotSent();
         if (thrown == null)
-            thrown = Lists.newLinkedList();
+            thrown = Sets.newLinkedHashSetWithExpectedSize(4);
         this.thrown.add(throwable);
 
         error = true;
@@ -112,16 +123,108 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return error;
     }
 
-    public ErrorReport buildReport() {
-        //TODO:
-        throw new UnsupportedOperationException();
-    }
-
-
     @Override
     public void error() {
         checkNotSent();
         queue.enqueue(buildReport());
         sentError = true;
     }
+
+
+    public ErrorReport buildReport() {
+        ErrorReport report = new ErrorReport();
+        report.setContext(serializeContext());
+        report.setUser(serializeUser());
+        report.setThrown(getThrown());
+        report.setLogRecords(serializeLogRecords());
+        if (localHost != null)
+        {
+            report.setLocalHostName(localHost.getHostName());
+            report.setLocalHostAddress(localHost.getHostAddress());
+        }
+
+        report.setEnvironmentVariables(getEnvironmentVariables());
+        report.setSystemProperties(getSystemProperties());
+
+        return report;
+    }
+
+    private Multimap<String, String> serializeContext()
+    {
+        if (context == null)
+            return ImmutableMultimap.of();
+        Multimap<String, String> serializedContext = HashMultimap.create(context.keys().size(), 1);
+        for (Map.Entry<String, Object> entry : context.entries())
+        {
+            serializedContext.put(entry.getKey(), serializer.toString(entry.getValue()));
+        }
+        return serializedContext;
+    }
+
+    private Map<String, String> serializeUser()
+    {
+        if (user == null)
+            return Collections.emptyMap();
+        else
+            return serializer.toStringMap(user);
+    }
+
+    private List<Throwable> getThrown()
+    {
+        if (thrown == null)
+            return Collections.emptyList();
+        return Lists.newArrayList(removeCauses());
+    }
+
+    private Set<Throwable> removeCauses()
+    {
+        Set<Throwable> filtered = Sets.newLinkedHashSet(thrown);
+        for (Throwable head : thrown)
+        {
+            Throwable cause = head.getCause();
+            while (cause != null)
+            {
+                filtered.remove(cause);
+                cause = cause.getCause();
+            }
+        }
+        return filtered;
+    }
+
+    private List<String> serializeLogRecords()
+    {
+        if (logRecords == null)
+            return Collections.emptyList();
+
+        List<String> serializedLogRecords = Lists.newArrayListWithCapacity(logRecords.size());
+        SimpleFormatter formatter = new SimpleFormatter();
+
+        for (LogRecord logRecord : logRecords)
+        {
+            serializedLogRecords.add(formatter.format(logRecord));
+        }
+        return serializedLogRecords;
+    }
+
+    private Map<String, String> getSystemProperties()
+    {
+        if (systemProperties == null)
+            return Collections.emptyMap();
+
+        Map<String, String> propertiesMap = Maps.newHashMapWithExpectedSize(systemProperties.size());
+        for (Map.Entry<Object, Object> entry : systemProperties.entrySet())
+        {
+            propertiesMap.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
+        }
+        return propertiesMap;
+    }
+
+    private Map<String, String> getEnvironmentVariables()
+    {
+        if (environmentVariables == null)
+            return Collections.emptyMap();
+        else
+            return environmentVariables;
+    }
+
 }

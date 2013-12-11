@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.cdi;
 
-import org.cru.redegg.reporting.ErrorQueue;
+import org.cru.redegg.recording.api.Serializer;
+import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
@@ -26,11 +27,14 @@ public class CdiRecorderFactory implements RecorderFactory {
     @Inject
     ErrorQueue errorQueue;
 
+    @Inject
+    Serializer serializer;
+
     @Override
     public ErrorRecorder getRecorder() {
         if (beanManager.getContext(RequestScoped.class).isActive())
             return webErrorRecorder;
         else
-            return new DefaultErrorRecorder(errorQueue);
+            return new DefaultErrorRecorder(errorQueue, serializer);
     }
 }

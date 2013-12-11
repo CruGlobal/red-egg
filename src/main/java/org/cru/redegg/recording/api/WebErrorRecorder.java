@@ -9,7 +9,7 @@ import java.net.URL;
 /**
  * @author Matt Drees
  */
-public interface WebErrorRecorder extends ErrorRecorder{
+public interface WebErrorRecorder extends ErrorRecorder {
 
     public static final WebErrorRecorder NULL_RECORDER = new NullWebErrorRecorder(null);
 
