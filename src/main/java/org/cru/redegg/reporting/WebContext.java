@@ -3,6 +3,7 @@ package org.cru.redegg.reporting;
 import com.google.common.collect.Multimap;
 import org.joda.time.DateTime;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 
 /**
@@ -19,7 +20,18 @@ public class WebContext {
     private Multimap<String, String> postParameters;
     private String entityRepresentation;
     private DateTime finish;
-    private int responseStatus;
+    private Integer responseStatus;
+    private Method component;
+
+    public Method getComponent()
+    {
+        return component;
+    }
+
+    public void setComponent(Method component)
+    {
+        this.component = component;
+    }
 
     public void setUrl(URI url) {
         this.url = url;
@@ -87,12 +99,12 @@ public class WebContext {
         this.entityRepresentation = entityRepresentation;
     }
 
-    public int getResponseStatus()
+    public Integer getResponseStatus()
     {
         return responseStatus;
     }
 
-    public void setResponseStatus(int responseStatus)
+    public void setResponseStatus(Integer responseStatus)
     {
         this.responseStatus = responseStatus;
     }

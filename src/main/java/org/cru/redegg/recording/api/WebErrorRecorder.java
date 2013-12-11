@@ -3,6 +3,7 @@ package org.cru.redegg.recording.api;
 import com.google.common.collect.Multimap;
 import org.joda.time.DateTime;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 
@@ -17,6 +18,8 @@ public interface WebErrorRecorder extends ErrorRecorder {
     WebErrorRecorder recordRequestUrl(String url);
     WebErrorRecorder recordRequestUrl(URL url);
     WebErrorRecorder recordRequestUrl(URI uri);
+
+    WebErrorRecorder recordComponent(Method method);
 
     WebErrorRecorder recordRequestStart(DateTime dateTime);
 

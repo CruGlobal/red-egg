@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,6 +75,15 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         checkNotNull(uri);
         webContext.setUrl(uri);
+        return this;
+    }
+
+    @Override
+    public WebErrorRecorder recordComponent(Method method)
+    {
+        checkState(!completed);
+        checkNotNull(method);
+        webContext.setComponent(method);
         return this;
     }
 
