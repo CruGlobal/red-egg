@@ -24,6 +24,8 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordLocalHost(InetAddress localHost);
 
+//    ErrorRecorder recordEnvironmentName(String environmentName);
+
 
     //these two may mark the current request (if any) as an error request
 
