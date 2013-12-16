@@ -17,7 +17,7 @@ public class ErrbitReporter implements ErrorReporter
     @Inject
     ErrbitConfig config;
 
-    AirbrakeNotifier notifier = new AirbrakeNotifier(config.getEndpoint());
+    AirbrakeNotifier notifier = new AirbrakeNotifier(config.getEndpoint().toString());
 
     public void send(ErrorReport report)
     {
