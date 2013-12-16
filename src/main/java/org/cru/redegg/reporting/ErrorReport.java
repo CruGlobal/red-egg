@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
 
 import java.net.InetAddress;
@@ -120,4 +121,38 @@ public class ErrorReport {
     {
         this.webContext = webContext;
     }
+
+    public Optional<Throwable> getRootException()
+    {
+
+        if (!thrown.isEmpty())
+        {
+            return Optional.of(thrown.get(0));
+        }
+        else
+        {
+            return Optional.absent();
+        }
+    }
+
+    public Optional<String> getRootErrorMessage()
+    {
+        if (getRootException().isPresent())
+        {
+            return Optional.fromNullable(getRootException().get().getMessage());
+        }
+        else
+        {
+            return getFirstLogMessage();
+        }
+    }
+
+    private Optional<String> getFirstLogMessage()
+    {
+        if (logRecords.isEmpty())
+            return Optional.absent();
+        else
+            return Optional.of(logRecords.get(0));
+    }
+
 }

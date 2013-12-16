@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.joda.time.DateTime;
 
@@ -22,6 +23,16 @@ public class WebContext {
     private DateTime finish;
     private Integer responseStatus;
     private Method component;
+
+
+    public Multimap<String, String> getCombinedQueryAndPostParameters()
+    {
+        Multimap<String, String> combined =
+            HashMultimap.create(queryParameters.size() + postParameters.size(), 1);
+        combined.putAll(queryParameters);
+        combined.putAll(postParameters);
+        return combined;
+    }
 
     public Method getComponent()
     {
