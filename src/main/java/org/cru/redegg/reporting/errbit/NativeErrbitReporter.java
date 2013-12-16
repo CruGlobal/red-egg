@@ -21,13 +21,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Matt Drees
+ *
+ * Reports errors to an Errbit instance using the v2.4 xml api.
  */
 public class NativeErrbitReporter implements ErrorReporter
 {
 
-    @Inject
     ErrbitConfig config;
 
+    @Inject
+    public NativeErrbitReporter(ErrbitConfig config)
+    {
+        this.config = config;
+    }
 
     public void send(ErrorReport report)
     {
