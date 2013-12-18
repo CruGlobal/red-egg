@@ -6,6 +6,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.util.ErrorLog;
 
 import java.util.logging.LogRecord;
 
@@ -25,6 +26,8 @@ public class RedEggAppender extends AppenderSkeleton {
 
     @Override
     protected void append(LoggingEvent event) {
+        if (event.getLoggerName().equals(ErrorLog.name()))
+            return;
 
         ErrorRecorder recorder = factory.getRecorder();
 

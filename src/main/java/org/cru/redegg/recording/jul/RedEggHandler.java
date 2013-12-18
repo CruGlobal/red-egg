@@ -3,6 +3,7 @@ package org.cru.redegg.recording.jul;
 import com.google.common.base.Preconditions;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.util.ErrorLog;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -24,6 +25,8 @@ public class RedEggHandler extends Handler {
 
     @Override
     public void publish(LogRecord record) {
+        if (record.getLoggerName().equals(ErrorLog.name()))
+            return;
         if (record.getLevel().intValue() >= getLevel().intValue())
         {
             ErrorRecorder recorder = factory.getRecorder();
