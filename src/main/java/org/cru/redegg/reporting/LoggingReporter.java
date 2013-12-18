@@ -87,7 +87,7 @@ public class LoggingReporter implements ErrorReporter
         addMultimapEntries(builder, webContext.getHeaders(), "Headers");
         if (webContext.getEntityRepresentation() != null)
         {
-            builder.appendChunk("Request Entity", webContext.getResponseStatus());
+            builder.appendChunk("Request Entity", webContext.getEntityRepresentation());
         }
         builder.appendLine("Response Status", webContext.getResponseStatus());
     }
