@@ -1,17 +1,19 @@
 package org.cru.redegg;
 
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
+import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.servlet.RedEggServletListener;
+import org.cru.redegg.test.DefaultDeployment;
+import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.util.Clock;
 import org.hamcrest.Matcher;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -20,14 +22,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.defaultanswers.ReturnsEmptyValues;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -42,7 +42,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -285,26 +284,8 @@ public class JaxrsRecordingIntegrationTest
         @Produces
         WebErrorRecorder recorder;
 
-
         @Produces
-        ParameterSanitizer sanitizer = new ParameterSanitizer() {
-            @Override
-            public List<String> sanitizeQueryStringParameter(
-                String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-
-            @Override
-            public List<String> sanitizePostBodyParameter(
-                String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-
-            @Override
-            public List<String> sanitizeParameter(String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-        };
+        ParameterSanitizer sanitizer = new NoOpParameterSanitizer();
 
         @PostConstruct
         public void init()

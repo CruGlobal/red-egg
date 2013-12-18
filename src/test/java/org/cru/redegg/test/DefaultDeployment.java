@@ -1,4 +1,4 @@
-package org.cru.redegg;
+package org.cru.redegg.test;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -59,6 +59,16 @@ public class DefaultDeployment {
             .resolve(libraryCoordinates)
             .withTransitivity()
             .asFile());
+    }
+
+    public DefaultDeployment addAllRuntimeDependencies()
+    {
+        webArchive.addAsLibraries(
+            resolver.importRuntimeDependencies()
+                .resolve()
+                .withTransitivity()
+                .asFile());
+        return this;
     }
 
 

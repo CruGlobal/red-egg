@@ -1,7 +1,7 @@
 package org.cru.redegg;
 
 
-import org.apache.log4j.Logger;
+import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
@@ -9,15 +9,14 @@ import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.servlet.ParameterSorter;
 import org.cru.redegg.servlet.RedEggServletListener;
+import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.util.Clock;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -35,9 +34,7 @@ import java.util.logging.LogRecord;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -103,24 +100,7 @@ public class RedEggAppenderIntegrationTest
 
 
         @Produces
-        ParameterSanitizer sanitizer = new ParameterSanitizer() {
-            @Override
-            public List<String> sanitizeQueryStringParameter(
-                String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-
-            @Override
-            public List<String> sanitizePostBodyParameter(
-                String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-
-            @Override
-            public List<String> sanitizeParameter(String parameterName, List<String> parameterValues) {
-                return parameterValues;
-            }
-        };
+        ParameterSanitizer sanitizer = new NoOpParameterSanitizer();
 
         @PostConstruct
         public void init()

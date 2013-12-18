@@ -16,9 +16,4 @@ public interface ParameterSanitizer
      */
     List<String> sanitizePostBodyParameter(String parameterName, List<String> parameterValues);
 
-    /**
-     * For generic param sanitization; could be a query string param or post body param
-     */
-    List<String> sanitizeParameter(String parameterName, List<String> parameterValues);
-
 }

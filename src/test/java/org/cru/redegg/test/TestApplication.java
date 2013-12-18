@@ -1,4 +1,4 @@
-package org.cru.redegg;
+package org.cru.redegg.test;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
