@@ -3,7 +3,7 @@ package org.cru.redegg.servlet;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.util.Log;
+import org.cru.redegg.util.ErrorLog;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * @author Matt Drees
@@ -25,13 +24,13 @@ import java.nio.charset.UnsupportedCharsetException;
 public class RecordingRequest extends HttpServletRequestWrapper
 {
 
-    private final Log log;
+    private final ErrorLog errorLog;
     private final WebErrorRecorder recorder;
 
-    public RecordingRequest(HttpServletRequest request, Log log, WebErrorRecorder recorder)
+    public RecordingRequest(HttpServletRequest request, ErrorLog errorLog, WebErrorRecorder recorder)
     {
         super(request);
-        this.log = log;
+        this.errorLog = errorLog;
         this.recorder = recorder;
     }
 
@@ -78,7 +77,7 @@ public class RecordingRequest extends HttpServletRequestWrapper
         }
         catch (Throwable throwable)
         {
-            log.error("unable to record entity", throwable);
+            errorLog.error("unable to record entity", throwable);
         }
         return new SimpleServletInputStream(new ByteArrayInputStream(content));
     }

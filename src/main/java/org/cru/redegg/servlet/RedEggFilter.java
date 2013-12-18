@@ -1,7 +1,7 @@
 package org.cru.redegg.servlet;
 
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.util.Log;
+import org.cru.redegg.util.ErrorLog;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -26,7 +26,7 @@ public class RedEggFilter implements Filter {
     Provider<WebErrorRecorder> errorRecorder;
 
     @Inject
-    Log log;
+    ErrorLog errorLog;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -49,7 +49,7 @@ public class RedEggFilter implements Filter {
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         RecordingResponse recordingResponse = new RecordingResponse(response);
-        RecordingRequest recordingRequest = new RecordingRequest(request, log, getRecorder());
+        RecordingRequest recordingRequest = new RecordingRequest(request, errorLog, getRecorder());
         try {
             chain.doFilter(recordingRequest, recordingResponse);
         } catch (IOException e) {
@@ -80,7 +80,7 @@ public class RedEggFilter implements Filter {
         }
         catch (Throwable throwable)
         {
-            log.error("unable to get web recorder", throwable);
+            errorLog.error("unable to get web recorder", throwable);
             return WebErrorRecorder.NULL_RECORDER;
         }
     }

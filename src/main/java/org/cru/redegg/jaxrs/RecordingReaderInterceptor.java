@@ -3,7 +3,7 @@ package org.cru.redegg.jaxrs;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.util.Log;
+import org.cru.redegg.util.ErrorLog;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -12,9 +12,7 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * @author Matt Drees
@@ -27,7 +25,7 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
     WebErrorRecorder recorder;
 
     @Inject
-    Log log;
+    ErrorLog errorLog;
 
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException
@@ -51,7 +49,7 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
         }
         catch (Throwable throwable)
         {
-            log.error("unable to record entity", throwable);
+            errorLog.error("unable to record entity", throwable);
         }
     }
 

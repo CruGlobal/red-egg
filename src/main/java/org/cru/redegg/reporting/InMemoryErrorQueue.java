@@ -4,7 +4,7 @@ import com.google.common.base.Throwables;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.api.Fallback;
-import org.cru.redegg.util.Log;
+import org.cru.redegg.util.ErrorLog;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
@@ -36,7 +36,7 @@ public class InMemoryErrorQueue implements ErrorQueue
     ErrorReporter fallbackReporter;
 
     @Inject
-    Log log;
+    ErrorLog errorLog;
 
     @PreDestroy
     public void shutdown() throws InterruptedException
@@ -59,7 +59,7 @@ public class InMemoryErrorQueue implements ErrorQueue
                 }
                 catch (Throwable t)
                 {
-                    log.error("unable to send error report; using fallback reporter", t);
+                    errorLog.error("unable to send error report; using fallback reporter", t);
 
                     try
                     {
@@ -67,7 +67,7 @@ public class InMemoryErrorQueue implements ErrorQueue
                     }
                     catch (Throwable t2)
                     {
-                        log.error("unable to send error report with fallback reporter", t2);
+                        errorLog.error("unable to send error report with fallback reporter", t2);
                         //swallow t2
                     }
 

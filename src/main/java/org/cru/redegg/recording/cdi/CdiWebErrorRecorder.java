@@ -1,17 +1,15 @@
 package org.cru.redegg.recording.cdi;
 
 import com.google.common.collect.Multimap;
-import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
-import org.cru.redegg.util.Log;
+import org.cru.redegg.util.ErrorLog;
 import org.joda.time.DateTime;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import java.lang.reflect.Method;
@@ -40,7 +38,7 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
     ErrorQueue queue;
 
     @Inject
-    Log log;
+    ErrorLog errorLog;
 
 
     WebContext webContext = new WebContext();
@@ -174,7 +172,7 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
         }
         catch (Throwable t)
         {
-            log.error("unable to record thrown exception due to the following secondary exception; " +
+            errorLog.error("unable to record thrown exception due to the following secondary exception; " +
                       "logging and swallowing instead to avoid masking original", t);
         }
         return this;
