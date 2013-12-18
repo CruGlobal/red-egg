@@ -18,6 +18,7 @@
     <version.arquillian_core>1.1.2.Final</version.arquillian_core>
     <wildfly.arquillian.version>8.0.0.Beta1</wildfly.arquillian.version>
     <jboss.as.arquillian.version>7.2.0.Final</jboss.as.arquillian.version>
+    <resteasy.version>3.0.5.Final</resteasy.version>
   </properties>
 
   <dependencyManagement>
@@ -90,13 +91,13 @@
 
 
     <dependency>
+      <!-- jax-rs not required, but we hook into it if it's there -->
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
-      <version>3.0.4.Final</version>
+      <version>${resteasy.version}</version>
+      <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-
-
 
 
 
@@ -106,6 +107,7 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-core</artifactId>
       <version>1.3</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -143,12 +145,14 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>1.9.5</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
       <version>0.2</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
