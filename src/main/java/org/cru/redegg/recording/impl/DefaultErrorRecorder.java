@@ -15,6 +15,7 @@ import org.cru.redegg.reporting.api.ErrorQueue;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -128,8 +129,48 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     @Override
     public void error() {
         checkNotSent();
+        addAdditionalContextIfPossible();
         queue.enqueue(buildReport());
         sentError = true;
+    }
+
+    public void addAdditionalContextIfPossible()
+    {
+        addLocalHost();
+        if (systemProperties == null)
+        {
+            try
+            {
+                systemProperties = System.getProperties();
+            }
+            catch (SecurityException ignored)
+            {
+            }
+        }
+        if (environmentVariables == null)
+        {
+            try
+            {
+                environmentVariables = System.getenv();
+            }
+            catch (SecurityException ignored)
+            {
+            }
+        }
+    }
+
+    private void addLocalHost()
+    {
+        if (localHost == null)
+        {
+            try
+            {
+                localHost = InetAddress.getLocalHost();
+            }
+            catch (UnknownHostException ignored)
+            {
+            }
+        }
     }
 
 

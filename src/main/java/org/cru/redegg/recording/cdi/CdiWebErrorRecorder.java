@@ -142,6 +142,7 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
         webContext.setFinish(finish);
         if (error || defaultRecorder.wereErrorsAdded())
         {
+            defaultRecorder.addAdditionalContextIfPossible();
             ErrorReport report = defaultRecorder.buildReport();
             report.addWebContext(webContext);
             queue.enqueue(report);
