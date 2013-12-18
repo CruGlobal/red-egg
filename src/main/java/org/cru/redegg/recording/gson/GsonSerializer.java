@@ -26,7 +26,10 @@ public class GsonSerializer implements Serializer
     @Override
     public String toString(Object value)
     {
-        return gson.toJson(value);
+        if (value instanceof String)
+            return (String) value;
+        else
+            return gson.toJson(value);
     }
 
     @Override
