@@ -2,8 +2,10 @@ package org.cru.redegg.it;
 
 import com.google.common.collect.ImmutableList;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
+import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
@@ -20,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -143,9 +146,15 @@ public class EndToEndIT
     @Path("/explosions")
     public static class ApiThatErrors
     {
+
+        @Inject
+        //TODO: set up dependencies such that user can just inject ErrorRecorder
+        WebErrorRecorder recorder;
+
         @POST
         public void boom()
         {
+            recorder.recordContext("fun fact:", "I'm about to blow");
             throw new IllegalStateException("kablooie!");
         }
 
