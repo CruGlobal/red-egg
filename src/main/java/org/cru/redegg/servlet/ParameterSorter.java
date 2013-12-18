@@ -33,8 +33,6 @@ public class ParameterSorter
 
     Sort sort(HttpServletRequest request) {
 
-        //HttpServletRequest does not provide generic API
-        @SuppressWarnings("unchecked")
         Map<String, String[]> parameterMap = request.getParameterMap();
         Set<String> keys = parameterMap.keySet();
 
