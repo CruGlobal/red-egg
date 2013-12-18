@@ -251,10 +251,10 @@ public class ErrbitXmlPayload
     // we'll stick it in the request cgi-data block
     private void writeOtherUsefulInformation() throws XMLStreamException
     {
+        writeVariables(helper.getDetails(report));
         writeVariables(helper.prefixKeys("context:", RedEggCollections.flatten(report.getContext())));
         writeVariables(helper.prefixKeys("environment:", report.getEnvironmentVariables()));
         writeVariables(helper.prefixKeys("system-property:", report.getSystemProperties()));
-        writeVariables(helper.getDetails(report));
     }
 
     private void writeVariables(Map<String, ?> cgiVariables) throws XMLStreamException
