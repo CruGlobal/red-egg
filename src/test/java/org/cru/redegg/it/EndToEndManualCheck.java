@@ -1,8 +1,5 @@
 package org.cru.redegg.it;
 
-import com.google.common.collect.ImmutableList;
-import org.cru.redegg.recording.api.ParameterSanitizer;
-import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
@@ -14,10 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
@@ -25,10 +18,8 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import static javax.ws.rs.client.Entity.form;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -66,9 +57,9 @@ public class EndToEndManualCheck
 
     @Test
     @RunAsClient
-    public void test()
+    public void testThrown()
     {
-        WebTarget target = getWebTarget().path("explosions");
+        WebTarget target = getWebTarget().path("explosions/throw");
         Form form = new Form()
             .param("secret", "letmein")
             .param("well-known-fact", "matt's a swell guy");
@@ -76,6 +67,20 @@ public class EndToEndManualCheck
             .request()
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(500));
+    }
+
+    @Test
+    @RunAsClient
+    public void testLogged()
+    {
+        WebTarget target = getWebTarget().path("explosions/log");
+        Form form = new Form()
+            .param("secret", "letmein")
+            .param("better-known-fact", "matt's got a swell wife");
+        Response appResponse = target
+            .request()
+            .post(form(form));
+        assertThat(appResponse.getStatus(), equalTo(204));
     }
 
 
@@ -98,49 +103,6 @@ public class EndToEndManualCheck
             config.setSourcePrefix("src/test/java");
             return config;
         }
-    }
-
-    public static class TestSanitizer implements ParameterSanitizer
-    {
-
-        @Override
-        public List<String> sanitizeQueryStringParameter(
-            String parameterName, List<String> parameterValues)
-        {
-            return sanitize(parameterName, parameterValues);
-        }
-
-        @Override
-        public List<String> sanitizePostBodyParameter(
-            String parameterName, List<String> parameterValues)
-        {
-            return sanitize(parameterName, parameterValues);
-        }
-
-        private List<String> sanitize(String parameterName, List<String> parameterValues)
-        {
-            if (parameterName.equals("secret"))
-                return ImmutableList.of("<redacted>");
-            else
-                return parameterValues;
-        }
-    }
-
-    @Path("/explosions")
-    public static class ApiThatErrors
-    {
-
-        @Inject
-        //TODO: set up dependencies such that user can just inject ErrorRecorder
-        WebErrorRecorder recorder;
-
-        @POST
-        public void boom()
-        {
-            recorder.recordContext("fun fact:", "I'm about to blow");
-            throw new IllegalStateException("kablooie!");
-        }
-
     }
 
 }
