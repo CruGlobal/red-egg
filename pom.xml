@@ -186,7 +186,7 @@
       <!-- An optional Arquillian testing profile that executes tests
           in a remote JBoss AS instance -->
       <!-- Run with: mvn clean test -Parq-jbossas-remote -->
-      <id>arq-jbossas-remote-as7</id>
+      <id>arq-jbossas-remote</id>
       <dependencies>
         <dependency>
           <groupId>org.jboss.as</groupId>
@@ -197,8 +197,9 @@
       </dependencies>
     </profile>
 
+    <!-- Run with: mvn clean test -Parq-wildfly-remote -->
     <profile>
-      <id>jbossas-remote-wildfly-8</id>
+      <id>arq-wildfly-remote</id>
       <dependencies>
         <dependency>
           <groupId>org.wildfly</groupId>
