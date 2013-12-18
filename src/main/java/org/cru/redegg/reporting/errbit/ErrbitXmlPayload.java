@@ -242,16 +242,10 @@ public class ErrbitXmlPayload
 
     private String guessPackageFromDots(String className)
     {
-        List<String> segments = Arrays.asList(className.split("\\."));
-        for (int i = segments.size() - 2; i >= 0; i--)
-        {
-            String segment = segments.get(i);
-            assert !segment.isEmpty() : "unexpected class name: " + className;
-            String firstLetter = segment.substring(0, 1);
-            if (firstLetter.toLowerCase().equals(firstLetter))
-                return Joiner.on('.').join(segments.subList(0, i + 1));
-        }
-        return null;
+        int index = className.lastIndexOf('.');
+        if (index == -1)
+            return null;
+        return className.substring(0, index);
     }
 
     private String prefix()
