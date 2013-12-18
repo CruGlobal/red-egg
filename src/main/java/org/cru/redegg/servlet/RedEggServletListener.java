@@ -67,7 +67,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         WebErrorRecorder recorder = errorRecorder.get()
             // capture the current time as early as possible
             .recordRequestStart(clock.dateTime())
-            .recordRequestUrl(request.getRequestURI())
+            .recordRequestUrl(request.getRequestURL().toString())
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));
 
