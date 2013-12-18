@@ -11,7 +11,7 @@ import javax.inject.Inject;
 /**
  * @author Matt Drees
  */
-public class ErrbitReporter implements ErrorReporter
+public class AirbrakeReporter implements ErrorReporter
 {
 
     @Inject
