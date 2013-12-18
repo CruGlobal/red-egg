@@ -11,6 +11,7 @@ import org.cru.redegg.servlet.ParameterSorter;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.util.Clock;
+import org.cru.redegg.util.ErrorLog;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -47,9 +48,11 @@ public class RedEggAppenderIntegrationTest
         return new DefaultDeployment()
             .getArchive()
             .addClass(RedEggServletListener.class)
+            .addClass(Lifecycle.class)
             .addClass(ParameterSorter.class)
             .addClass(RedEggHandler.class)
             .addClass(RedEggAppender.class)
+            .addClass(ErrorLog.class)
             .addClass(Clock.class)
 
             .addPackage(RecorderFactory.class.getPackage());
