@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.Logger;
+import org.cru.redegg.Lifecycle;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
@@ -27,11 +28,6 @@ import java.util.Enumeration;
 @WebListener
 public class RedEggServletListener implements ServletContextListener, ServletRequestListener {
 
-    private static Logger log = Logger.getLogger(RedEggServletListener.class);
-
-    private Logger log4jRoot;
-    private java.util.logging.Logger julRoot;
-
 
     @Inject
     RecorderFactory recorderFactory;
@@ -45,43 +41,17 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     @Inject
     ParameterSorter sorter;
 
+    @Inject
+    Lifecycle lifecycle;
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        addLog4jAppender();
-        addJulHandler();
-    }
-
-    RedEggAppender log4jAppender;
-    RedEggHandler julHandler;
-
-    private void addLog4jAppender() {
-        log4jAppender = new RedEggAppender(recorderFactory);
-        log4jRoot = Logger.getRootLogger();
-        log4jRoot.info("adding log4j appender");
-        log4jRoot.addAppender(log4jAppender);
-        Enumeration allAppenders = log4jRoot.getAllAppenders();
-        boolean none = !allAppenders.hasMoreElements();
-        if (none)
-            log4jRoot.info("log4j appenders appear to be disabled");
-    }
-
-    private void addJulHandler() {
-        julHandler = new RedEggHandler(recorderFactory);
-        julRoot = java.util.logging.Logger.getLogger(null);
-        julRoot.info("adding j.u.l. handler");
-        julRoot.addHandler(julHandler);
-
-        if (julRoot.getHandlers().length == 0)
-            julRoot.info("j.u.l. handlers appear to be disabled");
+        lifecycle.start();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        log4jRoot.info("removing log4j appender");
-        log4jRoot.removeAppender(log4jAppender);
-
-        julRoot.info("removing j.u.l. handler");
-        julRoot.removeHandler(julHandler);
+        lifecycle.stop();
     }
 
     @Override
