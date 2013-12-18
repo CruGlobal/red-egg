@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -9,7 +10,7 @@ public class ErrbitConfig
 {
     private String key;
     private String environmentName;
-    private URL endpoint;
+    private URI endpoint;
 
     public String getKey()
     {
@@ -21,12 +22,12 @@ public class ErrbitConfig
         this.key = key;
     }
 
-    public URL getEndpoint()
+    public URI getEndpoint()
     {
         return endpoint;
     }
 
-    public void setEndpoint(URL endpoint)
+    public void setEndpoint(URI endpoint)
     {
         this.endpoint = endpoint;
     }

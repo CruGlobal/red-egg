@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -36,9 +37,9 @@ public class ErrbitInterfaceTest
         config.setEnvironmentName("interface-test");
         try
         {
-            config.setEndpoint(new URL(endpoint));
+            config.setEndpoint(new URI(endpoint));
         }
-        catch (MalformedURLException e)
+        catch (URISyntaxException e)
         {
             throw new RuntimeException(e);
         }

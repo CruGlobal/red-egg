@@ -16,6 +16,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -54,7 +55,7 @@ public class NativeErrbitReporter implements ErrorReporter
         configure(urlConnection);
         sendXmlPayload(payload, urlConnection);
         int responseCode = urlConnection.getResponseCode();
-        if (responseCode != 200)
+        if (responseCode >= 400)
         {
             throw new RuntimeException(
                 "notice not successfully submitted; response code: " + responseCode +
@@ -114,10 +115,10 @@ public class NativeErrbitReporter implements ErrorReporter
 
     private HttpURLConnection buildConnection() throws IOException
     {
-        URL endpoint = config.getEndpoint();
+        URI endpoint = config.getEndpoint();
         if (endpoint == null)
             throw new IllegalArgumentException("no endpoint is configured!");
 
-        return (HttpURLConnection) endpoint.openConnection();
+        return (HttpURLConnection) endpoint.toURL().openConnection();
     }
 }
