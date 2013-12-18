@@ -6,11 +6,13 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 
 /**
  * @author Matt Drees
  */
+@Alternative
 public class AirbrakeReporter implements ErrorReporter
 {
 

@@ -6,6 +6,7 @@ import java.net.URL;
 /**
  * @author Matt Drees
  */
+@Empty
 public class ErrbitConfig
 {
     private String key;
