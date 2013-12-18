@@ -215,10 +215,16 @@ public class ErrbitXmlPayload
             return fileName;
         for (String basePackage : config.getApplicationBasePackages())
         {
-            if (packageName.startsWith(basePackage))
+            if (packageName.startsWith(basePackage) && notGenerated(fileName))
                 return "[PROJECT_ROOT]/" + prefix() + toPath(packageName) + fileName;
         }
         return fileName;
+    }
+
+    private boolean notGenerated(String fileName)
+    {
+        //most generated classes use a dollar sign in the 'pretend' filename, I believe
+        return !fileName.contains("$");
     }
 
     private String toPath(String packageName)
