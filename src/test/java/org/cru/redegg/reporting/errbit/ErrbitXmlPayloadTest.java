@@ -37,6 +37,8 @@ public class ErrbitXmlPayloadTest
         config = new ErrbitConfig();
         config.setEnvironmentName("unittest");
         config.setKey("secrets");
+        config.getApplicationBasePackages().add("org.cru.redegg");
+        config.setSourcePrefix("src/test/java");
     }
 
     @Test

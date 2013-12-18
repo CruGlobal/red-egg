@@ -113,6 +113,8 @@ public class EndToEndIT
             config.setEndpoint(new URI("http://localhost:8080/end-to-end-test/rest/dummyapi/notices"));
             config.setKey("abc");
             config.setEnvironmentName("integration-testing");
+            config.getApplicationBasePackages().add("org.cru.redegg");
+            config.setSourcePrefix("src/test/java");
             return config;
         }
     }

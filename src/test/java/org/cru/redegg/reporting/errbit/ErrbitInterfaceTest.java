@@ -35,6 +35,8 @@ public class ErrbitInterfaceTest
         ErrbitConfig config = new ErrbitConfig();
         config.setKey(key);
         config.setEnvironmentName("interface-test");
+        config.getApplicationBasePackages().add("org.cru.redegg");
+        config.setSourcePrefix("src/test/java");
         try
         {
             config.setEndpoint(new URI(endpoint));

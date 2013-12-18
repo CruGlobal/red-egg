@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
@@ -10,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.cru.redegg.util.RedEggCollections.flatten;
@@ -197,11 +200,69 @@ public class ErrbitXmlPayload
             writer.writeAttribute("number", String.valueOf(lineNumber));
         String fileName = element.getFileName();
         if (fileName != null)
-            writer.writeAttribute("file", fileName);
+            writer.writeAttribute("file", decorate(fileName, element.getClassName()));
         String method = element.getClassName() + '.' + element.getMethodName();
         writer.writeAttribute("method", method);
         writer.writeEndElement();
     }
+
+    //Add path information, if it appears to be a class from this application.
+    //This causes Errbit to render a link to the source file instead of using plain text.
+    private String decorate(String fileName, String className)
+    {
+        String packageName = determinePackageName(className);
+        if (packageName == null)
+            return fileName;
+        for (String basePackage : config.getApplicationBasePackages())
+        {
+            if (packageName.startsWith(basePackage))
+                return "[PROJECT_ROOT]/" + prefix() + toPath(packageName) + fileName;
+        }
+        return fileName;
+    }
+
+    private String toPath(String packageName)
+    {
+        return packageName.replace('.', '/') + "/";
+    }
+
+    private String determinePackageName(String className)
+    {
+        try
+        {
+            Package classPackage = Class.forName(className).getPackage();
+            return classPackage == null ? null : classPackage.getName();
+        }
+        catch (ClassNotFoundException ignored)
+        // not all classes on the stack may be visible to this class's classloader
+        {
+            return guessPackageFromDots(className);
+        }
+    }
+
+    private String guessPackageFromDots(String className)
+    {
+        List<String> segments = Arrays.asList(className.split("\\."));
+        for (int i = segments.size() - 2; i >= 0; i--)
+        {
+            String segment = segments.get(i);
+            assert !segment.isEmpty() : "unexpected class name: " + className;
+            String firstLetter = segment.substring(0, 1);
+            if (firstLetter.toLowerCase().equals(firstLetter))
+                return Joiner.on('.').join(segments.subList(0, i + 1));
+        }
+        return null;
+    }
+
+    private String prefix()
+    {
+        String prefix = config.getSourcePrefix();
+        if (prefix.isEmpty() || prefix.endsWith("/"))
+            return prefix;
+        else
+            return prefix + "/";
+    }
+
     private void writeRequest() throws XMLStreamException
     {
         writer.writeStartElement("request");

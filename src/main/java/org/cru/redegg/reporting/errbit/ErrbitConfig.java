@@ -1,7 +1,10 @@
 package org.cru.redegg.reporting.errbit;
 
+import com.google.common.collect.Sets;
+
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 
 /**
  * @author Matt Drees
@@ -12,6 +15,9 @@ public class ErrbitConfig
     private String key;
     private String environmentName;
     private URI endpoint;
+
+    private String sourcePrefix = "src/main/java";
+    private Set<String> applicationBasePackages = Sets.newHashSet();
 
     public String getKey()
     {
@@ -41,5 +47,25 @@ public class ErrbitConfig
     public void setEnvironmentName(String environmentName)
     {
         this.environmentName = environmentName;
+    }
+
+    public String getSourcePrefix()
+    {
+        return sourcePrefix;
+    }
+
+    public void setSourcePrefix(String sourcePrefix)
+    {
+        this.sourcePrefix = sourcePrefix;
+    }
+
+    public Set<String> getApplicationBasePackages()
+    {
+        return applicationBasePackages;
+    }
+
+    public void setApplicationBasePackages(Set<String> applicationBasePackages)
+    {
+        this.applicationBasePackages = applicationBasePackages;
     }
 }
