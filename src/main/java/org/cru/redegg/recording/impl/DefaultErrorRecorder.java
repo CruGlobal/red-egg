@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
@@ -201,7 +202,16 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
         for (LogRecord logRecord : logRecords)
         {
-            serializedLogRecords.add(formatter.format(logRecord));
+            StacktraceSimplifier simplifier = new StacktraceSimplifier(logRecord.getThrown());
+            simplifier.replaceStacktraceIfRedundant();
+            try
+            {
+                serializedLogRecords.add(formatter.format(logRecord));
+            }
+            finally
+            {
+                simplifier.restoreOriginalStacktraces();
+            }
         }
         return serializedLogRecords;
     }
@@ -227,4 +237,63 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             return environmentVariables;
     }
 
+    private class StacktraceSimplifier
+    {
+        private Throwable loggedThrowable;
+
+        Map<Throwable, StackTraceElement[]> originalStacktraces = Maps.newHashMapWithExpectedSize(4);
+
+        public StacktraceSimplifier(Throwable loggedThrowable)
+        {
+            this.loggedThrowable = loggedThrowable;
+        }
+
+        private void replaceStacktraceIfRedundant()
+        {
+            if (loggedThrowable == null)
+                return;
+            if (isThrowableRedundant())
+            {
+                removeStackTrace();
+            }
+        }
+
+        private void removeStackTrace()
+        {
+            for (Throwable link : Throwables.getCausalChain(loggedThrowable))
+            {
+                StackTraceElement[] originalStacktrace = link.getStackTrace();
+                originalStacktraces.put(link, originalStacktrace);
+
+                StackTraceElement[] newStackTrace = new StackTraceElement[1];
+                StackTraceElement dummy = new StackTraceElement("...(" + originalStacktrace.length  + " redundant stack frames removed)", "", "", 0);
+                newStackTrace[0] = dummy;
+                link.setStackTrace(newStackTrace);
+            }
+        }
+
+        private boolean isThrowableRedundant()
+        {
+            for (Throwable recordedThrowable : getThrown())
+            {
+                for (Throwable link : Throwables.getCausalChain(recordedThrowable))
+                {
+                    if (link == loggedThrowable)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void restoreOriginalStacktraces()
+        {
+            for (Map.Entry<Throwable, StackTraceElement[]> entry : originalStacktraces.entrySet())
+            {
+                Throwable t = entry.getKey();
+                t.setStackTrace(entry.getValue());
+            }
+        }
+    }
 }
