@@ -80,8 +80,8 @@ public class ErrbitXmlPayload
     {
         writer.writeStartElement("notifier");
         writeElementWithContent("name", "red-egg");
-        writeElementWithContent("version", "1-SNAPSHOT"); //TODO: programatically drive this
-        writeElementWithContent("url", "https://github.com/CruGloba/red-egg");
+        writeElementWithContent("version", "1-SNAPSHOT"); //TODO: programmatically drive this
+        writeElementWithContent("url", "https://github.com/CruGlobal/red-egg");
         writer.writeEndElement();
     }
 
