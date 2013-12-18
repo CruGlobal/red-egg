@@ -301,8 +301,8 @@ public class ErrbitXmlPayload
     private void writeCgiVariables(WebContext webContext) throws XMLStreamException
     {
         writer.writeStartElement("cgi-data");
-        Map<String, Object> cgiVariables = helper.toCgiVariables(RedEggCollections.flatten(webContext.getHeaders()));
-        writeVariables(cgiVariables);
+        Map<String, Object> flattenedHeaders = RedEggCollections.flatten(webContext.getHeaders());
+        writeVariables(helper.toCgiVariables(flattenedHeaders));
         writeVariables(helper.getOtherWebContextDetails(webContext));
         writeOtherUsefulInformation();
         writer.writeEndElement();
