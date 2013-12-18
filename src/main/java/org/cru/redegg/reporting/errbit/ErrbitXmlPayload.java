@@ -147,7 +147,7 @@ public class ErrbitXmlPayload
         writeBacktraceLineMessage("caused by: " + cause.toString());
         writeStackTraceElements(cause.getStackTrace(), smallestCommonFrame);
         if (framesInCommon != 0)
-            writeBacktraceLineMessage("\t... " + framesInCommon + " more");
+            writeBacktraceLineMessage("    ... " + framesInCommon + " more");
     }
 
 
