@@ -75,8 +75,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
         recorder
             .recordRequestQueryParameters(sort.queryParameters)
-            .recordRequestPostParameters(sort.postParameters)
-        ;
+            .recordRequestPostParameters(sort.postParameters);
     }
 
     private Multimap<String, String> getHeadersAsMultimap(HttpServletRequest request) {
