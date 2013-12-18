@@ -1,6 +1,7 @@
 package org.cru.redegg.reporting.errbit;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
@@ -314,16 +315,30 @@ public class ErrbitXmlPayload
     {
         writeVariables(helper.getDetails(report));
         writeVariables(helper.prefixKeys("context:", RedEggCollections.flatten(report.getContext())));
-        writeVariables(helper.prefixKeys("environment:", report.getEnvironmentVariables()));
-        writeVariables(helper.prefixKeys("system-property:", report.getSystemProperties()));
+        // the prefixes are shortened because the errbit display has limited width,
+        // and the key column is too wide to be practical
+        writeVariables(helper.prefixKeys("env:", report.getEnvironmentVariables()));
+        writeVariables(helper.prefixKeys("sysprop:", report.getSystemProperties()));
     }
 
     private void writeVariables(Map<String, ?> cgiVariables) throws XMLStreamException
     {
         for (Map.Entry<String, ?> entry : cgiVariables.entrySet())
         {
-            writeVar(entry.getKey(), entry.getValue().toString());
+            writeVar(abbreviateIfNecessary(entry.getKey()), entry.getValue().toString());
         }
+    }
+
+    private String abbreviateIfNecessary(String key)
+    {
+        int limit = 35;
+        String truncationIndicator = "...";
+        if (key.length() > limit)
+        {
+            return key.substring(0, limit - truncationIndicator.length()) + truncationIndicator;
+        }
+        else
+            return key;
     }
 
     private void writeParameters(WebContext webContext) throws XMLStreamException

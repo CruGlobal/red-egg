@@ -153,7 +153,7 @@ public class ErrbitXmlPayloadTest
         assertThat(xml, containsString("<action>public void doSomething(java.lang.String)</action>"));
         assertThat(xml, containsString("<var key=\"lang\">[en_au, en]</var>"));
         assertThat(xml, containsString("<var key=\"context:conferenceId\">10912</var>"));
-        assertThat(xml, containsString("<var key=\"environment:JAVA_OPTS\">-Xmx 512m</var>"));
+        assertThat(xml, containsString("<var key=\"env:JAVA_OPTS\">-Xmx 512m</var>"));
         assertThat(xml, containsString("<var key=\"HTTP_X_PROXY\">[proxy.somewhere.org, proxy.somewhereelse.org]</var>"));
         assertThat(xml, containsString("<var key=\"Server Hostname\">testserver.cru.org</var>"));
         assertThat(xml, containsString("<guid>ABE4234-FASFA</guid>"));
