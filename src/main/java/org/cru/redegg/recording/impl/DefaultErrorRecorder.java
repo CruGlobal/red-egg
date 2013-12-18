@@ -8,10 +8,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import org.cru.redegg.recording.api.Serializer;
-import org.cru.redegg.reporting.api.ErrorQueue;
-import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.recording.api.ErrorRecorder;
+import org.cru.redegg.recording.api.Serializer;
+import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.api.ErrorQueue;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
@@ -221,7 +222,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         if (systemProperties == null)
             return Collections.emptyMap();
 
-        Map<String, String> propertiesMap = Maps.newHashMapWithExpectedSize(systemProperties.size());
+        Map<String, String> propertiesMap = new TreeMap<String, String>();
         for (Map.Entry<Object, Object> entry : systemProperties.entrySet())
         {
             propertiesMap.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
@@ -233,8 +234,8 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     {
         if (environmentVariables == null)
             return Collections.emptyMap();
-        else
-            return environmentVariables;
+
+        return new TreeMap<String, String>(environmentVariables);
     }
 
     private class StacktraceSimplifier

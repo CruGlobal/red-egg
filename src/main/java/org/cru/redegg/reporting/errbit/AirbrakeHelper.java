@@ -9,6 +9,7 @@ import org.cru.redegg.reporting.WebContext;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,7 +99,7 @@ public class AirbrakeHelper
 
     Map<String, Object> prefixKeys(String prefix, Map<String, ?> map)
     {
-        Map<String, Object> prefixed = Maps.newHashMapWithExpectedSize(map.size());
+        Map<String, Object> prefixed = new LinkedHashMap<String, Object>(map.size());
         for (Map.Entry<String, ?> entry : map.entrySet())
         {
             prefixed.put(prefix + entry.getKey(), entry.getValue());
