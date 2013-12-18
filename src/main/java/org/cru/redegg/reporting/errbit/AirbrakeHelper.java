@@ -72,11 +72,11 @@ public class AirbrakeHelper
         Map<String, Object> otherWebDetails = Maps.newHashMap();
         if (webContext.getStart() != null)
         {
-            otherWebDetails.put("request started", formatter.print(webContext.getStart()));
+            otherWebDetails.put("Request Started", formatter.print(webContext.getStart()));
         }
         if (webContext.getFinish() != null)
         {
-            otherWebDetails.put("request finished", formatter.print(webContext.getFinish()));
+            otherWebDetails.put("Request Finished", formatter.print(webContext.getFinish()));
         }
         if (webContext.getMethod() != null)
         {
@@ -84,11 +84,11 @@ public class AirbrakeHelper
         }
         if (webContext.getEntityRepresentation() != null)
         {
-            otherWebDetails.put("http entity", webContext.getEntityRepresentation());
+            otherWebDetails.put("Http Entity", webContext.getEntityRepresentation());
         }
         if (webContext.getResponseStatus() != null)
         {
-            otherWebDetails.put("response status code", webContext.getResponseStatus());
+            otherWebDetails.put("Response Status Code", webContext.getResponseStatus());
         }
 
         return otherWebDetails;
