@@ -37,7 +37,7 @@ public class Lifecycle
 
     private void addJulHandler() {
         julHandler = new RedEggHandler(recorderFactory);
-        julRoot = java.util.logging.Logger.getLogger(null);
+        julRoot = java.util.logging.Logger.getLogger("");
         julRoot.info("adding j.u.l. handler");
         julRoot.addHandler(julHandler);
 
