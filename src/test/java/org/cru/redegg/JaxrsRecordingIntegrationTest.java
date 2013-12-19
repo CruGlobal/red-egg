@@ -116,6 +116,7 @@ public class JaxrsRecordingIntegrationTest
         expected.put("color", "red");
         verify(recorder).recordRequestQueryParameters(expected);
         verify(recorder).recordResponseStatus(200);
+        verify(recorder).recordComponent(FruitResource.class.getMethod("getFruit", String.class));
     }
 
 
@@ -133,6 +134,7 @@ public class JaxrsRecordingIntegrationTest
         Multimap<String, String> expected = LinkedHashMultimap.create();
         expected.put("color", "red");
         verify(recorder).recordRequestQueryParameters(expected);
+        verify(recorder).recordComponent(FruitResource.class.getMethod("deleteFruit", String.class));
     }
 
     @Test
