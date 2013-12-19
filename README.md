@@ -19,7 +19,7 @@ Make an `ErrbitConfig` producer.  For example:
     public class RedEggConfig
     {
         public
-        @Produces ErrbitConfig createConfig()
+        @Produces ErrbitConfig createConfig() throws URISyntaxException
         {
             ErrbitConfig config = new ErrbitConfig();
             config.setEndpoint(new URI("https://errors.uscm.org/notifier_api/v2/notices"));
