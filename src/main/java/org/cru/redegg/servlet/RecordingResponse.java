@@ -17,17 +17,17 @@ public class RecordingResponse extends HttpServletResponseWrapper
     int statusCode = -1;
 
     @Override
-    public void sendError(int sc) throws IOException
+    public void sendError(int statusCode) throws IOException
     {
-        statusCode = sc;
-        super.sendError(sc);
+        this.statusCode = statusCode;
+        super.sendError(statusCode);
     }
 
     @Override
-    public void sendError(int sc, String msg) throws IOException
+    public void sendError(int statusCode, String message) throws IOException
     {
-        statusCode = sc;
-        super.sendError(sc, msg);
+        this.statusCode = statusCode;
+        super.sendError(statusCode, message);
     }
 
     @Override
@@ -38,18 +38,18 @@ public class RecordingResponse extends HttpServletResponseWrapper
     }
 
     @Override
-    public void setStatus(int sc)
+    public void setStatus(int statusCode)
     {
-        statusCode = sc;
-        super.setStatus(sc);
+        this.statusCode = statusCode;
+        super.setStatus(statusCode);
     }
 
     @Override
     @Deprecated
-    public void setStatus(int sc, String sm)
+    public void setStatus(int statusCode, String statusMessage)
     {
-        statusCode = sc;
-        super.setStatus(sc, sm);
+        this.statusCode = statusCode;
+        super.setStatus(statusCode, statusMessage);
     }
 
     public int getStatusCode()
