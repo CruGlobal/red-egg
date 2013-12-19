@@ -6,8 +6,10 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import java.net.URI;
 
 /**
  * A reporter that uses Airbrake's java client:
@@ -35,7 +37,21 @@ public class AirbrakeReporter implements ErrorReporter
     @Inject
     ErrbitConfig config;
 
-    AirbrakeNotifier notifier = new AirbrakeNotifier(config.getEndpoint().toString());
+    AirbrakeNotifier notifier;
+
+    @PostConstruct
+    public void init()
+    {
+        URI endpoint = config.getEndpoint();
+        if (endpoint != null)
+        {
+            notifier = new AirbrakeNotifier(endpoint.toString());
+        }
+        else
+        {
+            notifier = new AirbrakeNotifier();
+        }
+    }
 
     public void send(ErrorReport report)
     {
