@@ -58,9 +58,7 @@ public class RedEggAirbreakNoticeBuilder extends AirbrakeNoticeBuilder
             environment(airbrakeHelper.getOtherWebContextDetails(webContext));
         }
 
-        //TODO: use errbit's user-attributes section for this.  Requires patching or ditching the Airbreak-Java lib.
         environment(airbrakeHelper.prefixKeys("user:", report.getUser()));
-
         environment(airbrakeHelper.prefixKeys("context:", RedEggCollections.flatten(report.getContext())));
         environment(airbrakeHelper.prefixKeys("environment:", report.getEnvironmentVariables()));
         environment(airbrakeHelper.prefixKeys("system-property:", report.getSystemProperties()));
