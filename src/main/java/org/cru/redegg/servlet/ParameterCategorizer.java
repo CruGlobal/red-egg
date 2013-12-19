@@ -54,33 +54,26 @@ public class ParameterCategorizer
 
         for (String param : keys)
         {
-            String queryString = request.getQueryString();
-            if (queryString != null && isQueryParameter(param, queryString))
-            {
-                List<String> sanitized = sanitizer.sanitizeQueryStringParameter(
-                    param,
-                    Arrays.asList(parameterMap.get(param)));
-                categorization.queryParameters.putAll(
-                    param,
-                    sanitized);
-            }
-            else
-            {
-                if (request.getMethod().equals("POST")) {
-                    List<String> sanitized = sanitizer.sanitizePostBodyParameter(
-                        param,
-                        Arrays.asList(parameterMap.get(param)));
-                    categorization.postParameters.putAll(
-                        param,
-                        sanitized);
-                }
-                else
-                {
-                    log.warn(String.format("parameter not in query string in %s request: %s", request.getMethod(), param));
-                }
-            }
+            categorizeParameter(param, request, parameterMap, categorization);
         }
         return categorization;
+    }
+
+    private void categorizeParameter(
+        String parameter,
+        HttpServletRequest request,
+        Map<String, String[]> parameterMap,
+        Categorization categorization)
+    {
+        String queryString = request.getQueryString();
+        if (queryString != null && isQueryParameter(parameter, queryString))
+        {
+            addQueryStringParameter(parameter, parameterMap, categorization);
+        }
+        else
+        {
+            addFormParameter(parameter, request, parameterMap, categorization);
+        }
     }
 
     /* need to verify the param is the 'parameter' part of the query string, and not just a value */
@@ -90,6 +83,40 @@ public class ParameterCategorizer
                 queryString.contains(';' + param + "=") || //believe it or not, ';' is a valid query param separator
                 queryString.equals(param) // eg. /soap/MyServiceEndpoint?wsdl
         );
+    }
+
+    private void addQueryStringParameter(
+        String parameter,
+        Map<String, String[]> parameterMap,
+        Categorization categorization)
+    {
+        List<String> sanitized = sanitizer.sanitizeQueryStringParameter(
+            parameter,
+            Arrays.asList(parameterMap.get(parameter)));
+        categorization.queryParameters.putAll(
+            parameter,
+            sanitized);
+    }
+
+    private void addFormParameter(
+        String parameter,
+        HttpServletRequest request,
+        Map<String, String[]> parameterMap,
+        Categorization categorization)
+    {
+        if (request.getMethod().equals("POST")) {
+            List<String> sanitized = sanitizer.sanitizePostBodyParameter(
+                parameter,
+                Arrays.asList(parameterMap.get(parameter)));
+            categorization.postParameters.putAll(
+                parameter,
+                sanitized);
+        }
+        else
+        {
+            log.warn(String.format("parameter not in query string in %s request: %s", request.getMethod(),
+                parameter));
+        }
     }
 
 }
