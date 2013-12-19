@@ -219,6 +219,11 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return Lists.newArrayList(removeCauses());
     }
 
+    /**
+     * Removes redundant throwables from the list.
+     * A throwable is redundant if it is a cause (directly or indirectly) for another exception in the list.
+     * Such causes will be printed when their parent is printed, and don't need to be printed separately.
+     */
     private Set<Throwable> removeCauses()
     {
         Set<Throwable> filtered = Sets.newLinkedHashSet(thrown);
