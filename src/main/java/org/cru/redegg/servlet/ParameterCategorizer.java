@@ -16,7 +16,7 @@ import java.util.Set;
 /**
 * @author Matt Drees
 */
-public class ParameterSorter
+public class ParameterCategorizer
 {
 
     private static Logger log = Logger.getLogger(RedEggServletListener.class);
@@ -25,27 +25,31 @@ public class ParameterSorter
     ParameterSanitizer sanitizer;
 
 
-    static class Sort
+    static class Categorization
     {
         Multimap<String, String> queryParameters;
         Multimap<String, String> postParameters;
     }
 
-    Sort sort(HttpServletRequest request) {
+    /**
+     * Determines which parameters are query string parameters, and which are form parameters.
+     * The servlet API doesn't readily give this information.
+     */
+    Categorization categorize(HttpServletRequest request) {
 
         Map<String, String[]> parameterMap = request.getParameterMap();
         Set<String> keys = parameterMap.keySet();
 
-        Sort sort = new Sort();
+        Categorization categorization = new Categorization();
         if (request.getMethod().equals("POST"))
         {
-            sort.queryParameters = LinkedHashMultimap.create(0, 1);
-            sort.postParameters = LinkedHashMultimap.create(keys.size(), 1);
+            categorization.queryParameters = LinkedHashMultimap.create(0, 1);
+            categorization.postParameters = LinkedHashMultimap.create(keys.size(), 1);
         }
         else
         {
-            sort.queryParameters = LinkedHashMultimap.create(keys.size(), 1);
-            sort.postParameters = ImmutableMultimap.of();
+            categorization.queryParameters = LinkedHashMultimap.create(keys.size(), 1);
+            categorization.postParameters = ImmutableMultimap.of();
         }
 
         for (String param : keys)
@@ -56,7 +60,7 @@ public class ParameterSorter
                 List<String> sanitized = sanitizer.sanitizeQueryStringParameter(
                     param,
                     Arrays.asList(parameterMap.get(param)));
-                sort.queryParameters.putAll(
+                categorization.queryParameters.putAll(
                     param,
                     sanitized);
             }
@@ -66,7 +70,7 @@ public class ParameterSorter
                     List<String> sanitized = sanitizer.sanitizePostBodyParameter(
                         param,
                         Arrays.asList(parameterMap.get(param)));
-                    sort.postParameters.putAll(
+                    categorization.postParameters.putAll(
                         param,
                         sanitized);
                 }
@@ -76,7 +80,7 @@ public class ParameterSorter
                 }
             }
         }
-        return sort;
+        return categorization;
     }
 
     /* need to verify the param is the 'parameter' part of the query string, and not just a value */

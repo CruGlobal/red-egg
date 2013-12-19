@@ -1,14 +1,10 @@
 package org.cru.redegg.servlet;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.log4j.Logger;
 import org.cru.redegg.Lifecycle;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.util.Clock;
 
 import javax.inject.Inject;
@@ -21,6 +17,8 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+
+import static org.cru.redegg.servlet.ParameterCategorizer.Categorization;
 
 /**
  * @author Matt Drees
@@ -39,7 +37,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     Clock clock;
 
     @Inject
-    ParameterSorter sorter;
+    ParameterCategorizer categorizer;
 
     @Inject
     Lifecycle lifecycle;
@@ -71,11 +69,11 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));
 
-        ParameterSorter.Sort sort = sorter.sort(request);
+        Categorization categorization = categorizer.categorize(request);
 
         recorder
-            .recordRequestQueryParameters(sort.queryParameters)
-            .recordRequestPostParameters(sort.postParameters);
+            .recordRequestQueryParameters(categorization.queryParameters)
+            .recordRequestPostParameters(categorization.postParameters);
     }
 
     private Multimap<String, String> getHeadersAsMultimap(HttpServletRequest request) {

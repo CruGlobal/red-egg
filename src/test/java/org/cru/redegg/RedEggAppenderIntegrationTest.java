@@ -7,7 +7,7 @@ import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
-import org.cru.redegg.servlet.ParameterSorter;
+import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.util.Clock;
@@ -30,7 +30,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-import java.util.List;
 import java.util.logging.LogRecord;
 
 import static org.mockito.Matchers.any;
@@ -49,7 +48,7 @@ public class RedEggAppenderIntegrationTest
             .getArchive()
             .addClass(RedEggServletListener.class)
             .addClass(Lifecycle.class)
-            .addClass(ParameterSorter.class)
+            .addClass(ParameterCategorizer.class)
             .addClass(RedEggHandler.class)
             .addClass(RedEggAppender.class)
             .addClass(ErrorLog.class)
