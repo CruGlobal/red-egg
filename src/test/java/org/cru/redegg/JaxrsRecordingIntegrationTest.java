@@ -12,6 +12,7 @@ import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.servlet.RedEggServletListener;
+import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.util.Clock;
@@ -25,9 +26,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.stubbing.defaultanswers.ReturnsEmptyValues;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -47,16 +45,13 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.client.Entity.form;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -308,26 +303,5 @@ public class JaxrsRecordingIntegrationTest
 
     }
 
-    /**
-     * from http://jakegoulding.com/blog/2012/01/09/stubbing-builder-pattern-in-mockito/
-     * Returns the mock object itself for any method that returns the specified class.
-     */
-    public static class AnswerWithSelf implements Answer<Object> {
-        private final Answer<Object> delegate = new ReturnsEmptyValues();
-        private final Class<?> clazz;
-
-        public AnswerWithSelf(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        public Object answer(InvocationOnMock invocation) throws Throwable {
-            Class<?> returnType = invocation.getMethod().getReturnType();
-            if (returnType.isAssignableFrom(clazz)) {
-                return invocation.getMock();
-            } else {
-                return delegate.answer(invocation);
-            }
-        }
-    }
 
 }
