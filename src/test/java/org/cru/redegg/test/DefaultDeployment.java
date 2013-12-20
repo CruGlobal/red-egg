@@ -20,17 +20,7 @@ public class DefaultDeployment {
     }
 
     public DefaultDeployment(String archiveName) {
-        try
-        {
-            resolver = Maven.resolver().offline().loadPomFromFile("pom.xml");
-        }
-        catch (Throwable e)
-        // arquillian was not displaying the stacktrace from an exception thrown from above, so we
-        // display stacktraces manually
-        {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        resolver = Maven.resolver().offline().loadPomFromFile("pom.xml");
 
         webArchive = getWebArchive(archiveName)
            .addAsWebInfResource("beans.xml");
