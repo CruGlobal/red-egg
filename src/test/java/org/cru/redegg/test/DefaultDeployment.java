@@ -40,8 +40,6 @@ public class DefaultDeployment {
            "uk.co.datumedge:hamcrest-json",
            "com.google.guava:guava",
            "joda-time:joda-time"
-//            "org.ccci:atlassian-hamcrest",
-//            "org.hamcrest:hamcrest-library"
         );
 
     }
