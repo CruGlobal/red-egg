@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -58,7 +59,7 @@ public class EndToEndIT
 
     @Test
     @RunAsClient
-    public void testThrown()
+    public void testThrown() throws InterruptedException
     {
         WebTarget target = getWebTarget().path("explosions/throw");
         Form form = new Form()
@@ -69,18 +70,18 @@ public class EndToEndIT
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(500));
 
+        waitABit();
         String report = getReport();
 
         assertThat(report, containsString("<api-key>abc</api-key>"));
         assertThat(report, containsString("kablooie!"));
         assertThat(report, containsString("matt's a swell guy"));
         assertThat(report, not(containsString("letmein")));
-
     }
 
     @Test
     @RunAsClient
-    public void testLogged()
+    public void testLogged() throws InterruptedException
     {
         WebTarget target = getWebTarget().path("explosions/log");
         Form form = new Form()
@@ -91,6 +92,7 @@ public class EndToEndIT
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(204));
 
+        waitABit();
         String report = getReport();
 
         assertThat(report, containsString("<api-key>abc</api-key>"));
@@ -98,6 +100,16 @@ public class EndToEndIT
         assertThat(report, containsString("matt's got a swell wife"));
         assertThat(report, containsString("204"));
         assertThat(report, not(containsString("letmein")));
+    }
+
+    /**
+     * On wildfly, this wait is necessary.
+     * Otherwise the error queueing & reporting takes a hair longer than the tests' followup getReport() request,
+     * and the dummy api won't have received the report yet.
+     */
+    private void waitABit() throws InterruptedException
+    {
+        TimeUnit.MILLISECONDS.sleep(100);
     }
 
     private String getReport()
