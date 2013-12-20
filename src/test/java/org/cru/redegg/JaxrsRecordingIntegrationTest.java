@@ -235,7 +235,7 @@ public class JaxrsRecordingIntegrationTest
         @javax.ws.rs.Produces({"application/json", "application/xml"})
         public Fruit getFruit(@QueryParam("color") String color)
         {
-            return new Fruit("red", 2.3);
+            return new Fruit(color, 2.3);
         }
 
         @DELETE
