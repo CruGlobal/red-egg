@@ -1,7 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
@@ -11,14 +10,10 @@ import org.cru.redegg.util.RedEggCollections;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static org.cru.redegg.util.RedEggCollections.flatten;
 
 /**
  * @author Matt Drees
@@ -96,7 +91,7 @@ public class ErrbitXmlPayload
         Multimap<String, String> context = report.getContext();
         if (context.containsKey("framework"))
         {
-            writeElementWithContent("framework", flatten(context).get("framework").toString());
+            writeElementWithContent("framework", RedEggCollections.flatten(context).get("framework").toString());
         }
     }
 
@@ -349,7 +344,7 @@ public class ErrbitXmlPayload
         Multimap<String, String> requestParameters = webContext.getCombinedQueryAndPostParameters();
         if (!requestParameters.isEmpty())
         {
-            for (Map.Entry<String, Object> entry : flatten(requestParameters).entrySet())
+            for (Map.Entry<String, Object> entry : RedEggCollections.flatten(requestParameters).entrySet())
             {
                 writeVar(entry.getKey(), entry.getValue().toString());
             }
