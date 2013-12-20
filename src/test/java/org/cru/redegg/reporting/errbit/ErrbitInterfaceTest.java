@@ -105,8 +105,8 @@ public class ErrbitInterfaceTest
         WebContext context = new WebContext();
         context.setComponent(TestResource.class.getMethod("doSomething", String.class));
         context.setEntityRepresentation("{\"color\": \"blue\", \"size\":12}");
-        context.setStart(new DateTime(2013, 12, 13, 14, 23, 37, 724));
-        context.setFinish(new DateTime(2013, 12, 13, 14, 23, 37, 493));
+        context.setStart(new DateTime(2013, 12, 13, 14, 23, 37, 493));
+        context.setFinish(new DateTime(2013, 12, 13, 14, 23, 37, 724));
         context.setHeaders(ImmutableMultimap.of(
             "Accept", "application/json",
             "Content-Type", "application/json",
