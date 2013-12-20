@@ -150,7 +150,7 @@ public class ErrbitXmlPayloadTest
         assertThat(xml, containsString("<line method=\"caused by: java.lang.NullPointerException\">"));
         assertThat(xml, containsString("<message>something bad happened</message>"));
         assertThat(xml, containsString("<component>TestResource</component>"));
-        assertThat(xml, containsString("<action>public void doSomething(java.lang.String)</action>"));
+        assertThat(xml, containsString("<action>doSomething(String)</action>"));
         assertThat(xml, containsString("<var key=\"lang\">[en_au, en]</var>"));
         assertThat(xml, containsString("<var key=\"context:conferenceId\">10912</var>"));
         assertThat(xml, containsString("<var key=\"env:JAVA_OPTS\">-Xmx 512m</var>"));

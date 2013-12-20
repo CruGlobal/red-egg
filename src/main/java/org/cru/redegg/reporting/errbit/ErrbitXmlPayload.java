@@ -2,6 +2,7 @@ package org.cru.redegg.reporting.errbit;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
@@ -12,6 +13,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -376,9 +378,25 @@ public class ErrbitXmlPayload
         {
             Class<?> declaringClass = webContext.getComponent().getDeclaringClass();
             writeElementWithContent("component", declaringClass.getSimpleName());
-            String methodName = webContext.getComponent().toGenericString();
-            writeElementWithContent("action", methodName.replace(declaringClass.getName() + ".", ""));
+            Method method = webContext.getComponent();
+            writeElementWithContent("action", buildSimplifiedMethodName(declaringClass, method));
         }
+    }
+
+    private String buildSimplifiedMethodName(Class<?> declaringClass, Method method)
+    {
+        return method.getName() + "(" + simpleParamList(method) + ")";
+    }
+
+    private String simpleParamList(Method method)
+    {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        List<String> parameterTypeNames = Lists.newArrayListWithCapacity(parameterTypes.length);
+        for (Class<?> aClass : parameterTypes)
+        {
+            parameterTypeNames.add(aClass.getSimpleName());
+        }
+        return Joiner.on(',').join(parameterTypeNames);
     }
 
     private void writeServerEnvironment() throws XMLStreamException
