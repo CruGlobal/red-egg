@@ -33,4 +33,9 @@ public class ErrorLog
             //not sure what to do here.  Likely things are messed up enough that there's nothing reasonable to do.
         }
     }
+
+    public void warn(String message)
+    {
+        log.warn(message);
+    }
 }

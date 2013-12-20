@@ -39,10 +39,24 @@ public class InMemoryErrorQueue implements ErrorQueue
     ErrorLog errorLog;
 
     @PreDestroy
-    public void shutdown() throws InterruptedException
+    public void shutdown()
     {
         executorService.shutdown();
-        executorService.awaitTermination(20, TimeUnit.SECONDS);
+        try
+        {
+            int timeout = 20;
+            TimeUnit timeUnit = TimeUnit.SECONDS;
+            boolean completed = executorService.awaitTermination(timeout, timeUnit);
+            if (!completed)
+                errorLog.warn("unable to shut down report executor within " + timeout + " " + timeUnit.name().toLowerCase());
+        }
+        catch (InterruptedException e)
+        {
+            errorLog.error("report executor shutdown interrupted", e);
+            // Lifecycle interceptor methods may not throw checked exceptions.
+            // So to preserve the interruption, we have to set the interrupt flag.
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
