@@ -95,9 +95,9 @@ If you are using a Servlet 2.5 (or less) servlet container, add this to your web
         <listener-class>org.cru.redegg.servlet.RedEggServletListener</listener-class>
     </listener>
 
-Note: this currently requires a CDI environment.
+Note: This project currently requires a CDI environment.
 Servlet filters & listeners need CDI injection capability.
-This usually requires implementation-specific configuration
+In non-java-ee environments, this requires implementation-specific configuration
 (for example, see
 [Weld's servlet integration](http://docs.jboss.org/weld/reference/1.1.16.Final/en-US/html/environments.html#d0e5228)).
 
