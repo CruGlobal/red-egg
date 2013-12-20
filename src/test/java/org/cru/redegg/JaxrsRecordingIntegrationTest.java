@@ -78,6 +78,7 @@ public class JaxrsRecordingIntegrationTest
             .addClass(TestApplication.class)
             .addClass(Fruit.class)
             .addClass(FruitResource.class)
+            .addClass(AnswerWithSelf.class)
            ;
     }
 

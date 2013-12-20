@@ -51,7 +51,8 @@ public class RedEggAppenderIntegrationTest
             .addClass(ErrorLog.class)
             .addClass(Clock.class)
 
-            .addPackage(RecorderFactory.class.getPackage());
+            .addPackage(RecorderFactory.class.getPackage())
+            .addClass(AnswerWithSelf.class);
     }
 
 
