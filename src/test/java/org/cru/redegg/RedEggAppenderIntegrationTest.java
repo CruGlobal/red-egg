@@ -80,7 +80,7 @@ public class RedEggAppenderIntegrationTest
 
     @Test
     public void testJulErrorLogging() throws Exception {
-        java.util.logging.Logger.getLogger(null).severe("error from test");
+        java.util.logging.Logger.getLogger("").severe("error from test");
 
         verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
         verify(recorder, atLeast(1)).error();
