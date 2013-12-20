@@ -69,7 +69,16 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
             <class>org.cru.redegg.recording.api.NoOpParameterSanitizer</class>
         </alternatives>
 
+
+Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be combined) to accomplish this:
+
+1. Log the exception with Log4j or with java.util.logging (or make sure your framework does so),
+2. Throw the exception past the RedEgg filter, or
+3. Inject the WebErrorRecorder into one of your interceptors and call `recordThrown()`.
+
+
 If you are using a Servlet 3 (or greater) servlet container, you are done.
+
 If you are using a Servlet 2.5 (or less) servlet container, add this to your web.xml:
 
     <filter>
@@ -96,5 +105,5 @@ Eventually I'd like CDI to be optional, since not all Cru apps use CDI (yet).
 
 
 You can optionally record additional context information that will make your error reports more useful.
-Inject an ErrorRecorder into an appropriate class (likely an interceptor),
+Inject a WebErrorRecorder into an appropriate class (likely an interceptor or decorator),
 and use the `recordContext()` and/or `recordUser()` methods.
