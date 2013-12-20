@@ -25,6 +25,11 @@ Make an `ErrbitConfig` producer.  For example:
             config.setEndpoint(new URI("https://errors.uscm.org/notifier_api/v2/notices"));
             config.setKey("paste-your-app's-key-here");
             config.setEnvironmentName(determineEnvironmentName());
+
+            // configure which classes will be treated as belonging to this app
+            config.getApplicationBasePackages().addAll(
+                ImmutableList.of("org.cru.yourapp"));
+
             return config;
         }
 
