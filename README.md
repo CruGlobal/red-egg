@@ -68,12 +68,14 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
                     return parameterValues;
             }
         }
-2. or use the NoOp sanitizer by adding this to your `<alternatives>` list in beans.xml:
+2. or use the NoOp sanitizer by 'producing' it in your config class, as such:
 
-        <alternatives>
-            <class>org.cru.redegg.recording.api.NoOpParameterSanitizer</class>
-        </alternatives>
+        public class RedEggConfig
+        {
+            //...
 
+            @Produces ParameterSanitizer sanitizer = new NoOpParameterSanitizer();
+        }
 
 Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be combined) to accomplish this:
 
