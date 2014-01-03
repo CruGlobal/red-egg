@@ -1,14 +1,18 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
 
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.LogRecord;
+
+import static org.cru.redegg.util.RedEggStrings.truncate;
 
 /**
  * @author Matt Drees
@@ -143,8 +147,29 @@ public class ErrorReport {
         }
         else
         {
-            return getFirstLogMessage();
+            return shortenLogMessage(getFirstLogMessage());
         }
+    }
+
+    private Optional<String> shortenLogMessage(Optional<String> firstLogMessage)
+    {
+        return firstLogMessage.transform(new Function<String, String>()
+        {
+            public String apply(String input)
+            {
+                String stripped = stripStacktrace(input);
+                return truncate(stripped, 100, "...");
+            }
+
+            private String stripStacktrace(String input)
+            {
+                int stacktraceBegin = input.indexOf("\n\tat ");
+                if (stacktraceBegin != -1)
+                    return input.substring(0, stacktraceBegin);
+                else
+                    return input;
+            }
+        });
     }
 
     private Optional<String> getFirstLogMessage()
