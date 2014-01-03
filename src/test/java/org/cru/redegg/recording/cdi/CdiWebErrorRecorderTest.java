@@ -68,14 +68,14 @@ public class CdiWebErrorRecorderTest
     }
 
     @Test
-    public void clientErrorShouldTriggerAReportWhenErrorWasManuallyCalled()
+    public void clientErrorShouldNotTriggerAReportEvenWhenErrorWasManuallyCalled()
     {
         recorder.recordThrown(new BadRequestException());
         recorder.recordResponseStatus(400);
         recorder.error();
         recorder.recordRequestComplete(new DateTime());
 
-        verify(queue).enqueue(any(ErrorReport.class));
+        verify(queue, never()).enqueue(any(ErrorReport.class));
     }
 
 }
