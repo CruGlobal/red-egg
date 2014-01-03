@@ -44,8 +44,9 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private Map<String, String> environmentVariables;
     private Properties systemProperties;
 
-    boolean error;
-    boolean sentError;
+    private boolean error;
+    private boolean sentError;
+    private boolean userError;
 
     @Inject
     public DefaultErrorRecorder(ErrorQueue queue, Serializer serializer) {
@@ -188,6 +189,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
         report.setEnvironmentVariables(getEnvironmentVariables());
         report.setSystemProperties(getSystemProperties());
+        report.setUserError(userError);
 
         return report;
     }
@@ -282,6 +284,11 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             return Collections.emptyMap();
 
         return new TreeMap<String, String>(environmentVariables);
+    }
+
+    public void userError()
+    {
+        userError = true;
     }
 
     private class StacktraceSimplifier

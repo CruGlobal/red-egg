@@ -28,7 +28,7 @@ public class ErrorReport {
     private String localHostAddress;
     private Map<String, String> environmentVariables;
     private Map<String, String> systemProperties;
-
+    private boolean userError;
 
     private WebContext webContext;
 
@@ -180,4 +180,13 @@ public class ErrorReport {
             return Optional.of(logRecords.get(0));
     }
 
+    public void setUserError(boolean userError)
+    {
+        this.userError = userError;
+    }
+
+    public boolean isUserError()
+    {
+        return userError;
+    }
 }
