@@ -15,6 +15,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import static org.cru.redegg.util.RedEggStrings.truncate;
+
 /**
  * @author Matt Drees
  */
@@ -322,21 +324,10 @@ public class ErrbitXmlPayload
     {
         for (Map.Entry<String, ?> entry : cgiVariables.entrySet())
         {
-            writeVar(abbreviateIfNecessary(entry.getKey()), entry.getValue().toString());
+            writeVar(truncate(entry.getKey(), 35, "..."), entry.getValue().toString());
         }
     }
 
-    private String abbreviateIfNecessary(String key)
-    {
-        int limit = 35;
-        String truncationIndicator = "...";
-        if (key.length() > limit)
-        {
-            return key.substring(0, limit - truncationIndicator.length()) + truncationIndicator;
-        }
-        else
-            return key;
-    }
 
     private void writeParameters(WebContext webContext) throws XMLStreamException
     {

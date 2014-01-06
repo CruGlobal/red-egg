@@ -3,7 +3,6 @@ package org.cru.redegg.reporting.errbit;
 import com.google.common.collect.Sets;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Set;
 
 /**

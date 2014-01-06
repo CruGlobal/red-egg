@@ -5,18 +5,19 @@ import org.cru.redegg.recording.impl.DefaultErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -47,35 +48,75 @@ public class CdiWebErrorRecorderTest
     }
 
     @Test
-    public void anErrorShouldTriggerAReport()
+    public void anErrorShouldTriggerAServerErrorReport()
     {
         recorder.recordThrown(new InternalServerErrorException());
         recorder.recordResponseStatus(500);
         recorder.recordRequestComplete(new DateTime());
 
-        verify(queue).enqueue(any(ErrorReport.class));
+        verify(queue).enqueue(argThat(isServerError()));
     }
-
-
     @Test
-    public void clientErrorShouldNotTriggerAReport()
+    public void clientErrorShouldTriggerAUserErrorReport()
     {
         recorder.recordThrown(new BadRequestException());
         recorder.recordResponseStatus(400);
         recorder.recordRequestComplete(new DateTime());
 
-        verify(queue, never()).enqueue(any(ErrorReport.class));
+        verify(queue).enqueue(argThat(isUserError()));
     }
 
     @Test
-    public void clientErrorShouldTriggerAReportWhenErrorWasManuallyCalled()
+    public void clientErrorShouldTriggerAUserErrorReportWhenErrorWasManuallyCalled()
     {
         recorder.recordThrown(new BadRequestException());
         recorder.recordResponseStatus(400);
         recorder.error();
         recorder.recordRequestComplete(new DateTime());
 
-        verify(queue).enqueue(any(ErrorReport.class));
+        verify(queue).enqueue(argThat(isUserError()));
     }
 
+    private Matcher<ErrorReport> isServerError()
+    {
+        return new ErrorReportTypeSafeDiagnosingMatcher(false);
+    }
+
+    private Matcher<ErrorReport> isUserError()
+    {
+        return new ErrorReportTypeSafeDiagnosingMatcher(true);
+    }
+
+
+    private static class ErrorReportTypeSafeDiagnosingMatcher extends TypeSafeDiagnosingMatcher<ErrorReport>
+    {
+        private boolean expectedUserError;
+
+        public ErrorReportTypeSafeDiagnosingMatcher(boolean expectedUserError)
+        {
+            this.expectedUserError = expectedUserError;
+        }
+
+        @Override
+        protected boolean matchesSafely(
+            ErrorReport item, Description mismatchDescription)
+        {
+            if (item.isUserError() == expectedUserError) return true;
+            else
+            {
+                mismatchDescription
+                    .appendText("userError is ")
+                    .appendValue(item.isUserError());
+                return false;
+            }
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description
+                .appendText("a report whose userError property is ")
+                .appendValue(expectedUserError);
+        }
+    }
 }

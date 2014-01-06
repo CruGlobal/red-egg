@@ -1,11 +1,11 @@
 package org.cru.redegg.recording.cdi;
 
-import org.cru.redegg.recording.api.Serializer;
-import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
+import org.cru.redegg.reporting.api.ErrorQueue;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;

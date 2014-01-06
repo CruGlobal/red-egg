@@ -3,6 +3,7 @@ package org.cru.redegg.reporting.errbit;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import org.apache.log4j.Logger;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 
@@ -17,16 +18,20 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URI;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Matt Drees
- *
  * Reports errors to an Errbit instance using the v2.4 xml api.
+ *
+ * Errbit doesn't really distinguish user/client errors from server errors, so user errors are not reported.
+ * Instead, we just log (info) a short summary message.
+ *
+ * @author Matt Drees
  */
 public class NativeErrbitReporter implements ErrorReporter
 {
+
+    Logger log = Logger.getLogger(getClass());
 
     ErrbitConfig config;
 
@@ -37,6 +42,19 @@ public class NativeErrbitReporter implements ErrorReporter
     }
 
     public void send(ErrorReport report)
+    {
+        if (report.isUserError())
+            logUserWarning(report);
+        else
+            doSend(report);
+    }
+
+    private void logUserWarning(ErrorReport report)
+    {
+        log.info("user error: " + report.getRootErrorMessage().or("<message not available>"));
+    }
+
+    private void doSend(ErrorReport report)
     {
         ErrbitXmlPayload payload = new ErrbitXmlPayload(report, config);
         try

@@ -1,6 +1,5 @@
 package org.cru.redegg.recording.jul;
 
-import com.google.common.base.Preconditions;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.util.ErrorLog;

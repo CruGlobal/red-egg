@@ -1,12 +1,12 @@
 package org.cru.redegg.recording.cdi;
 
 import com.google.common.collect.Multimap;
-import org.cru.redegg.reporting.api.ErrorQueue;
-import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
+import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
 import org.joda.time.DateTime;
 
@@ -140,8 +140,12 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         completed = true;
         webContext.setFinish(finish);
-        if (error || (defaultRecorder.wereErrorsAdded() && !wasClientError()))
+        if (error || defaultRecorder.wereErrorsAdded())
         {
+            if (wasClientError())
+            {
+                defaultRecorder.userError();
+            }
             defaultRecorder.addAdditionalContextIfPossible();
             ErrorReport report = defaultRecorder.buildReport();
             report.addWebContext(webContext);

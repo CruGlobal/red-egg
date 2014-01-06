@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 
 import static javax.ws.rs.client.Entity.form;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
