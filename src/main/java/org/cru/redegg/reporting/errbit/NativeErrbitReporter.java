@@ -18,7 +18,6 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URI;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 /**

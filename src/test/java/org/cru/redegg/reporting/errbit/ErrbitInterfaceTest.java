@@ -1,17 +1,9 @@
 package org.cru.redegg.reporting.errbit;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.WebContext;
-import org.joda.time.DateTime;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
 
 /**
  * @author Matt Drees

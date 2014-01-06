@@ -1,18 +1,10 @@
 package org.cru.redegg.reporting.errbit;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.WebContext;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;

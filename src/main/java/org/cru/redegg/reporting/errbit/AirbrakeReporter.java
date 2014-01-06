@@ -4,7 +4,6 @@ import airbrake.AirbrakeNotice;
 import airbrake.AirbrakeNotifier;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.reporting.errbit.ErrbitConfig;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Alternative;

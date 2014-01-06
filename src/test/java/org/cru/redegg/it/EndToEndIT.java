@@ -1,7 +1,5 @@
 package org.cru.redegg.it;
 
-import com.google.common.collect.ImmutableList;
-import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
@@ -23,7 +21,6 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;

@@ -1,6 +1,5 @@
 package org.cru.redegg.recording.api;
 
-import javax.enterprise.context.RequestScoped;
 import java.net.InetAddress;
 import java.util.Map;
 import java.util.Properties;

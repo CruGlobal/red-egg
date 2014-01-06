@@ -4,13 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
 
-import javax.annotation.Nullable;
-import java.net.InetAddress;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.logging.LogRecord;
 
 import static org.cru.redegg.util.RedEggStrings.truncate;
 
