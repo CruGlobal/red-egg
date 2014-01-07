@@ -101,7 +101,7 @@ public class ErrbitXmlPayload
     {
         writer.writeStartElement("error");
         writeExceptionClassIfPossible();
-        writeMessageIfPossible();
+        writeMessage();
         writeBacktrace();
         writer.writeEndElement();
     }
@@ -114,12 +114,9 @@ public class ErrbitXmlPayload
         }
     }
 
-    private void writeMessageIfPossible() throws XMLStreamException
+    private void writeMessage() throws XMLStreamException
     {
-        if (report.getRootErrorMessage().isPresent())
-        {
-            writeElementWithContent("message", report.getRootErrorMessage().get());
-        }
+        writeElementWithContent("message", report.getRootErrorMessage().or("(message not available)"));
     }
 
     private void writeBacktrace() throws XMLStreamException
