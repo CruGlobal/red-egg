@@ -60,7 +60,8 @@ public class AirbrakeHelper
     {
         List<Throwable> thrown = report.getThrown();
         return thrown.size() > 1 ||
-               thrown.size() == 1 && thrown.get(0).getCause() != null;
+               (thrown.size() == 1 &&
+                thrown.get(0).getCause() != null);
     }
 
     private List<String> convertStacktraces(ErrorReport report)
