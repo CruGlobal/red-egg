@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.cru.redegg.util.RedEggStrings.truncate;
 
@@ -150,9 +151,22 @@ public class ErrbitXmlPayload
         if (fileName != null)
             writer.writeAttribute("file", decorate(fileName, element.getClassName()));
         String method = element.getClassName() + '.' + element.getMethodName();
-        writer.writeAttribute("method", method);
+        writer.writeAttribute("method", normalize(method));
         writer.writeEndElement();
     }
+
+    /**
+     * Reflection is very commonly used, and Sun/Oracle's implementation uses generated classes whose names can vary.
+     * To keep this from causing different Errbit fingerprints, we normalize the generated class names.
+     */
+    private String normalize(String method)
+    {
+        return SUN_REFLECTION_PATTERN.matcher(method).replaceFirst("$1_N_");
+    }
+
+    private static final Pattern SUN_REFLECTION_PATTERN =
+        Pattern.compile("(sun\\.reflect\\.GeneratedMethodAccessor)\\d+");
+
 
     //Add path information, if it appears to be a class from this application.
     //This causes Errbit to render a link to the source file instead of using plain text.
