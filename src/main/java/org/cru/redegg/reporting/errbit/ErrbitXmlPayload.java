@@ -1,6 +1,7 @@
 package org.cru.redegg.reporting.errbit;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
@@ -110,7 +111,7 @@ public class ErrbitXmlPayload
     {
         if (!report.getThrown().isEmpty())
         {
-            writeElementWithContent("class", report.getThrown().get(0).getClass().getName());
+            writeElementWithContent("class", report.getRootException().get().getClass().getName());
         }
     }
 
@@ -130,63 +131,13 @@ public class ErrbitXmlPayload
     private void writeBacktraceFor(Throwable throwable) throws XMLStreamException
     {
         StackTraceElement[] stackTrace = throwable.getStackTrace();
-        writeStackTraceElements(stackTrace, stackTrace.length - 1);
-        Throwable cause = throwable.getCause();
-        if (cause != null)
-        {
-            writeBacktraceForCause(cause, stackTrace);
-        }
-    }
-
-    private void writeBacktraceForCause(Throwable cause, StackTraceElement[] causedTrace) throws XMLStreamException
-    {
-        StackTraceElement[] causeTrace = cause.getStackTrace();
-        int smallestCommonFrame = determineIndexOfSmallestCommonFrame(causedTrace, causeTrace);
-        int framesInCommon = causeTrace.length - 1 - smallestCommonFrame;
-
-        writeBacktraceLineMessage("caused by: " + cause.toString());
-        writeStackTraceElements(cause.getStackTrace(), smallestCommonFrame);
-        if (framesInCommon != 0)
-            writeBacktraceLineMessage("    ... " + framesInCommon + " more");
-    }
-
-
-    private int determineIndexOfSmallestCommonFrame(StackTraceElement[] causedTrace, StackTraceElement[] causeTrace)
-    {
-        int causeIndex = causeTrace.length - 1;
-        int causedIndex = causedTrace.length - 1;
-        while (indicesValid(causeIndex, causedIndex) &&
-               causeTrace[causeIndex].equals(causedTrace[causedIndex]))
-        {
-            causeIndex--;
-            causedIndex--;
-        }
-        return causeIndex;
-    }
-
-    private void writeStackTraceElements(StackTraceElement[] stackTrace, int maxIndexToWrite) throws XMLStreamException
-    {
         if (stackTrace != null)
         {
-            for (int i=0; i <= maxIndexToWrite; i++)
+            for (StackTraceElement element : stackTrace)
             {
-                writeLine(stackTrace[i]);
+                writeLine(element);
             }
         }
-    }
-
-    private boolean indicesValid(int causeIndex, int causedIndex)
-    {
-        return causeIndex >= 0 && causedIndex >= 0;
-    }
-
-
-    //TODO: is this the right way to communicate 'non-frame' information?
-    private void writeBacktraceLineMessage(String message) throws XMLStreamException
-    {
-        writer.writeStartElement("line");
-        writer.writeAttribute("method", message);
-        writer.writeEndElement();
     }
 
     private void writeLine(StackTraceElement element) throws XMLStreamException

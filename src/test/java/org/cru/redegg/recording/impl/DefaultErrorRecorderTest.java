@@ -15,6 +15,7 @@ import java.util.logging.LogRecord;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
  * @author Matt Drees
@@ -78,6 +79,9 @@ public class DefaultErrorRecorderTest
 
         assertThat(report.getRootException().isPresent(), is(true));
         assertThat(report.getRootException().get(), CoreMatchers.<Throwable>sameInstance(root));
+        assertThat(report.getThrown(), hasSize(2));
+        assertThat(report.getThrown().get(0), CoreMatchers.<Throwable>sameInstance(root));
+        assertThat(report.getThrown().get(1), CoreMatchers.<Throwable>sameInstance(unrelated));
     }
 
     @Test
@@ -94,7 +98,9 @@ public class DefaultErrorRecorderTest
         ErrorReport report = recorder.buildReport();
 
         assertThat(report.getRootException().isPresent(), is(true));
-        assertThat(report.getRootException().get(), CoreMatchers.<Throwable>sameInstance(wrapper));
+        assertThat(report.getRootException().get(), CoreMatchers.<Throwable>sameInstance(root));
+        assertThat(report.getThrown(), hasSize(1));
+        assertThat(report.getThrown().get(0), CoreMatchers.<Throwable>sameInstance(wrapper));
     }
 
     @Test
