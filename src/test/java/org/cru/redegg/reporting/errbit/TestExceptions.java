@@ -9,7 +9,7 @@ public class TestExceptions
 
     public static NullPointerException boom()
     {
-        //The following should be line line 13
+        //The following should be on line 13.  This is depended upon by a test.
         return new NullPointerException();
     }
 
