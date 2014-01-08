@@ -56,9 +56,10 @@ public class ErrbitXmlPayloadTest
         assertThat(xml, startsWith("<?xml "));
         assertThat(xml, containsString("<notice version=\"2.4\">"));
         assertThat(xml, containsString("<api-key>secrets</api-key>"));
-        assertThat(xml, containsString("<class>java.lang.RuntimeException</class>"));
-        assertThat(xml, containsString("<line method=\"caused by: java.lang.NullPointerException\">"));
-        assertThat(xml, containsString("<message>something bad happened</message>"));
+        assertThat(xml, containsString("<class>java.lang.NullPointerException</class>"));
+        assertThat(xml, containsString("<message>java.lang.NullPointerException</message>"));
+        assertThat(xml, containsString("<backtrace><line number=\"13\" file=\"[PROJECT_ROOT]/src/test/java/" + TestExceptions.filename() + "\" method=\"" + TestExceptions.class.getName() + ".boom\"></line>"));
+        assertThat(xml, containsString("java.lang.RuntimeException"));
         assertThat(xml, containsString("<component>TestResource</component>"));
         assertThat(xml, containsString("<action>doSomething(String)</action>"));
         assertThat(xml, containsString("<var key=\"lang\">[en_au, en]</var>"));

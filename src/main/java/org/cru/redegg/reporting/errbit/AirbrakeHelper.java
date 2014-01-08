@@ -48,23 +48,30 @@ public class AirbrakeHelper
             String logSnippet = Joiner.on("\n").join(report.getLogRecords());
             otherDetails.put("Log Snippet", logSnippet);
         }
-        if (report.getThrown().size() > 1)
+        if (moreThanOneException(report))
         {
-            List<String> otherStackTraces = convertOtherStacktraces(report);
-            otherDetails.put("Other Thrown Exceptions", Joiner.on("\n\n").join(otherStackTraces));
+            List<String> stackTraces = convertStacktraces(report);
+            otherDetails.put("All Thrown Exceptions", Joiner.on("\n\n").join(stackTraces));
         }
         return otherDetails;
     }
 
-    private List<String> convertOtherStacktraces(ErrorReport report)
+    private boolean moreThanOneException(ErrorReport report)
     {
-        List<String> otherStackTraces = Lists.newArrayListWithCapacity(report.getThrown().size() - 1);
-        for (int i = 1; i < report.getThrown().size(); i++)
+        List<Throwable> thrown = report.getThrown();
+        return thrown.size() > 1 ||
+               (thrown.size() == 1 &&
+                thrown.get(0).getCause() != null);
+    }
+
+    private List<String> convertStacktraces(ErrorReport report)
+    {
+        List<String> stackTraces = Lists.newArrayListWithCapacity(report.getThrown().size());
+        for (Throwable throwable : report.getThrown())
         {
-            Throwable other = report.getThrown().get(i);
-            otherStackTraces.add(Throwables.getStackTraceAsString(other));
+            stackTraces.add(Throwables.getStackTraceAsString(throwable));
         }
-        return otherStackTraces;
+        return stackTraces;
     }
 
     public Map<String, Object> getOtherWebContextDetails(WebContext webContext)

@@ -12,7 +12,6 @@ import java.util.List;
 
 public class DummyReportBuilder
 {
-
     public ErrorReport buildDummyReport()
     {
         ErrorReport report = new ErrorReport();
@@ -39,7 +38,7 @@ public class DummyReportBuilder
             ));
         report.setThrown(
             ImmutableList.<Throwable>of(
-                new RuntimeException("something bad happened", boom())
+                TestExceptions.runtimeWrappingNullPointer()
             ));
         report.setContext(
             ImmutableMultimap.of(
@@ -57,11 +56,6 @@ public class DummyReportBuilder
             throw new AssertionError(e);
         }
         return report;
-    }
-
-    private NullPointerException boom()
-    {
-        return new NullPointerException();
     }
 
     private WebContext buildSampleWebContext() throws Exception

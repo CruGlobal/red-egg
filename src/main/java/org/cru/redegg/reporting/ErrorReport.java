@@ -2,6 +2,7 @@ package org.cru.redegg.reporting;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Multimap;
 
 import java.util.List;
@@ -126,7 +127,7 @@ public class ErrorReport {
 
         if (!thrown.isEmpty())
         {
-            return Optional.of(thrown.get(0));
+            return Optional.of(Throwables.getRootCause(thrown.get(0)));
         }
         else
         {
@@ -138,7 +139,7 @@ public class ErrorReport {
     {
         if (getRootException().isPresent())
         {
-            return Optional.fromNullable(getRootException().get().getMessage());
+            return Optional.of(getRootException().get().toString());
         }
         else
         {

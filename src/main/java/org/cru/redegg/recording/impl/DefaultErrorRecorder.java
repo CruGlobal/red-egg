@@ -92,7 +92,12 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             logRecords = Lists.newLinkedList();
         logRecords.add(record);
         if (isErrorLog(record))
-            error = true;
+        {
+            if (record.getThrown() != null)
+                recordThrown(record.getThrown());
+            else
+                error = true;
+        }
         return this;
     }
 
