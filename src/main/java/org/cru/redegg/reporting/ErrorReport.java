@@ -138,7 +138,7 @@ public class ErrorReport {
     {
         if (getRootException().isPresent())
         {
-            return Optional.fromNullable(getRootException().get().getMessage());
+            return Optional.fromNullable(getRootException().get().toString());
         }
         else
         {
