@@ -27,4 +27,10 @@ public class NoOpParameterSanitizer implements ParameterSanitizer
         return parameterValues;
     }
 
+    @Override
+    public List<String> sanitizeHeader(String headerName, List<String> headerValues)
+    {
+        return headerValues;
+    }
+
 }

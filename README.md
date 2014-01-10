@@ -60,6 +60,13 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
                 return sanitize(parameterName, parameterValues);
             }
 
+            @Override
+            public List<String> sanitizeHeader(
+                String headerName, List<String> headerValues)
+            {
+                return sanitize(headerName, headerValues);
+            }
+
             private List<String> sanitize(String parameterName, List<String> parameterValues)
             {
                 if (parameterName.equals("secret"))

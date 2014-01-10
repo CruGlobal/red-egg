@@ -16,4 +16,9 @@ public interface ParameterSanitizer
      */
     List<String> sanitizePostBodyParameter(String parameterName, List<String> parameterValues);
 
+    /**
+     * Sanitize a header
+     */
+    List<String> sanitizeHeader(String headerName, List<String> headerValues);
+
 }

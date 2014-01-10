@@ -3,6 +3,7 @@ package org.cru.redegg.servlet;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.Lifecycle;
+import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.Clock;
@@ -16,7 +17,9 @@ import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import static org.cru.redegg.servlet.ParameterCategorizer.Categorization;
 
@@ -41,6 +44,9 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Inject
     Lifecycle lifecycle;
+
+    @Inject
+    ParameterSanitizer sanitizer;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -88,11 +94,9 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         while (headerNames.hasMoreElements())
         {
             String headerName = headerNames.nextElement();
-            Enumeration<String> values = request.getHeaders(headerName);
-            while (values.hasMoreElements())
-            {
-                httpHeaders.put(headerName, values.nextElement());
-            }
+            List<String> rawValues = Collections.list(request.getHeaders(headerName));
+            List<String> sanitizedValues = sanitizer.sanitizeHeader(headerName, rawValues);
+            httpHeaders.putAll(headerName, sanitizedValues);
         }
 
         return httpHeaders;

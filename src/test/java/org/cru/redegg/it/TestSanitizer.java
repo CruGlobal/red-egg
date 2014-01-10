@@ -25,6 +25,12 @@ public class TestSanitizer implements ParameterSanitizer
         return sanitize(parameterName, parameterValues);
     }
 
+    @Override
+    public List<String> sanitizeHeader(String headerName, List<String> headerValues)
+    {
+        return sanitize(headerName, headerValues);
+    }
+
     private List<String> sanitize(String parameterName, List<String> parameterValues)
     {
         if (parameterName.equals("secret"))

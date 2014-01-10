@@ -64,6 +64,8 @@ public class EndToEndIT
             .param("well-known-fact", "matt's a swell guy");
         Response appResponse = target
             .request()
+            .header("secret", "ssshh")
+            .header("answer-to-life-universe-and-everything", "42")
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(500));
 
@@ -74,6 +76,8 @@ public class EndToEndIT
         assertThat(report, containsString("kablooie!"));
         assertThat(report, containsString("matt's a swell guy"));
         assertThat(report, not(containsString("letmein")));
+        assertThat(report, containsString("42"));
+        assertThat(report, not(containsString("ssshh")));
     }
 
     @Test
