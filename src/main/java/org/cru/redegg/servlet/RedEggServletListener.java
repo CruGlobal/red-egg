@@ -80,8 +80,6 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
         Multimap<String, String> httpHeaders = LinkedHashMultimap.create(8, 1);
 
-        //HttpServletRequest does not provide a generic API
-        @SuppressWarnings("unchecked")
         Enumeration<String> headerNames = request.getHeaderNames();
 
         if (headerNames == null)
@@ -90,7 +88,6 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         while (headerNames.hasMoreElements())
         {
             String headerName = headerNames.nextElement();
-            @SuppressWarnings("unchecked")
             Enumeration<String> values = request.getHeaders(headerName);
             while (values.hasMoreElements())
             {
