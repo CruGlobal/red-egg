@@ -205,6 +205,78 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <properties>
+        <arquillian.management.port>9999</arquillian.management.port>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>arq-wildfly-managed</id>
+      <!--
+        The build will start and stop Wildfly for integration tests.
+      -->
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-arquillian-container-remote</artifactId>
+          <version>${wildfly.arquillian.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <id>reserve-network-ports</id>
+                <goals>
+                  <goal>reserve-network-port</goal>
+                </goals>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <portNames>
+                    <portName>jboss.management.http.port</portName>
+                    <portName>jboss.http.port</portName>
+                    <portName>jboss.management.native.port</portName>
+                  </portNames>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.wildfly.plugins</groupId>
+            <artifactId>wildfly-maven-plugin</artifactId>
+            <version>1.0.0.Beta1</version>
+            <configuration>
+              <version>${wildfly.arquillian.version}</version>
+              <jvmArgs>
+                -Djboss.management.http.port=${jboss.management.http.port}
+                -Djboss.management.native.port=${jboss.management.native.port}
+                -Djboss.http.port=${jboss.http.port}
+              </jvmArgs>
+              <port>${jboss.management.http.port}</port>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+            </executions>
+
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <arquillian.management.port>${jboss.management.http.port}</arquillian.management.port>
+      </properties>
     </profile>
 
     <!-- Run with: mvn clean test -Parq-wildfly-remote -->
@@ -218,10 +290,21 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <properties>
+        <arquillian.management.port>9990</arquillian.management.port>
+      </properties>
     </profile>
   </profiles>
 
   <build>
+
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
     <plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>

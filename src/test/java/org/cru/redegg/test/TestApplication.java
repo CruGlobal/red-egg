@@ -6,8 +6,9 @@ import javax.ws.rs.core.Application;
 /**
 * @author Matt Drees
 */
-@ApplicationPath("rest")
+@ApplicationPath(TestApplication.REST_PATH)
 public class TestApplication extends Application
 {
 
+    static final String REST_PATH = "rest";
 }
