@@ -16,7 +16,7 @@
 
   <properties>
     <version.arquillian_core>1.1.2.Final</version.arquillian_core>
-    <wildfly.arquillian.version>8.0.0.Beta1</wildfly.arquillian.version>
+    <wildfly.arquillian.version>8.0.0.CR1</wildfly.arquillian.version>
     <jboss.as.arquillian.version>7.2.0.Final</jboss.as.arquillian.version>
     <resteasy.version>3.0.5.Final</resteasy.version>
 
