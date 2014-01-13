@@ -60,6 +60,13 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
                 return sanitize(parameterName, parameterValues);
             }
 
+            @Override
+            public List<String> sanitizeHeader(
+                String headerName, List<String> headerValues)
+            {
+                return sanitize(headerName, headerValues);
+            }
+
             private List<String> sanitize(String parameterName, List<String> parameterValues)
             {
                 if (parameterName.equals("secret"))
@@ -81,7 +88,7 @@ Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be 
 
 1. Log the exception with Log4j or with java.util.logging (or make sure your framework does so),
 2. Throw the exception past the RedEgg filter, or
-3. Inject the WebErrorRecorder into one of your interceptors and call `recordThrown()`.
+3. Inject the `WebErrorRecorder` into one of your interceptors and call `recordThrown()`.
 
 
 If you are using a Servlet 3 (or greater) servlet container, you are done.
