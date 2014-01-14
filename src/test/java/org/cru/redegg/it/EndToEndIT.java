@@ -117,7 +117,7 @@ public class EndToEndIT
      */
     private void waitABit() throws InterruptedException
     {
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(500);
     }
 
     private String getReport()
