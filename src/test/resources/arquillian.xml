@@ -30,4 +30,10 @@
    <defaultProtocol type="Servlet 3.0" />
    -->
 
+
+  <container qualifier="default" default="true">
+    <configuration>
+      <property name="managementPort">${arquillian.management.port}</property>
+    </configuration>
+  </container>
 </arquillian>

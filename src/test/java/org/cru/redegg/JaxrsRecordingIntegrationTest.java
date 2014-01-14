@@ -15,6 +15,7 @@ import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
+import org.cru.redegg.test.WebTargetBuilder;
 import org.cru.redegg.util.Clock;
 import org.hamcrest.Matcher;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -76,6 +77,7 @@ public class JaxrsRecordingIntegrationTest
             .addPackage(RecordingReaderInterceptor.class.getPackage())
 
             .addClass(TestApplication.class)
+            .addClass(WebTargetBuilder.class)
             .addClass(Fruit.class)
             .addClass(FruitResource.class)
             .addClass(AnswerWithSelf.class)
@@ -188,7 +190,9 @@ public class JaxrsRecordingIntegrationTest
 
     private WebTarget getWebTarget()
     {
-        return ClientBuilder.newClient().target("http://localhost:8080/jaxrs-test/rest/fruits");
+        return new WebTargetBuilder()
+               .getWebTarget("jaxrs-test")
+               .path("fruits");
     }
 
 

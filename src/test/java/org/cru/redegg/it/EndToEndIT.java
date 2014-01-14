@@ -3,9 +3,11 @@ package org.cru.redegg.it;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
+import org.cru.redegg.test.WebTargetBuilder;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
@@ -47,12 +50,16 @@ public class EndToEndIT
             .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
 
             .addClass(TestApplication.class)
+            .addClass(WebTargetBuilder.class)
             .addClass(ApiThatErrors.class)
             .addClass(DummyErrbitApi.class)
             .addClass(TestSanitizer.class)
             .addClass(ConfigProducer.class)
             ;
     }
+
+    @ArquillianResource
+    URL deploymentURL;
 
     @Test
     @RunAsClient
@@ -128,7 +135,7 @@ public class EndToEndIT
 
     private WebTarget getWebTarget()
     {
-        return ClientBuilder.newClient().target("http://localhost:8080/end-to-end-test/rest");
+        return new WebTargetBuilder().getWebTarget(deploymentURL);
     }
 
 
@@ -138,7 +145,7 @@ public class EndToEndIT
         public ErrbitConfig buildConfig() throws URISyntaxException
         {
             ErrbitConfig config = new ErrbitConfig();
-            config.setEndpoint(new URI("http://localhost:8080/end-to-end-test/rest/dummyapi/notices"));
+            config.setEndpoint(new WebTargetBuilder().getWebTarget("end-to-end-test").path("/dummyapi/notices").getUri());
             config.setKey("abc");
             config.setEnvironmentName("integration-testing");
             config.getApplicationBasePackages().add("org.cru.redegg");
