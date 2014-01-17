@@ -114,6 +114,7 @@ public class RedEggAppenderIntegrationTest
             // once for this test class, and there is no easy way to modify its reference to a new mock
             Mockito.reset(recorder, factory);
             when(factory.getRecorder()).thenReturn(recorder);
+            when(factory.getWebRecorder()).thenReturn(recorder);
         }
 
     }

@@ -1,5 +1,6 @@
 package org.cru.redegg.servlet;
 
+import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.ErrorLog;
 
@@ -23,7 +24,7 @@ import java.io.IOException;
 public class RedEggFilter implements Filter {
 
     @Inject
-    Provider<WebErrorRecorder> errorRecorder;
+    RecorderFactory factory;
 
     @Inject
     ErrorLog errorLog;
@@ -76,7 +77,7 @@ public class RedEggFilter implements Filter {
     {
         try
         {
-            return errorRecorder.get();
+            return factory.getWebRecorder();
         }
         catch (Throwable throwable)
         {

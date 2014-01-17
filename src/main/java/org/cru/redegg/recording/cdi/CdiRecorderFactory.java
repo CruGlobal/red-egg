@@ -37,4 +37,12 @@ public class CdiRecorderFactory implements RecorderFactory {
         else
             return new DefaultErrorRecorder(errorQueue, serializer);
     }
+
+    @Override
+    public WebErrorRecorder getWebRecorder()
+    {
+        if (!beanManager.getContext(RequestScoped.class).isActive())
+            throw new IllegalStateException("there is no web request being processed on this thread");
+        return webErrorRecorder;
+    }
 }

@@ -6,4 +6,5 @@ package org.cru.redegg.recording.api;
 public interface RecorderFactory {
 
     public ErrorRecorder getRecorder() ;
+    public WebErrorRecorder getWebRecorder() ;
 }
