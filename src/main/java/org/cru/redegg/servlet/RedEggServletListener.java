@@ -2,7 +2,7 @@ package org.cru.redegg.servlet;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.Lifecycle;
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
@@ -46,12 +46,12 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        lifecycle.start();
+        lifecycle.beginApplication();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        lifecycle.stop();
+        lifecycle.endApplication();
     }
 
     @Override

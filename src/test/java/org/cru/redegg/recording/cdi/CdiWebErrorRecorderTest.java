@@ -41,10 +41,10 @@ public class CdiWebErrorRecorderTest
     public void setup()
     {
         MockitoAnnotations.initMocks(this);
-        recorder = new CdiWebErrorRecorder();
-        recorder.queue = queue;
-        recorder.errorLog = errorLog;
-        recorder.defaultRecorder = new DefaultErrorRecorder(queue, serializer);
+        recorder = new CdiWebErrorRecorder(
+            new DefaultErrorRecorder(queue, serializer),
+            queue,
+            errorLog);
     }
 
     @Test

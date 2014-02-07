@@ -1,9 +1,10 @@
-package org.cru.redegg;
+package org.cru.redegg.boot;
 
 import org.apache.log4j.Logger;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.util.ProxyConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,14 +16,37 @@ import java.util.Enumeration;
 @ApplicationScoped
 public class Lifecycle
 {
+    private final RecorderFactory recorderFactory;
 
     @Inject
-    RecorderFactory recorderFactory;
+    public Lifecycle(RecorderFactory recorderFactory)
+    {
+        this.recorderFactory = recorderFactory;
+    }
+
+    @ProxyConstructor
+    @SuppressWarnings("UnusedDeclaration")
+    Lifecycle()
+    {
+        recorderFactory = null;
+    }
 
     private Logger log4jRoot;
     private java.util.logging.Logger julRoot;
     private RedEggAppender log4jAppender;
     private RedEggHandler julHandler;
+
+    public void beginApplication()
+    {
+        addLog4jAppender();
+        addJulHandler();
+    }
+
+    public void endApplication()
+    {
+        removeLog4jAppender();
+        removeJulHandler();
+    }
 
     private void addLog4jAppender() {
         log4jAppender = new RedEggAppender(recorderFactory);
@@ -45,18 +69,24 @@ public class Lifecycle
             julRoot.info("j.u.l. handlers appear to be disabled");
     }
 
-    public void start()
+    private void removeJulHandler()
     {
-        addLog4jAppender();
-        addJulHandler();
-    }
-
-    public void stop()
-    {
-        log4jRoot.info("removing log4j appender");
-        log4jRoot.removeAppender(log4jAppender);
-
         julRoot.info("removing j.u.l. handler");
         julRoot.removeHandler(julHandler);
     }
+
+    private void removeLog4jAppender()
+    {
+        log4jRoot.info("removing log4j appender");
+        log4jRoot.removeAppender(log4jAppender);
+    }
+
+    public void beginRequest()
+    {
+    }
+
+    public void endRequest()
+    {
+    }
+
 }

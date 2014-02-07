@@ -1,6 +1,7 @@
 package org.cru.redegg;
 
 
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;

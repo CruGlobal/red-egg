@@ -4,6 +4,7 @@ package org.cru.redegg;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
