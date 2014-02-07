@@ -4,7 +4,7 @@ import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.cdi.CdiWebErrorRecorder;
+import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.gson.GsonSerializer;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
 import org.cru.redegg.reporting.InMemoryErrorQueue;
@@ -77,7 +77,7 @@ public class Builder
 
     WebErrorRecorder buildWebRecorder()
     {
-        return new CdiWebErrorRecorder(
+        return new DefaultWebErrorRecorder(
             buildDefaultErrorRecorder(),
             buildQueue(),
             buildErrorLog());

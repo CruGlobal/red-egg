@@ -1,4 +1,4 @@
-package org.cru.redegg.recording.cdi;
+package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Multimap;
 import org.cru.redegg.recording.api.ErrorRecorder;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @author Matt Drees
  */
 @RequestScoped
-public class CdiWebErrorRecorder implements WebErrorRecorder {
+public class DefaultWebErrorRecorder implements WebErrorRecorder {
 
     private final DefaultErrorRecorder defaultRecorder;
 
@@ -38,7 +38,7 @@ public class CdiWebErrorRecorder implements WebErrorRecorder {
     private final ErrorLog errorLog;
 
     @Inject
-    public CdiWebErrorRecorder(
+    public DefaultWebErrorRecorder(
         DefaultErrorRecorder defaultRecorder,
         ErrorQueue queue,
         ErrorLog errorLog)
