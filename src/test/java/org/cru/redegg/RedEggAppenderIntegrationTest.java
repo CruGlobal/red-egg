@@ -45,12 +45,12 @@ public class RedEggAppenderIntegrationTest
         return new DefaultDeployment()
             .getArchive()
             .addClass(RedEggServletListener.class)
-            .addClass(Lifecycle.class)
             .addClass(ParameterCategorizer.class)
             .addClass(RedEggHandler.class)
             .addClass(RedEggAppender.class)
             .addClass(ErrorLog.class)
             .addClass(Clock.class)
+            .addPackage(Lifecycle.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
             .addClass(AnswerWithSelf.class);

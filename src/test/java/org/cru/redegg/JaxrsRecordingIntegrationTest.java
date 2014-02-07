@@ -69,7 +69,7 @@ public class JaxrsRecordingIntegrationTest
         return new DefaultDeployment("jaxrs-test.war")
             .getArchive()
             .addPackage(RedEggServletListener.class.getPackage())
-            .addClass(Lifecycle.class)
+            .addPackage(Lifecycle.class.getPackage())
             .addPackage(Clock.class.getPackage())
             .addPackage(RecorderFactory.class.getPackage())
             .addPackage(RedEggHandler.class.getPackage())

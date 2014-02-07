@@ -7,6 +7,7 @@ import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.Clock;
+import org.cru.redegg.boot.Initializer;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
@@ -46,6 +47,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        Initializer.initializeIfNecessary(this, sce.getServletContext());
         lifecycle.beginApplication();
     }
 
@@ -64,6 +66,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     private void requestInitialized(HttpServletRequest request)
     {
+        lifecycle.beginRequest();
         WebErrorRecorder recorder = recorderFactory.getWebRecorder()
             // capture the current time as early as possible
             .recordRequestStart(clock.dateTime())
@@ -100,11 +103,34 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
-        sre.getServletRequest();
-
         recorderFactory.getWebRecorder()
             .recordRequestComplete(clock.dateTime());
+        lifecycle.endRequest();
     }
 
 
+    public void setRecorderFactory(RecorderFactory recorderFactory)
+    {
+        this.recorderFactory = recorderFactory;
+    }
+
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
+    }
+
+    public void setCategorizer(ParameterCategorizer categorizer)
+    {
+        this.categorizer = categorizer;
+    }
+
+    public void setLifecycle(Lifecycle lifecycle)
+    {
+        this.lifecycle = lifecycle;
+    }
+
+    public void setSanitizer(ParameterSanitizer sanitizer)
+    {
+        this.sanitizer = sanitizer;
+    }
 }
