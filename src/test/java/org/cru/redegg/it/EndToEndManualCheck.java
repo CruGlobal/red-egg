@@ -48,7 +48,8 @@ public class EndToEndManualCheck
             .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
 
             .addClass(TestApplication.class)
-            .addClass(ApiThatErrors.class)
+            .addClass(AbstractApiThatErrors.class)
+            .addClass(ApiWithCdiThatErrors.class)
             .addClass(TestSanitizer.class)
             .addClass(ConfigProducer.class)
             ;
