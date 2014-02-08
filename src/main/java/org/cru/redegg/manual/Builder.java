@@ -2,6 +2,7 @@ package org.cru.redegg.manual;
 
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.ParameterSanitizer;
+import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
@@ -143,5 +144,10 @@ public class Builder
             queue = null;
         }
         this.errbitConfig = errbitConfig;
+    }
+
+    public RecorderFactory getRecorderFactory()
+    {
+        return buildRecorderFactory();
     }
 }
