@@ -66,7 +66,7 @@ public class JaxrsRecordingIntegrationTest
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment("jaxrs-test.war")
+        return DefaultDeployment.withCdi("jaxrs-test.war")
             .getArchive()
             .addPackage(RedEggServletListener.class.getPackage())
             .addPackage(Lifecycle.class.getPackage())

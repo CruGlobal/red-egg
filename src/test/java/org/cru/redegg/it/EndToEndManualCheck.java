@@ -41,7 +41,7 @@ public class EndToEndManualCheck
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment("end-to-end-test.war")
+        return DefaultDeployment.withCdi("end-to-end-test.war")
             .addAllRuntimeDependencies()
             .getArchive()
             //TODO: figure out how to not hard code the version here

@@ -42,7 +42,7 @@ public class RedEggAppenderIntegrationTest
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment()
+        return DefaultDeployment.withCdi()
             .getArchive()
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
