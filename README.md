@@ -4,8 +4,8 @@ The name comes from the name of the first
 [Flight Data Recorder](http://en.wikipedia.org/wiki/Flight_data_recorder).
 
 
-Usage
-=====
+Usage (in an environment with CDI)
+==================================
 Include the maven dependency:
 
     <dependency>
@@ -109,14 +109,34 @@ If you are using a Servlet 2.5 (or less) servlet container, add this to your web
         <listener-class>org.cru.redegg.servlet.RedEggServletListener</listener-class>
     </listener>
 
-Note: This project currently requires a CDI environment.
-Servlet filters & listeners need CDI injection capability.
-In non-java-ee environments, this requires implementation-specific configuration
-(for example, see
-[Weld's servlet integration](http://docs.jboss.org/weld/reference/1.1.16.Final/en-US/html/environments.html#d0e5228)).
+Usage (in an environment without CDI)
+=====================================
 
-Eventually I'd like CDI to be optional, since not all Cru apps use CDI (yet).
+To use in an app that doesn't have CDI, or that doesn't support CDI injection in servlet listeners,
+do everything in the CDI section above, but:
 
+In addition, add this to your `web.xml`:
+
+    <context-param>
+      <param-name>org.cru.redegg.no-cdi</param-name>
+      <param-value>true</param-value>
+    </context-param>
+
+Instead of using @Producer methods,
+configure a sanitizer and the errbit config via java code in your app's initialization code;
+it should look like the following:
+
+    RedEgg.configure()
+        .setParameterSanitizer(new MyCustomParameterSanitizer()) // or use the built-in NoOpParameterSanitizer
+        .setErrbitConfig(createConfig()); // see CDI section for example code
+
+Instead of injecting a `WebErrorRecorder`, look one up via the `RecorderFactory`.
+You can get the `RecorderFactory` via `RedEgg.getRecorderFactory()`.
+(The `RecorderFactory` is threadsafe and can be cached.)
+
+
+Additional Context
+==================
 
 You can optionally record additional context information that will make your error reports more useful.
 Inject a WebErrorRecorder into an appropriate class (likely an interceptor or decorator),
