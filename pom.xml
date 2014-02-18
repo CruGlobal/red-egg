@@ -21,6 +21,7 @@
     <resteasy.version>3.0.5.Final</resteasy.version>
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.target>1.6</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
