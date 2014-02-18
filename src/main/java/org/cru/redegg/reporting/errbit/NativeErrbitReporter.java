@@ -97,13 +97,16 @@ public class NativeErrbitReporter implements ErrorReporter
     private String readErrorStream(InputStream errorStream) throws IOException
     {
         Reader reader = new InputStreamReader(errorStream, Charsets.UTF_8);
+        boolean threw = true;
         try
         {
-            return CharStreams.toString(reader);
+            String content = CharStreams.toString(reader);
+            threw = false;
+            return content;
         }
         finally
         {
-            Closeables.closeQuietly(reader);
+            Closeables.close(reader, threw);
         }
     }
 
@@ -112,13 +115,15 @@ public class NativeErrbitReporter implements ErrorReporter
         urlConnection.connect();
         OutputStream outputStream = urlConnection.getOutputStream();
         Writer writer = new OutputStreamWriter(outputStream, Charsets.UTF_8);
+        boolean threw = true;
         try
         {
             payload.writeXmlTo(writer);
+            threw = false;
         }
         finally
         {
-            Closeables.closeQuietly(writer);
+            Closeables.close(writer, threw);
         }
     }
 
