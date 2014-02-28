@@ -73,6 +73,7 @@ public class Builder
 
     ManualRecorderFactory buildRecorderFactory()
     {
+        /* ManualRecorderFactory  is stateless; multiple instances are fine */
         return new ManualRecorderFactory(this);
     }
 
