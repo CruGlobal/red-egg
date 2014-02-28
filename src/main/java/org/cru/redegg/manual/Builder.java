@@ -125,11 +125,7 @@ public class Builder
 
     public synchronized void shutdown()
     {
-        if (queue != null)
-        {
-            queue.shutdown();
-            queue = null;
-        }
+        shutdownQueue();
     }
 
     public void setParameterSanitizer(ParameterSanitizer sanitizer)
@@ -139,12 +135,21 @@ public class Builder
 
     public void setErrbitConfig(ErrbitConfig errbitConfig)
     {
+        /*
+         * The current queue, if it exists, is using the old ErrbitConfig. It needs to go.
+         * A new queue (with the correct config) will be created when needed.
+         */
+        shutdownQueue();
+        this.errbitConfig = errbitConfig;
+    }
+
+    private void shutdownQueue()
+    {
         if (queue != null)
         {
             queue.shutdown();
             queue = null;
         }
-        this.errbitConfig = errbitConfig;
     }
 
     public RecorderFactory getRecorderFactory()
