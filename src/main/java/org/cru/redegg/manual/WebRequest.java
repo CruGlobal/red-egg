@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class WebRequest
 {
-    private static final ThreadLocal<WebRequest> requests = new ThreadLocal<WebRequest>();
+    private static final ThreadLocal<WebRequest> request = new ThreadLocal<WebRequest>();
 
     private final WebErrorRecorder recorder;
 
@@ -20,23 +20,23 @@ public class WebRequest
 
     public static boolean isActive()
     {
-        return requests.get() != null;
+        return request.get() != null;
     }
 
     public static WebRequest get()
     {
         checkState(isActive(), "there is no web request being processed on this thread");
-        return requests.get();
+        return request.get();
     }
 
     public static void begin(Builder builder)
     {
-        requests.set(new WebRequest(builder.buildWebRecorder()));
+        request.set(new WebRequest(builder.buildWebRecorder()));
     }
 
     public static void end()
     {
-        requests.remove();
+        request.remove();
     }
 
 
