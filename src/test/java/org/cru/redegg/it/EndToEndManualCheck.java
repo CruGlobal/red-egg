@@ -41,14 +41,15 @@ public class EndToEndManualCheck
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment("end-to-end-test.war")
+        return DefaultDeployment.withCdi("end-to-end-test.war")
             .addAllRuntimeDependencies()
             .getArchive()
             //TODO: figure out how to not hard code the version here
             .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
 
             .addClass(TestApplication.class)
-            .addClass(ApiThatErrors.class)
+            .addClass(AbstractApiThatErrors.class)
+            .addClass(ApiWithCdiThatErrors.class)
             .addClass(TestSanitizer.class)
             .addClass(ConfigProducer.class)
             ;

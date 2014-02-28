@@ -13,15 +13,49 @@ public class DefaultDeployment {
     private PomEquippedResolveStage resolver;
     private WebArchive webArchive;
 
-    public DefaultDeployment() {
-        this(null);
+    public static DefaultDeployment withCdi() {
+        return withCdi(null);
     }
 
-    public DefaultDeployment(String archiveName) {
+    public static DefaultDeployment withoutCdi(String archiveName)
+    {
+        DefaultDeployment deployment = new DefaultDeployment(archiveName);
+        deployment.addNoCdiWebXml();
+
+        /* This is a little odd for a 'without cdi' test, but we need it.
+         * Without it, if the container we are testing against has CDI capabilities,
+         * the red-egg jar will fail the deployment because of unsatisified dependencies.
+         * I want the testsuite to be able to be fully run against one container,
+         * and that means the container must have CDI.
+         */
+        deployment.addBeansXml();
+
+        return deployment;
+    }
+
+    private void addNoCdiWebXml()
+    {
+        webArchive.addAsWebInfResource("no-cdi-web.xml", "web.xml");
+    }
+
+
+    public static DefaultDeployment withCdi(String archiveName)
+    {
+        DefaultDeployment deployment = new DefaultDeployment(archiveName);
+        deployment.addBeansXml();
+        return deployment;
+    }
+
+    private void addBeansXml()
+    {
+        webArchive.addAsWebInfResource("beans.xml");
+    }
+
+
+    private DefaultDeployment(String archiveName) {
         resolver = Maven.resolver().offline().loadPomFromFile("pom.xml");
 
-        webArchive = getWebArchive(archiveName)
-           .addAsWebInfResource("beans.xml");
+        webArchive = getWebArchive(archiveName);
 
         addLibraries(
            "org.mockito:mockito-core",

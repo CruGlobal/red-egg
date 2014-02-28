@@ -1,10 +1,11 @@
 package org.cru.redegg.servlet;
 
+import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.boot.Initializer;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,13 +24,14 @@ import java.io.IOException;
 public class RedEggFilter implements Filter {
 
     @Inject
-    Provider<WebErrorRecorder> errorRecorder;
+    RecorderFactory factory;
 
     @Inject
     ErrorLog errorLog;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        Initializer.initializeIfNecessary(this, filterConfig.getServletContext());
     }
 
     @Override
@@ -76,7 +78,7 @@ public class RedEggFilter implements Filter {
     {
         try
         {
-            return errorRecorder.get();
+            return factory.getWebRecorder();
         }
         catch (Throwable throwable)
         {
@@ -92,5 +94,15 @@ public class RedEggFilter implements Filter {
 
     @Override
     public void destroy() {
+    }
+
+    public void setFactory(RecorderFactory factory)
+    {
+        this.factory = factory;
+    }
+
+    public void setErrorLog(ErrorLog errorLog)
+    {
+        this.errorLog = errorLog;
     }
 }

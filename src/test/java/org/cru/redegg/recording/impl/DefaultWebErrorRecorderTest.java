@@ -1,6 +1,7 @@
-package org.cru.redegg.recording.cdi;
+package org.cru.redegg.recording.impl;
 
 import org.cru.redegg.recording.api.Serializer;
+import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
@@ -23,10 +24,10 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Matt Drees
  */
-public class CdiWebErrorRecorderTest
+public class DefaultWebErrorRecorderTest
 {
 
-    CdiWebErrorRecorder recorder;
+    DefaultWebErrorRecorder recorder;
 
     @Mock
     ErrorQueue queue;
@@ -41,10 +42,10 @@ public class CdiWebErrorRecorderTest
     public void setup()
     {
         MockitoAnnotations.initMocks(this);
-        recorder = new CdiWebErrorRecorder();
-        recorder.queue = queue;
-        recorder.errorLog = errorLog;
-        recorder.defaultRecorder = new DefaultErrorRecorder(queue, serializer);
+        recorder = new DefaultWebErrorRecorder(
+            new DefaultErrorRecorder(queue, serializer),
+            queue,
+            errorLog);
     }
 
     @Test

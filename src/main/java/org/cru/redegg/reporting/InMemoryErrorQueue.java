@@ -5,6 +5,7 @@ import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.api.Fallback;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.ProxyConstructor;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
@@ -21,22 +22,41 @@ import java.util.concurrent.TimeUnit;
 public class InMemoryErrorQueue implements ErrorQueue
 {
 
-    //TODO: this should probably be configurable
-    ExecutorService executorService = new ThreadPoolExecutor(
-        0,
-        10,
-        5,
-        TimeUnit.MINUTES,
-        new ArrayBlockingQueue<Runnable>(1000));
+    private final ErrorReporter primaryErrorReporter;
+
+    private final ErrorReporter fallbackReporter;
+
+    private final ErrorLog errorLog;
+
+    private final ExecutorService executorService;
 
     @Inject
-    ErrorReporter primaryErrorReporter;
+    public InMemoryErrorQueue(
+        ErrorReporter primaryErrorReporter,
+        @Fallback ErrorReporter fallbackReporter,
+        ErrorLog errorLog)
+    {
+        this.primaryErrorReporter = primaryErrorReporter;
+        this.fallbackReporter = fallbackReporter;
+        this.errorLog = errorLog;
 
-    @Inject @Fallback
-    ErrorReporter fallbackReporter;
+        //TODO: this should probably be configurable
+        executorService = new ThreadPoolExecutor(
+            0,
+            10,
+            5,
+            TimeUnit.MINUTES,
+            new ArrayBlockingQueue<Runnable>(1000));
+    }
 
-    @Inject
-    ErrorLog errorLog;
+    @ProxyConstructor
+    @SuppressWarnings("UnusedDeclaration")
+    InMemoryErrorQueue() {
+        this.primaryErrorReporter = null;
+        this.fallbackReporter = null;
+        this.errorLog = null;
+        this.executorService = null;
+    }
 
     @PreDestroy
     public void shutdown()

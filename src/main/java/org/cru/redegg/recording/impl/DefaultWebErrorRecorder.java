@@ -1,4 +1,4 @@
-package org.cru.redegg.recording.cdi;
+package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Multimap;
 import org.cru.redegg.recording.api.ErrorRecorder;
@@ -8,6 +8,7 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.ProxyConstructor;
 import org.joda.time.DateTime;
 
 import javax.enterprise.context.RequestScoped;
@@ -28,20 +29,33 @@ import static com.google.common.base.Preconditions.checkState;
  * @author Matt Drees
  */
 @RequestScoped
-public class CdiWebErrorRecorder implements WebErrorRecorder {
+public class DefaultWebErrorRecorder implements WebErrorRecorder {
+
+    private final DefaultErrorRecorder defaultRecorder;
+
+    private final ErrorQueue queue;
+
+    private final ErrorLog errorLog;
 
     @Inject
-    DefaultErrorRecorder defaultRecorder;
+    public DefaultWebErrorRecorder(
+        DefaultErrorRecorder defaultRecorder,
+        ErrorQueue queue,
+        ErrorLog errorLog)
+    {
+        this.defaultRecorder = defaultRecorder;
+        this.queue = queue;
+        this.errorLog = errorLog;
+    }
 
+    @ProxyConstructor
+    protected DefaultWebErrorRecorder(){
+        defaultRecorder = null;
+        queue = null;
+        errorLog = null;
+    }
 
-    @Inject
-    ErrorQueue queue;
-
-    @Inject
-    ErrorLog errorLog;
-
-
-    WebContext webContext = new WebContext();
+    private final WebContext webContext = new WebContext();
 
     private boolean error;
     private boolean completed;

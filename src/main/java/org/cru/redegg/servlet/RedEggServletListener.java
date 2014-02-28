@@ -2,14 +2,14 @@ package org.cru.redegg.servlet;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.Lifecycle;
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.Clock;
+import org.cru.redegg.boot.Initializer;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequest;
@@ -34,9 +34,6 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     RecorderFactory recorderFactory;
 
     @Inject
-    Provider<WebErrorRecorder> errorRecorder;
-
-    @Inject
     Clock clock;
 
     @Inject
@@ -50,12 +47,13 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        lifecycle.start();
+        Initializer.initializeIfNecessary(this, sce.getServletContext());
+        lifecycle.beginApplication();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        lifecycle.stop();
+        lifecycle.endApplication();
     }
 
     @Override
@@ -68,7 +66,8 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     private void requestInitialized(HttpServletRequest request)
     {
-        WebErrorRecorder recorder = errorRecorder.get()
+        lifecycle.beginRequest();
+        WebErrorRecorder recorder = recorderFactory.getWebRecorder()
             // capture the current time as early as possible
             .recordRequestStart(clock.dateTime())
             .recordRequestUrl(request.getRequestURL().toString())
@@ -104,11 +103,34 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
-        sre.getServletRequest();
-
-        errorRecorder.get()
+        recorderFactory.getWebRecorder()
             .recordRequestComplete(clock.dateTime());
+        lifecycle.endRequest();
     }
 
 
+    public void setRecorderFactory(RecorderFactory recorderFactory)
+    {
+        this.recorderFactory = recorderFactory;
+    }
+
+    public void setClock(Clock clock)
+    {
+        this.clock = clock;
+    }
+
+    public void setCategorizer(ParameterCategorizer categorizer)
+    {
+        this.categorizer = categorizer;
+    }
+
+    public void setLifecycle(Lifecycle lifecycle)
+    {
+        this.lifecycle = lifecycle;
+    }
+
+    public void setSanitizer(ParameterSanitizer sanitizer)
+    {
+        this.sanitizer = sanitizer;
+    }
 }

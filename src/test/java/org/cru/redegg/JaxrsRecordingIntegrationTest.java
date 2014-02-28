@@ -4,6 +4,7 @@ package org.cru.redegg;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
@@ -65,10 +66,10 @@ public class JaxrsRecordingIntegrationTest
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment("jaxrs-test.war")
+        return DefaultDeployment.withCdi("jaxrs-test.war")
             .getArchive()
             .addPackage(RedEggServletListener.class.getPackage())
-            .addClass(Lifecycle.class)
+            .addPackage(Lifecycle.class.getPackage())
             .addPackage(Clock.class.getPackage())
             .addPackage(RecorderFactory.class.getPackage())
             .addPackage(RedEggHandler.class.getPackage())
@@ -304,6 +305,7 @@ public class JaxrsRecordingIntegrationTest
             // once for this test class, and there is no easy way to modify its reference to a new mock
             Mockito.reset(recorder, factory);
             when(factory.getRecorder()).thenReturn(recorder);
+            when(factory.getWebRecorder()).thenReturn(recorder);
         }
 
     }

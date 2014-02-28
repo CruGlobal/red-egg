@@ -1,28 +1,13 @@
 package org.cru.redegg.it;
 
-import org.cru.redegg.reporting.errbit.ErrbitConfig;
-import org.cru.redegg.test.DefaultDeployment;
-import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.test.WebTargetBuilder;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import javax.enterprise.inject.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -35,28 +20,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Matt Drees
  */
-
-@RunWith(Arquillian.class)
-public class EndToEndIT
+public abstract class AbstractEndToEndIT
 {
-
-    @Deployment
-    public static WebArchive deployment()  {
-
-        return new DefaultDeployment("end-to-end-test.war")
-            .addAllRuntimeDependencies()
-            .getArchive()
-            //TODO: figure out how to not hard code the version here
-            .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
-
-            .addClass(TestApplication.class)
-            .addClass(WebTargetBuilder.class)
-            .addClass(ApiThatErrors.class)
-            .addClass(DummyErrbitApi.class)
-            .addClass(TestSanitizer.class)
-            .addClass(ConfigProducer.class)
-            ;
-    }
 
     @ArquillianResource
     URL deploymentURL;
@@ -137,41 +102,5 @@ public class EndToEndIT
     {
         return new WebTargetBuilder().getWebTarget(deploymentURL);
     }
-
-
-    public static class ConfigProducer
-    {
-        @Produces
-        public ErrbitConfig buildConfig() throws URISyntaxException
-        {
-            ErrbitConfig config = new ErrbitConfig();
-            config.setEndpoint(new WebTargetBuilder().getWebTarget("end-to-end-test").path("/dummyapi/notices").getUri());
-            config.setKey("abc");
-            config.setEnvironmentName("integration-testing");
-            config.getApplicationBasePackages().add("org.cru.redegg");
-            config.setSourcePrefix("src/test/java");
-            return config;
-        }
-    }
-
-    @Path("/dummyapi/notices")
-    public static class DummyErrbitApi
-    {
-        volatile static String report;
-
-        @POST
-        public void postNotice(String xmlPayload)
-        {
-            report = xmlPayload;
-        }
-
-        @GET
-        public String getMostRecentReport()
-        {
-            return report;
-        }
-
-    }
-
 
 }

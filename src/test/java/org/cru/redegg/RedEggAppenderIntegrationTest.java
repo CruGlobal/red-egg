@@ -1,6 +1,7 @@
 package org.cru.redegg;
 
 
+import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
@@ -41,15 +42,15 @@ public class RedEggAppenderIntegrationTest
     @Deployment
     public static WebArchive deployment()  {
 
-        return new DefaultDeployment()
+        return DefaultDeployment.withCdi()
             .getArchive()
             .addClass(RedEggServletListener.class)
-            .addClass(Lifecycle.class)
             .addClass(ParameterCategorizer.class)
             .addClass(RedEggHandler.class)
             .addClass(RedEggAppender.class)
             .addClass(ErrorLog.class)
             .addClass(Clock.class)
+            .addPackage(Lifecycle.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
             .addClass(AnswerWithSelf.class);
@@ -114,6 +115,7 @@ public class RedEggAppenderIntegrationTest
             // once for this test class, and there is no easy way to modify its reference to a new mock
             Mockito.reset(recorder, factory);
             when(factory.getRecorder()).thenReturn(recorder);
+            when(factory.getWebRecorder()).thenReturn(recorder);
         }
 
     }

@@ -21,9 +21,13 @@ public class ParameterCategorizer
 
     private static Logger log = Logger.getLogger(RedEggServletListener.class);
 
-    @Inject
-    ParameterSanitizer sanitizer;
+    private final ParameterSanitizer sanitizer;
 
+    @Inject
+    public ParameterCategorizer(ParameterSanitizer sanitizer)
+    {
+        this.sanitizer = sanitizer;
+    }
 
     static class Categorization
     {
