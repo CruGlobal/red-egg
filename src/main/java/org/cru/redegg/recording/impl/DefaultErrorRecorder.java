@@ -47,6 +47,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private boolean error;
     private boolean sentError;
     private boolean userError;
+    private boolean mustNotify;
 
     @Inject
     public DefaultErrorRecorder(ErrorQueue queue, Serializer serializer) {
@@ -127,6 +128,15 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return this;
     }
 
+    @Override
+    public ErrorRecorder mustNotify()
+    {
+        checkNotSent();
+        this.mustNotify = true;
+        this.error = true;
+        return this;
+    }
+
 
     public boolean wereErrorsAdded() {
         return error;
@@ -195,6 +205,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         report.setEnvironmentVariables(getEnvironmentVariables());
         report.setSystemProperties(getSystemProperties());
         report.setUserError(userError);
+        report.setMustNotify(mustNotify);
 
         return report;
     }

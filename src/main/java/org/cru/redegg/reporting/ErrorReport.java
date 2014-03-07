@@ -27,6 +27,7 @@ public class ErrorReport {
     private boolean userError;
 
     private WebContext webContext;
+    private boolean mustNotify;
 
     public void addWebContext(WebContext webContext) {
         this.webContext = webContext;
@@ -184,5 +185,15 @@ public class ErrorReport {
     public boolean isUserError()
     {
         return userError;
+    }
+
+    public void setMustNotify(boolean mustNotify)
+    {
+        this.mustNotify = mustNotify;
+    }
+
+    public boolean isMustNotify()
+    {
+        return mustNotify;
     }
 }

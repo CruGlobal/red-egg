@@ -121,6 +121,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public ErrorRecorder mustNotify()
+    {
+        return this;
+    }
+
+    @Override
     public ErrorRecorder recordThrown(Throwable thrown)
     {
         return this;

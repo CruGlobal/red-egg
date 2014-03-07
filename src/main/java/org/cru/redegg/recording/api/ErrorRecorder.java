@@ -26,7 +26,14 @@ public interface ErrorRecorder {
 //    ErrorRecorder recordEnvironmentName(String environmentName);
 
 
-    //these two may mark the current request (if any) as an error request
+
+    //these three may mark the current request (if any) as an error request
+
+    /**
+     * Indicates that an error report must be sent,
+     * even if it is a user error.
+     */
+    ErrorRecorder mustNotify();
 
     /** will not, under any circumstances, throw an exception */
     ErrorRecorder recordThrown(Throwable thrown);

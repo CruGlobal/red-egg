@@ -44,7 +44,11 @@ public class NativeErrbitReporter implements ErrorReporter
     public void send(ErrorReport report)
     {
         if (report.isUserError())
+        {
             logUserWarning(report);
+            if (report.isMustNotify())
+                doSend(report);
+        }
         else
             doSend(report);
     }

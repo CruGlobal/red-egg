@@ -235,6 +235,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder mustNotify()
+    {
+        checkState(!completed);
+        defaultRecorder.mustNotify();
+        return this;
+    }
+
+    @Override
     public void error() {
         checkState(!completed);
         error = true;
