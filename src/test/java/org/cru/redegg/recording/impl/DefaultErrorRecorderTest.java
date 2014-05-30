@@ -133,5 +133,17 @@ public class DefaultErrorRecorderTest
         assertThat(report.getRootException().get(), CoreMatchers.<Throwable>sameInstance(unrelated));
     }
 
+    @Test
+    public void testReportWithAnIgnoredLogCategoryDoesNotTriggerAnError() throws Exception
+    {
+        recorder.ignoreErrorsFromLogger("some.dumb.logger");
+
+        LogRecord record = new LogRecord(Level.SEVERE, "bad stuff");
+        record.setLoggerName("some.dumb.logger");
+        recorder.recordLogRecord(record);
+
+        assertThat(recorder.wereErrorsAdded(), is(false));
+    }
+
 
 }

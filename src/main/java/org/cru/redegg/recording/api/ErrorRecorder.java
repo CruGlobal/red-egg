@@ -27,6 +27,8 @@ public interface ErrorRecorder {
 
 
 
+    ErrorRecorder ignoreErrorsFromLogger(String loggerName);
+
     //these three may mark the current request (if any) as an error request
 
     /**
