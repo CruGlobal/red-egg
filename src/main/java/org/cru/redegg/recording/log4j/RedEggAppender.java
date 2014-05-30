@@ -76,7 +76,7 @@ public class RedEggAppender extends AppenderSkeleton {
             case Level.OFF_INT:
                 return java.util.logging.Level.OFF;
             default:
-                throw new UnsupportedOperationException("log4j levels aren't currently supported");
+                throw new UnsupportedOperationException("custom log4j levels aren't currently supported");
         }
 
     }
