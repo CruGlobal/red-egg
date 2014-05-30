@@ -74,7 +74,7 @@ public class RedEggAppenderIntegrationTest
         org.apache.log4j.Logger.getRootLogger().error("error from test");
 
         verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
-        verify(recorder, atLeast(1)).error();
+        verify(recorder, atLeast(1)).sendReportIfNecessary();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class RedEggAppenderIntegrationTest
         java.util.logging.Logger.getLogger("").severe("error from test");
 
         verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
-        verify(recorder, atLeast(1)).error();
+        verify(recorder, atLeast(1)).sendReportIfNecessary();
     }
 
 

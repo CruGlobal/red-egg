@@ -21,7 +21,7 @@ public class RedEggAppender extends AppenderSkeleton {
 
     public RedEggAppender(RecorderFactory factory) {
         this.factory = checkNotNull(factory);
-        setThreshold(Level.ERROR);
+        setThreshold(Level.DEBUG);
     }
 
     @Override
@@ -31,11 +31,15 @@ public class RedEggAppender extends AppenderSkeleton {
 
         ErrorRecorder recorder = factory.getRecorder();
 
+        if (event.getLevel().toInt() >= Level.ERROR.toInt()) {
+            recorder
+                .recordContext("log4j MDC", event.getProperties())
+                .recordContext("log4j NDC", event.getNDC());
+        }
+
         recorder
-            .recordContext("log4j MDC", event.getProperties())
-            .recordContext("log4j NDC", event.getNDC())
             .recordLogRecord(toLogRecord(event))
-            .error();
+            .sendReportIfNecessary();
     }
 
     private LogRecord toLogRecord(LoggingEvent event) {

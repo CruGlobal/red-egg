@@ -142,4 +142,9 @@ class NullWebErrorRecorder implements WebErrorRecorder
     public void error()
     {
     }
+
+    @Override
+    public void sendReportIfNecessary()
+    {
+    }
 }

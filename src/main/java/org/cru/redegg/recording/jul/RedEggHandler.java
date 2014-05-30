@@ -19,21 +19,17 @@ public class RedEggHandler extends Handler {
 
     public RedEggHandler(RecorderFactory factory) {
         this.factory = checkNotNull(factory);
-        setLevel(Level.SEVERE);
+        setLevel(Level.FINE);
     }
 
     @Override
     public void publish(LogRecord record) {
         if (record.getLoggerName().equals(ErrorLog.name()))
             return;
-        if (record.getLevel().intValue() >= getLevel().intValue())
-        {
-            ErrorRecorder recorder = factory.getRecorder();
-            recorder
-                .recordLogRecord(record)
-                .error();
-        }
-
+        ErrorRecorder recorder = factory.getRecorder();
+        recorder
+            .recordLogRecord(record)
+            .sendReportIfNecessary();
     }
 
     @Override

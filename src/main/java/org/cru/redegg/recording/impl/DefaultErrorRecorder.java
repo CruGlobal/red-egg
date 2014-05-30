@@ -102,7 +102,6 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return this;
     }
 
-    //TODO: decide whether to remove this or the error() call in logging appenders
     private boolean isErrorLog(LogRecord record) {
         return record.getLevel().intValue() >= Level.SEVERE.intValue();
     }
@@ -148,6 +147,12 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         addAdditionalContextIfPossible();
         queue.enqueue(buildReport());
         sentError = true;
+    }
+
+    @Override
+    public void sendReportIfNecessary() {
+        if (wereErrorsAdded())
+            error();
     }
 
     public void addAdditionalContextIfPossible()

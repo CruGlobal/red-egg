@@ -247,4 +247,9 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         error = true;
     }
+
+    @Override
+    public void sendReportIfNecessary()
+    {
+    }
 }
