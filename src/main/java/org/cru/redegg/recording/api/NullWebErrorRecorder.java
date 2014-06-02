@@ -121,6 +121,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
+    {
+        return this;
+    }
+
+    @Override
     public ErrorRecorder mustNotify()
     {
         return this;
@@ -140,6 +146,11 @@ class NullWebErrorRecorder implements WebErrorRecorder
 
     @Override
     public void error()
+    {
+    }
+
+    @Override
+    public void sendReportIfNecessary()
     {
     }
 }

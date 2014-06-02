@@ -235,6 +235,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
+    {
+        checkState(!completed);
+        defaultRecorder.ignoreErrorsFromLogger(loggerName);
+        return this;
+    }
+
+    @Override
     public ErrorRecorder mustNotify()
     {
         checkState(!completed);
@@ -246,5 +254,10 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     public void error() {
         checkState(!completed);
         error = true;
+    }
+
+    @Override
+    public void sendReportIfNecessary()
+    {
     }
 }

@@ -27,6 +27,8 @@ public interface ErrorRecorder {
 
 
 
+    ErrorRecorder ignoreErrorsFromLogger(String loggerName);
+
     //these three may mark the current request (if any) as an error request
 
     /**
@@ -45,4 +47,11 @@ public interface ErrorRecorder {
      * or may flag the current request as needing an error report when it completes
      * */
     void error();
+
+    /**
+     * triggers an error report if any errors were added and this is not
+     * a web error recorder.
+     * (For those, errors are always sent at the end of the request)
+     */
+    public void sendReportIfNecessary();
 }

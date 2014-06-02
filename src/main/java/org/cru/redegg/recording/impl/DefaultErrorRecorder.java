@@ -28,6 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * @author Matt Drees
  */
@@ -43,6 +45,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private InetAddress localHost;
     private Map<String, String> environmentVariables;
     private Properties systemProperties;
+    private Set<String> loggersToIgnore;
 
     private boolean error;
     private boolean sentError;
@@ -92,7 +95,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         if (logRecords == null)
             logRecords = Lists.newLinkedList();
         logRecords.add(record);
-        if (isErrorLog(record))
+        if (isErrorLog(record) && isNotIgnored(record.getLoggerName()))
         {
             if (record.getThrown() != null)
                 recordThrown(record.getThrown());
@@ -102,7 +105,12 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return this;
     }
 
-    //TODO: decide whether to remove this or the error() call in logging appenders
+    private boolean isNotIgnored(String loggerName)
+    {
+        return loggersToIgnore == null ||
+               !loggersToIgnore.contains(loggerName);
+    }
+
     private boolean isErrorLog(LogRecord record) {
         return record.getLevel().intValue() >= Level.SEVERE.intValue();
     }
@@ -143,11 +151,27 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
+    {
+        checkNotSent();
+        if (loggersToIgnore == null)
+            loggersToIgnore = Sets.newHashSetWithExpectedSize(1);
+        loggersToIgnore.add(loggerName);
+        return this;
+    }
+
+    @Override
     public void error() {
         checkNotSent();
         addAdditionalContextIfPossible();
         queue.enqueue(buildReport());
         sentError = true;
+    }
+
+    @Override
+    public void sendReportIfNecessary() {
+        if (wereErrorsAdded())
+            error();
     }
 
     public void addAdditionalContextIfPossible()
