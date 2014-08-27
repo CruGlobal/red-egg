@@ -113,7 +113,7 @@ Usage (in an environment without CDI)
 =====================================
 
 To use in an app that doesn't have CDI, or that doesn't support CDI injection in servlet listeners,
-do everything in the CDI section above, but:
+first do everything in the CDI section above.
 
 In addition, add this to your `web.xml`:
 
