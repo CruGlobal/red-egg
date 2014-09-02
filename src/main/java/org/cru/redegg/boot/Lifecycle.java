@@ -1,14 +1,18 @@
 package org.cru.redegg.boot;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.log4j.Logger;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.reporting.LoggingReporter;
+import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Enumeration;
+import java.util.Set;
 
 /**
  * @author Matt Drees
@@ -17,6 +21,15 @@ import java.util.Enumeration;
 public class Lifecycle
 {
     private final RecorderFactory recorderFactory;
+
+    /**
+     * The logger names for which 'error()' calls should *not* trigger a notification.
+     * If they did, we could get into an infinite loop.
+     */
+    private final Set<String> ignoredLoggers = ImmutableSet.of(
+        ErrorLog.name(),
+        LoggingReporter.name()
+    );
 
     @Inject
     public Lifecycle(RecorderFactory recorderFactory)
@@ -49,7 +62,7 @@ public class Lifecycle
     }
 
     private void addLog4jAppender() {
-        log4jAppender = new RedEggAppender(recorderFactory);
+        log4jAppender = new RedEggAppender(recorderFactory, ignoredLoggers);
         log4jRoot = Logger.getRootLogger();
         log4jRoot.info("adding log4j appender");
         log4jRoot.addAppender(log4jAppender);
@@ -60,7 +73,7 @@ public class Lifecycle
     }
 
     private void addJulHandler() {
-        julHandler = new RedEggHandler(recorderFactory);
+        julHandler = new RedEggHandler(recorderFactory, ignoredLoggers);
         julRoot = java.util.logging.Logger.getLogger("");
         julRoot.info("adding j.u.l. handler");
         julRoot.addHandler(julHandler);
