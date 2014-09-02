@@ -43,6 +43,7 @@ public class NativeErrbitReporter implements ErrorReporter
 
     public void send(ErrorReport report)
     {
+        config.validate();
         if (report.isUserError())
         {
             logUserWarning(report);

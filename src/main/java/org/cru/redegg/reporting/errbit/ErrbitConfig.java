@@ -67,4 +67,12 @@ public class ErrbitConfig
     {
         this.applicationBasePackages = applicationBasePackages;
     }
+
+    public void validate()
+    {
+        if (endpoint == null)
+            throw new IllegalArgumentException("Errbit endpoint is required");
+        if (key == null)
+            throw new IllegalArgumentException("Errbit key is required");
+    }
 }

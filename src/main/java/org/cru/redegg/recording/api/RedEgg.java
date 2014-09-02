@@ -27,6 +27,7 @@ public class RedEgg
 
     public RedEgg setErrbitConfig(ErrbitConfig config)
     {
+        config.validate();
         builder.setErrbitConfig(config);
         return this;
     }
