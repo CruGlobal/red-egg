@@ -25,6 +25,12 @@ public class RedEgg
         return new RedEgg();
     }
 
+    /**
+     * Enables Errbit reporting.
+     *
+     * At minimum, the Errbit url and the api key must be present.
+     * If this method is not called, red-egg will simply log failures.
+     */
     public RedEgg setErrbitConfig(ErrbitConfig config)
     {
         config.validate();
@@ -32,6 +38,11 @@ public class RedEgg
         return this;
     }
 
+    /**
+     * Configures a custom parameter sanitizer.
+     *
+     * If this method is not called, all parameters will be removed.
+     */
     public RedEgg setParameterSanitizer(ParameterSanitizer sanitizer)
     {
         builder.setParameterSanitizer(sanitizer);
