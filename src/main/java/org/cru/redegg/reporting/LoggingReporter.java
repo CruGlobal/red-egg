@@ -19,7 +19,15 @@ import java.util.Map;
 @Fallback
 public class LoggingReporter implements ErrorReporter
 {
-    Logger errorLogger = Logger.getLogger("org.cru.redegg.loggedErrors");
+    private static final String NAME = "org.cru.redegg.loggedErrors";
+
+    public static String name()
+    {
+        return NAME;
+    }
+
+    Logger errorLogger = Logger.getLogger(NAME);
+
 
     @Override
     public void send(ErrorReport report)

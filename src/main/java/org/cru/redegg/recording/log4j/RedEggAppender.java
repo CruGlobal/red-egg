@@ -8,6 +8,7 @@ import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.util.ErrorLog;
 
+import java.util.Set;
 import java.util.logging.LogRecord;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -18,15 +19,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RedEggAppender extends AppenderSkeleton {
 
     private final RecorderFactory factory;
+    private final Set<String> ignoredLoggerNames;
 
-    public RedEggAppender(RecorderFactory factory) {
+    public RedEggAppender(RecorderFactory factory, Set<String> ignoredLoggerNames) {
         this.factory = checkNotNull(factory);
+        this.ignoredLoggerNames = checkNotNull(ignoredLoggerNames);
         setThreshold(Level.DEBUG);
     }
 
     @Override
     protected void append(LoggingEvent event) {
-        if (event.getLoggerName().equals(ErrorLog.name()))
+        if (ignoredLoggerNames.contains(event.getLoggerName()))
             return;
 
         ErrorRecorder recorder = factory.getRecorder();
