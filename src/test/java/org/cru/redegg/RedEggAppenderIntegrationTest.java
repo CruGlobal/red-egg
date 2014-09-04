@@ -8,6 +8,8 @@ import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.reporting.LoggingReporter;
+import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
@@ -53,6 +55,10 @@ public class RedEggAppenderIntegrationTest
             .addPackage(Lifecycle.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
+
+            .addClass(LoggingReporter.class)
+            .addClass(ErrorReporter.class)
+
             .addClass(AnswerWithSelf.class);
     }
 

@@ -12,6 +12,8 @@ import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.reporting.LoggingReporter;
+import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
@@ -76,6 +78,9 @@ public class JaxrsRecordingIntegrationTest
             .addPackage(RedEggAppender.class.getPackage())
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())
+
+            .addClass(LoggingReporter.class)
+            .addClass(ErrorReporter.class)
 
             .addClass(TestApplication.class)
             .addClass(WebTargetBuilder.class)
