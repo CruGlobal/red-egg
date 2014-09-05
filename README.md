@@ -91,9 +91,9 @@ Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be 
 3. Inject the `WebErrorRecorder` into one of your interceptors and call `recordThrown()`.
 
 
-If you are using a Servlet 3 (or greater) servlet container, you are done.
+If your web.xml version is 3.0 (or greater), you are done.
 
-If you are using a Servlet 2.5 (or less) servlet container, add this to your web.xml:
+If your web.xml version is 2.5 (or less), add this to your web.xml:
 
     <filter>
         <filter-name>RedEggFilter</filter-name>
