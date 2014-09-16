@@ -80,6 +80,8 @@ public class RedEggAppender extends AppenderSkeleton {
                 return java.util.logging.Level.SEVERE;
             case Level.FATAL_INT:
                 return java.util.logging.Level.SEVERE;
+            case Level.WARN_INT:
+                return java.util.logging.Level.WARNING;
             case Level.OFF_INT:
                 return java.util.logging.Level.OFF;
             default:
