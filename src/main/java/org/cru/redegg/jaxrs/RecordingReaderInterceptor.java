@@ -32,6 +32,7 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
     {
         //for now, we buffer all request entities.
         //FUTURE: enable a way to opt-out of this, if requests are too massive to be buffered in memory
+        //TODO: add a note in the docs about this
 
         byte[] content = ByteStreams.toByteArray(context.getInputStream());
         recordContentIfPossible(context, content);
