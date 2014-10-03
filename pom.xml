@@ -255,13 +255,14 @@
           <plugin>
             <groupId>org.wildfly.plugins</groupId>
             <artifactId>wildfly-maven-plugin</artifactId>
-            <version>1.0.0.Beta1</version>
+            <version>1.0.1.Final</version>
             <configuration>
               <version>${wildfly.arquillian.version}</version>
               <jvmArgs>
                 -Djboss.management.http.port=${jboss.management.http.port}
                 -Djboss.management.native.port=${jboss.management.native.port}
                 -Djboss.http.port=${jboss.http.port}
+                -XX:MaxPermSize=512m
               </jvmArgs>
               <port>${jboss.management.http.port}</port>
             </configuration>
