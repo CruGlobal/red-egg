@@ -1,6 +1,12 @@
 package org.cru.redegg.test;
 
+import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.interceptor.ActionRecordingInterceptor;
+import org.cru.redegg.recording.jul.RedEggHandler;
+import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.servlet.RedEggServletListener;
+import org.cru.redegg.util.Clock;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
@@ -96,6 +102,51 @@ public class DefaultDeployment {
 
     public WebArchive getArchive() {
         return webArchive;
+    }
+
+    /**
+     * Adds the boot, servlet, util, api, jul, and log4j packages
+     */
+    public DefaultDeployment addCorePackages()
+    {
+        getArchive()
+            .addPackage(boot())
+            .addPackage(servlet())
+            .addPackage(util())
+            .addPackage(recordingApi())
+            .addPackage(recordingJul())
+            .addPackage(recordingLog4j());
+        return this;
+    }
+
+    private Package boot()
+    {
+        return Lifecycle.class.getPackage();
+    }
+
+    private Package servlet()
+    {
+        return RedEggServletListener.class.getPackage();
+    }
+
+    private Package util()
+    {
+        return Clock.class.getPackage();
+    }
+
+    private Package recordingApi()
+    {
+        return RecorderFactory.class.getPackage();
+    }
+
+    private Package recordingJul()
+    {
+        return RedEggHandler.class.getPackage();
+    }
+
+    private Package recordingLog4j()
+    {
+        return RedEggAppender.class.getPackage();
     }
 
 }

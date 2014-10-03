@@ -4,22 +4,16 @@ package org.cru.redegg;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.api.NoOpParameterSanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
-import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.test.WebTargetBuilder;
-import org.cru.redegg.util.Clock;
 import org.hamcrest.Matcher;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -69,13 +63,8 @@ public class JaxrsRecordingIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("jaxrs-test.war")
+            .addCorePackages()
             .getArchive()
-            .addPackage(RedEggServletListener.class.getPackage())
-            .addPackage(Lifecycle.class.getPackage())
-            .addPackage(Clock.class.getPackage())
-            .addPackage(RecorderFactory.class.getPackage())
-            .addPackage(RedEggHandler.class.getPackage())
-            .addPackage(RedEggAppender.class.getPackage())
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())
 
