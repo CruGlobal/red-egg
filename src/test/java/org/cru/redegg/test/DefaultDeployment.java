@@ -1,5 +1,6 @@
 package org.cru.redegg.test;
 
+import org.cru.redegg.recording.interceptor.ActionRecordingInterceptor;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
@@ -43,6 +44,7 @@ public class DefaultDeployment {
     {
         DefaultDeployment deployment = new DefaultDeployment(archiveName);
         deployment.addBeansXml();
+        deployment.getArchive().addClass(ActionRecordingInterceptor.class);
         return deployment;
     }
 
