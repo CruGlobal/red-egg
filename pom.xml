@@ -102,7 +102,21 @@
       <optional>true</optional>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.ws</groupId>
+      <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
+      <version>2.0.2.Final</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
 
+    <dependency>
+      <groupId>javax.jws</groupId>
+      <artifactId>jsr181-api</artifactId>
+      <version>1.0-MR1</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
 
 
 
