@@ -23,8 +23,6 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordLocalHost(InetAddress localHost);
 
-//    ErrorRecorder recordEnvironmentName(String environmentName);
-
 
 
     ErrorRecorder ignoreErrorsFromLogger(String loggerName);
