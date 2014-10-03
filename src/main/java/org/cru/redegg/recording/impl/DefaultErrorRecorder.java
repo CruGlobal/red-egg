@@ -326,9 +326,10 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return new TreeMap<String, String>(environmentVariables);
     }
 
-    public void userError()
+    public DefaultErrorRecorder userError()
     {
         userError = true;
+        return this;
     }
 
     private class StacktraceSimplifier

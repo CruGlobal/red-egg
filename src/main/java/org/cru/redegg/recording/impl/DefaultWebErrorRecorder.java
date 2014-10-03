@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -259,5 +260,13 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     @Override
     public void sendReportIfNecessary()
     {
+    }
+
+    @Override
+    public ErrorRecorder userError()
+    {
+        checkState(!completed);
+        defaultRecorder.userError();
+        return this;
     }
 }
