@@ -23,9 +23,9 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordLocalHost(InetAddress localHost);
 
-
-
     ErrorRecorder ignoreErrorsFromLogger(String loggerName);
+
+
     /**
      * indicates that this the error recorded (if any) was definitely the user/client's fault.
      *
@@ -49,6 +49,8 @@ public interface ErrorRecorder {
     ErrorRecorder recordThrown(Throwable thrown);
 
     ErrorRecorder recordLogRecord(LogRecord record);
+
+
 
     /**
      * May trigger an error report immediately,
