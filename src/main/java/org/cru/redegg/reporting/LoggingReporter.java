@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.Logger;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.reporting.api.Fallback;
+import org.cru.redegg.qualifier.Fallback;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 

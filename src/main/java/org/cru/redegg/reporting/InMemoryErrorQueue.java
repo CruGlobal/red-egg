@@ -3,7 +3,7 @@ package org.cru.redegg.reporting;
 import com.google.common.base.Throwables;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.reporting.api.Fallback;
+import org.cru.redegg.qualifier.Fallback;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
 

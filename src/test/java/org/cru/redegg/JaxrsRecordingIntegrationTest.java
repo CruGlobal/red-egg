@@ -53,6 +53,7 @@ public class JaxrsRecordingIntegrationTest
 
         return DefaultDeployment.withCdi("jaxrs-test.war")
             .addCorePackages()
+            .addRecordingSanitizerClasses()
             .getArchive()
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())

@@ -1,18 +1,20 @@
-package org.cru.redegg.manual;
+package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.ImmutableList;
 import org.cru.redegg.recording.api.ParameterSanitizer;
+import org.cru.redegg.qualifier.Fallback;
 
-import javax.enterprise.inject.Alternative;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Filters out everything
+ * A parameter sanitizer that filters out everything.
+ *
+ * This is the parameter sanitizer used if the user does not configure one.
  *
  * @author Matt Drees
  */
-@Alternative
+@Fallback
 public class HyperConservativeParameterSanitizer implements ParameterSanitizer
 {
     private volatile static boolean warned = false;
@@ -39,18 +41,19 @@ public class HyperConservativeParameterSanitizer implements ParameterSanitizer
 
     private List<String> sanitize()
     {
-        warnIfNecesary();
+        warnIfNecessary();
         return ImmutableList.of("<removed>");
     }
 
-    private void warnIfNecesary()
+    private void warnIfNecessary()
     {
         if (!warned)
         {
             warned = true;
             Logger.getLogger(getClass().getName()).warning(
                 "removing all parameter values for this request." +
-                " To configure a less conservative strategy use Builder.setParameterSanitizer()");
+                " To avoid this message or to gather more detail," +
+                " configure a less conservative strategy");
         }
     }
 }

@@ -3,6 +3,7 @@ package org.cru.redegg.servlet;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
@@ -43,6 +44,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     Lifecycle lifecycle;
 
     @Inject
+    @Selected
     ParameterSanitizer sanitizer;
 
     @Override

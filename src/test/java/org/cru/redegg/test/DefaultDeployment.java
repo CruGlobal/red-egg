@@ -1,7 +1,10 @@
 package org.cru.redegg.test;
 
 import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.cdi.SanitizerProducer;
+import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
 import org.cru.redegg.recording.interceptor.ActionRecordingInterceptor;
 import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggAppender;
@@ -50,8 +53,15 @@ public class DefaultDeployment {
     {
         DefaultDeployment deployment = new DefaultDeployment(archiveName);
         deployment.addBeansXml();
-        deployment.getArchive().addClass(ActionRecordingInterceptor.class);
+        deployment.getArchive()
+            .addClass(ActionRecordingInterceptor.class)
+            .addPackage(qualifier());
         return deployment;
+    }
+
+    private static Package qualifier()
+    {
+        return Selected.class.getPackage();
     }
 
     private void addBeansXml()
@@ -149,4 +159,11 @@ public class DefaultDeployment {
         return RedEggAppender.class.getPackage();
     }
 
+    public DefaultDeployment addRecordingSanitizerClasses()
+    {
+        getArchive()
+            .addClass(HyperConservativeParameterSanitizer.class)
+            .addClass(SanitizerProducer.class);
+        return this;
+    }
 }
