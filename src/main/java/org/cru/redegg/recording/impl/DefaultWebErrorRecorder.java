@@ -1,9 +1,10 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Multimap;
+import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.impl.DefaultErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.api.ErrorQueue;
@@ -22,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -37,16 +37,19 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     private final ErrorQueue queue;
 
     private final ErrorLog errorLog;
+    private final EntitySanitizer entitySanitizer;
 
     @Inject
     public DefaultWebErrorRecorder(
         DefaultErrorRecorder defaultRecorder,
         ErrorQueue queue,
-        ErrorLog errorLog)
+        ErrorLog errorLog,
+        @Selected EntitySanitizer entitySanitizer)
     {
         this.defaultRecorder = defaultRecorder;
         this.queue = queue;
         this.errorLog = errorLog;
+        this.entitySanitizer = entitySanitizer;
     }
 
     @ProxyConstructor
@@ -54,6 +57,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         defaultRecorder = null;
         queue = null;
         errorLog = null;
+        entitySanitizer = null;
     }
 
     private final WebContext webContext = new WebContext();
@@ -138,7 +142,9 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     @Override
     public WebErrorRecorder recordEntityRepresentation(String entityRepresentation) {
         checkState(!completed);
-        webContext.setEntityRepresentation(checkNotNull(entityRepresentation));
+        checkNotNull(entityRepresentation);
+        String sanitized = entitySanitizer.sanitizeEntity(entityRepresentation);
+        webContext.setEntityRepresentation(sanitized);
         return this;
     }
 

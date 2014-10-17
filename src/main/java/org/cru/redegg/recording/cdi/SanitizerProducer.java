@@ -2,6 +2,7 @@ package org.cru.redegg.recording.cdi;
 
 import org.cru.redegg.qualifier.Fallback;
 import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 
 import javax.enterprise.inject.Default;
@@ -25,4 +26,17 @@ public class SanitizerProducer
         else
             return fallbackSanitizer;
     }
+
+    public
+    @Produces
+    @Selected EntitySanitizer selectEntitySanitizer(
+        @Default Instance<EntitySanitizer> defaultSanitizer,
+        @Fallback EntitySanitizer fallbackSanitizer)
+    {
+        if (!defaultSanitizer.isUnsatisfied())
+            return defaultSanitizer.get();
+        else
+            return fallbackSanitizer;
+    }
+
 }

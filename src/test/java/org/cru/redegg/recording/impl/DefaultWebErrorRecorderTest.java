@@ -1,5 +1,6 @@
 package org.cru.redegg.recording.impl;
 
+import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
@@ -38,6 +39,9 @@ public class DefaultWebErrorRecorderTest
     @Mock
     Serializer serializer;
 
+    @Mock
+    EntitySanitizer entitySanitizer;
+
     @Before
     public void setup()
     {
@@ -45,7 +49,8 @@ public class DefaultWebErrorRecorderTest
         recorder = new DefaultWebErrorRecorder(
             new DefaultErrorRecorder(queue, serializer),
             queue,
-            errorLog);
+            errorLog,
+            entitySanitizer);
     }
 
     @Test
