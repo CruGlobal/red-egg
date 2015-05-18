@@ -61,9 +61,6 @@ public class JaxwsRecordingIntegrationTest
 
             .addClass(TestApplication.class)
             .addClass(PortBuilder.class)
-            .addClass(Fruit.class)
-            .addClass(FruitService.class)
-            .addClass(FruitServiceImpl.class)
             .addClass(AnswerWithSelf.class)
             .addClass(RecordingMocks.class)
 

@@ -63,8 +63,6 @@ public class JaxrsRecordingIntegrationTest
 
             .addClass(TestApplication.class)
             .addClass(WebTargetBuilder.class)
-            .addClass(Fruit.class)
-            .addClass(FruitResource.class)
             .addClass(AnswerWithSelf.class)
             .addClass(RecordingMocks.class)
            ;
