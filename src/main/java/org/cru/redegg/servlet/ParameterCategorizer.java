@@ -5,7 +5,9 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.Logger;
 import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.qualifier.EntityStreamPreservation;
 import org.cru.redegg.recording.api.ParameterSanitizer;
+import org.cru.redegg.recording.api.RequestMatcher;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -23,11 +25,15 @@ public class ParameterCategorizer
     private static Logger log = Logger.getLogger(RedEggServletListener.class);
 
     private final ParameterSanitizer sanitizer;
+    private final RequestMatcher streamPreservationMatcher;
 
     @Inject
-    public ParameterCategorizer(@Selected ParameterSanitizer sanitizer)
+    public ParameterCategorizer(
+        @Selected ParameterSanitizer sanitizer,
+        @Selected @EntityStreamPreservation RequestMatcher streamPreservationMatcher)
     {
         this.sanitizer = sanitizer;
+        this.streamPreservationMatcher = streamPreservationMatcher;
     }
 
     static class Categorization
@@ -41,6 +47,9 @@ public class ParameterCategorizer
      * The servlet API doesn't readily give this information.
      */
     Categorization categorize(HttpServletRequest request) {
+
+        if (streamPreservationMatcher.matches(request))
+            return empty();
 
         Map<String, String[]> parameterMap = request.getParameterMap();
         Set<String> keys = parameterMap.keySet();
@@ -62,6 +71,14 @@ public class ParameterCategorizer
             categorizeParameter(param, request, parameterMap, categorization);
         }
         return categorization;
+    }
+
+    private Categorization empty()
+    {
+        Categorization emptyCategorization = new Categorization();
+        emptyCategorization.postParameters = ImmutableMultimap.of();
+        emptyCategorization.queryParameters = ImmutableMultimap.of();
+        return emptyCategorization;
     }
 
     private void categorizeParameter(

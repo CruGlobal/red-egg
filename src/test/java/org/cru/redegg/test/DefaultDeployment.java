@@ -3,6 +3,7 @@ package org.cru.redegg.test;
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.cdi.RequestMatcherProducer;
 import org.cru.redegg.recording.cdi.SanitizerProducer;
 import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
 import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
@@ -160,11 +161,12 @@ public class DefaultDeployment {
         return RedEggAppender.class.getPackage();
     }
 
-    public DefaultDeployment addRecordingSanitizerClasses()
+    public DefaultDeployment addRecordingConfigurationClasses()
     {
         getArchive()
             .addClass(HyperConservativeEntitySanitizer.class)
             .addClass(HyperConservativeParameterSanitizer.class)
+            .addClass(RequestMatcherProducer.class)
             .addClass(SanitizerProducer.class);
         return this;
     }

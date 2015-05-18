@@ -115,6 +115,25 @@ entities will be completely removed.
 
 
 
+
+If your app sometimes needs to directly consume the request's http entity,
+configure or write a request matcher to identify which requests must have access to them.
+(For these requests, Red Egg will not call `ServletRequest.getParameter()` or related methods,
+which have the side-effect of making
+`ServletRequest.getInputStream()` and `ServletRequest.getReader()` unusable.)
+You can implement your own `RequestMatcher` or use one of the built-in `RequestMatchers` factories:
+
+    public class RedEggConfig
+    {
+        public
+        @Produces
+        @Default
+        @EntityStreamPreservation
+        RequestMatcher matcher = RequestMatchers.matchingPaths("/rest-api/.*");
+    }
+
+
+
 Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be combined) to accomplish this:
 
 1. Log the exception with Log4j or with java.util.logging (or make sure your framework does so),
@@ -160,7 +179,8 @@ it should look like the following:
     RedEgg.configure()
         .setParameterSanitizer(new MyCustomParameterSanitizer()) // or use the built-in NoOpParameterSanitizer
         .setEntitySanitizer(new MyCustomEntitySanitizer()) // or use the built-in NoOpEntitySanitizer
-        .setErrbitConfig(createConfig()); // see CDI section for example code
+        .setErrbitConfig(createConfig()) // see CDI section for example code
+        .setEntityStreamPreservationMatcher(createMatcher()); // see CDI section for example code
 
 Instead of injecting a `WebErrorRecorder`, look one up via the `RecorderFactory`.
 You can get the `RecorderFactory` via `RedEgg.getRecorderFactory()`.

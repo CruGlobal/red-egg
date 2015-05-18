@@ -5,6 +5,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
+import org.cru.redegg.qualifier.EntityStreamPreservation;
+import org.cru.redegg.recording.api.RequestMatcher;
+import org.cru.redegg.recording.api.RequestMatchers;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
@@ -20,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -53,7 +57,7 @@ public class JaxrsRecordingIntegrationTest
 
         return DefaultDeployment.withCdi("jaxrs-test.war")
             .addCorePackages()
-            .addRecordingSanitizerClasses()
+            .addRecordingConfigurationClasses()
             .getArchive()
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())
@@ -172,6 +176,25 @@ public class JaxrsRecordingIntegrationTest
         verify(recorder).recordRequestPostParameters(expected);
     }
 
+    @Test
+    public void testSimpleJsonJaxrsPostFormRequestForRawProcessing() throws Exception {
+        WebTarget target = getWebTarget().path("raw");
+
+        Form fruit = new Form()
+            .param("color", "orange")
+            .param("weight", "3.3");
+        Response response = target
+            .request()
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .post(form(fruit));
+        assertThat(response.getStatus(), equalTo(204));
+
+        verify(recorder).recordEntityRepresentation(anyString());
+
+        Multimap<String, String> expected = ImmutableMultimap.of();
+        verify(recorder).recordRequestPostParameters(expected);
+    }
+
     private WebTarget getWebTarget()
     {
         return new WebTargetBuilder()
@@ -181,6 +204,7 @@ public class JaxrsRecordingIntegrationTest
 
 
 
+    @SuppressWarnings("UnusedDeclaration")
     @XmlRootElement
     public static class Fruit
     {
@@ -250,6 +274,15 @@ public class JaxrsRecordingIntegrationTest
             return new Fruit(color, weight);
         }
 
+        @Path("/raw")
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public void postFruitWithRawHandling(String rawContentAsString)
+        {
+            String expectedRawContent = "color=orange&weight=3.3";
+            assertThat(rawContentAsString, equalTo(expectedRawContent));
+        }
+
         @PUT
         @javax.ws.rs.Produces({"application/json", "application/xml"})
         @Consumes({"application/json", "application/xml"})
@@ -260,4 +293,12 @@ public class JaxrsRecordingIntegrationTest
 
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public static class EntityPreservingRequestMatcherProducer
+    {
+        @javax.enterprise.inject.Produces
+        @Default
+        @EntityStreamPreservation
+        public RequestMatcher matcher = RequestMatchers.matchingPaths("/.*/raw");
+    }
 }

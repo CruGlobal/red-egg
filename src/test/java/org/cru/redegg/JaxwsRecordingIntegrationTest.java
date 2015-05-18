@@ -51,7 +51,7 @@ public class JaxwsRecordingIntegrationTest
 
         return DefaultDeployment.withCdi("jaxws-test.war")
             .addCorePackages()
-            .addRecordingSanitizerClasses()
+            .addRecordingConfigurationClasses()
             .getArchive()
 
             .addPackage(RecordingSoapHandler.class.getPackage())
