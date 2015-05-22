@@ -1,7 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;

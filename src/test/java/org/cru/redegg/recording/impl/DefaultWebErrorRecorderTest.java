@@ -2,8 +2,6 @@ package org.cru.redegg.recording.impl;
 
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.Serializer;
-import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
-import org.cru.redegg.recording.impl.DefaultErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;

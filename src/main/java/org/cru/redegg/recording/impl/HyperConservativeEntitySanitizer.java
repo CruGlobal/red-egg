@@ -1,7 +1,7 @@
 package org.cru.redegg.recording.impl;
 
-import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.qualifier.Fallback;
+import org.cru.redegg.recording.api.EntitySanitizer;
 
 import java.util.logging.Logger;
 

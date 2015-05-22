@@ -1,9 +1,9 @@
 package org.cru.redegg.servlet;
 
+import org.cru.redegg.boot.Initializer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.ErrorLog;
-import org.cru.redegg.boot.Initializer;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;

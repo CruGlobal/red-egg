@@ -1,8 +1,8 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.ImmutableList;
-import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.qualifier.Fallback;
+import org.cru.redegg.recording.api.ParameterSanitizer;
 
 import java.util.List;
 import java.util.logging.Logger;
