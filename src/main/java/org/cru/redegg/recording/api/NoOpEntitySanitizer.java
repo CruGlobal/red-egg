@@ -3,7 +3,7 @@ package org.cru.redegg.recording.api;
 import javax.enterprise.inject.Alternative;
 
 /**
- * Performs no sanitizing at all.  Parameters are returned as-is.
+ * Performs no sanitizing at all.  Entity is returned as-is.
  *
  * @author Matt Drees
  */
