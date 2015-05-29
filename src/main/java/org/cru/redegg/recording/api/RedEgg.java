@@ -48,4 +48,15 @@ public class RedEgg
         builder.setParameterSanitizer(sanitizer);
         return this;
     }
+
+    /**
+     * Configures a custom entity sanitizer.
+     *
+     * If this method is not called, the entity will be completely removed.
+     */
+    public RedEgg setEntitySanitizer(EntitySanitizer sanitizer)
+    {
+        builder.setEntitySanitizer(sanitizer);
+        return this;
+    }
 }

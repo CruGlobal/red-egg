@@ -1,6 +1,7 @@
 package org.cru.redegg.manual;
 
 import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.Serializer;
@@ -143,6 +144,11 @@ public class Builder
     public void setParameterSanitizer(ParameterSanitizer sanitizer)
     {
         this.parameterSanitizer.replace(sanitizer);
+    }
+
+    public void setEntitySanitizer(EntitySanitizer sanitizer)
+    {
+        this.entitySanitizer.replace(sanitizer);
     }
 
     public void setErrbitConfig(ErrbitConfig errbitConfig)
