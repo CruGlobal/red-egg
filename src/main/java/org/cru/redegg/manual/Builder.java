@@ -1,6 +1,7 @@
 package org.cru.redegg.manual;
 
 import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
@@ -173,5 +174,10 @@ public class Builder
     public RecorderFactory getRecorderFactory()
     {
         return buildRecorderFactory();
+    }
+
+    public void init(RecordingReaderInterceptor interceptor)
+    {
+        interceptor.setFactory(buildRecorderFactory());
     }
 }

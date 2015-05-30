@@ -2,11 +2,17 @@ package org.cru.redegg.jaxrs;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
+import org.cru.redegg.boot.Initializer;
+import org.cru.redegg.manual.ManualRecorderFactory;
+import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.ErrorLog;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -22,10 +28,21 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
 {
 
     @Inject
-    WebErrorRecorder recorder;
+    RecorderFactory recorderFactory;
 
     @Inject
     ErrorLog errorLog;
+
+    @Context
+    ServletContext servletContext;
+
+
+
+    @PostConstruct
+    public void init()
+    {
+        Initializer.initializeIfNecessary(this, servletContext);
+    }
 
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException
@@ -46,6 +63,8 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
         {
             Charset charsetGuess = guessCharset(context);
             String representation = new String(content, charsetGuess);
+
+            WebErrorRecorder recorder = recorderFactory.getWebRecorder();
             recorder.recordEntityRepresentation(representation);
         }
         catch (Throwable throwable)
@@ -70,5 +89,10 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
             return defaultGuess;
 
         return Charset.forName(pieces[1]);
+    }
+
+    public void setFactory(RecorderFactory recorderFactory)
+    {
+        this.recorderFactory = recorderFactory;
     }
 }

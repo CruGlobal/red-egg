@@ -1,6 +1,7 @@
 package org.cru.redegg.boot;
 
 import com.google.common.base.Objects;
+import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.manual.Builder;
 import org.cru.redegg.servlet.RedEggFilter;
 import org.cru.redegg.servlet.RedEggServletListener;
@@ -36,5 +37,15 @@ public class Initializer
     private static boolean manualInitializationNeeded(ServletContext servletContext)
     {
         return Objects.equal(servletContext.getInitParameter("org.cru.redegg.no-cdi"), "true");
+    }
+
+    public static void initializeIfNecessary(
+        RecordingReaderInterceptor interceptor,
+        ServletContext servletContext)
+    {
+        if (manualInitializationNeeded(servletContext))
+        {
+            Builder.getInstance().init(interceptor);
+        }
     }
 }
