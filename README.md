@@ -43,7 +43,7 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
 
 1. Create a custom sanitizer class yourself:
 
-        public static class CustomSanitizer implements ParameterSanitizer
+        public static class CustomParameterSanitizer implements ParameterSanitizer
         {
 
             @Override
@@ -83,6 +83,37 @@ Make a parameter sanitizer. This will keep sensitive data out of the error datab
 
             @Produces ParameterSanitizer sanitizer = new NoOpParameterSanitizer();
         }
+All parameters are removed by default.
+
+
+Similarly, make an entity sanitizer.
+This is unnecessary if your application only uses `ServletRequest.getParameter()` (and friends),
+but if your application consumes anything else (such as json or xml),
+or if your application does its own `x-www-form-urlencoded` parsing,
+then you should consider creating one.
+
+It could look like this:
+
+        public static class CustomEntitySanitizer implements EntitySanitizer
+        {
+            @Override
+            public String sanitizeEntity(String entityRepresentation)
+            {
+                return entityRepresentation.replaceAll(
+                    "(\"secret\"\\s*:\\s*\")[^\"]+(\")",
+                    "$1<removed>$2"
+                );
+            }
+        }
+
+This example removes the string value from a json key/value pair whose key is 'secret'.
+Note: you will probably need to think carefully about how you implement this,
+and you should have several test cases.
+
+If you do not provide an entity sanitizer,
+entities will be completely removed.
+
+
 
 Make sure your exceptions are visible to Red Egg.  There's 3 ways (which can be combined) to accomplish this:
 
@@ -128,6 +159,7 @@ it should look like the following:
 
     RedEgg.configure()
         .setParameterSanitizer(new MyCustomParameterSanitizer()) // or use the built-in NoOpParameterSanitizer
+        .setEntitySanitizer(new MyCustomEntitySanitizer()) // or use the built-in NoOpEntitySanitizer
         .setErrbitConfig(createConfig()); // see CDI section for example code
 
 Instead of injecting a `WebErrorRecorder`, look one up via the `RecorderFactory`.
