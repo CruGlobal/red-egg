@@ -8,7 +8,7 @@ import java.util.List;
 /**
 * @author Matt Drees
 */
-public class TestSanitizer implements ParameterSanitizer
+public class TestParameterSanitizer implements ParameterSanitizer
 {
 
     @Override

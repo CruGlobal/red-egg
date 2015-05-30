@@ -34,7 +34,8 @@ public class EndToEndWithCdiIT extends AbstractEndToEndIT
             .addClass(AbstractApiThatErrors.class)
             .addClass(ApiWithCdiThatErrors.class)
             .addClass(DummyErrbitApi.class)
-            .addClass(TestSanitizer.class)
+            .addClass(TestParameterSanitizer.class)
+            .addClass(TestEntitySanitizer.class)
             .addClass(ConfigProducer.class)
             .addClass(AbstractEndToEndIT.class)
             ;

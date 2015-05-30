@@ -50,7 +50,7 @@ public class EndToEndManualCheck
             .addClass(TestApplication.class)
             .addClass(AbstractApiThatErrors.class)
             .addClass(ApiWithCdiThatErrors.class)
-            .addClass(TestSanitizer.class)
+            .addClass(TestParameterSanitizer.class)
             .addClass(ConfigProducer.class)
             ;
     }

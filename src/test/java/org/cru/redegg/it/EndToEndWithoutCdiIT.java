@@ -37,7 +37,8 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
             .addClass(AbstractApiThatErrors.class)
             .addClass(ApiWithoutCdiThatErrors.class)
             .addClass(DummyErrbitApi.class)
-            .addClass(TestSanitizer.class)
+            .addClass(TestParameterSanitizer.class)
+            .addClass(TestEntitySanitizer.class)
             .addClass(ConfigProducer.class)
             .addClass(Initializer.class)
             .addClass(AbstractEndToEndIT.class)
@@ -54,7 +55,8 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
             try
             {
                 RedEgg.configure()
-                    .setParameterSanitizer(new TestSanitizer())
+                    .setParameterSanitizer(new TestParameterSanitizer())
+                    .setEntitySanitizer(new TestEntitySanitizer())
                     .setErrbitConfig(new ConfigProducer().buildConfig());
             }
             catch (URISyntaxException e)
