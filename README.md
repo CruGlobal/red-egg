@@ -173,3 +173,20 @@ Additional Context
 You can optionally record additional context information that will make your error reports more useful.
 Inject a WebErrorRecorder into an appropriate class (likely an interceptor or decorator),
 and use the `recordContext()` and/or `recordUser()` methods.
+
+
+Building this project
+=====================
+
+This project requires maven.
+A full build also requires that you specify an arquillian profile.
+For command-line builds, generally this is a good route:
+
+    mvn install -Parq-wildfly-managed
+
+This will launch a wildfly instance, run the tests on it, and shut it down afterward.
+
+If you are running tests from your IDE,
+generally you will want to instead activate the `arq-wildfly-remote` profile.
+This requires that you fire up wildfly yourself in a terminal window.
+This will run the tests faster and give you quicker feedback as you develop.
