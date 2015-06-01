@@ -1,5 +1,7 @@
 package org.cru.redegg.it;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.DefaultModelReader;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.test.WebTargetBuilder;
@@ -10,6 +12,11 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
 
 /**
  * @author Matt Drees
@@ -26,8 +33,7 @@ public class EndToEndWithCdiIT extends AbstractEndToEndIT
         return DefaultDeployment.withCdi("end-to-end-test.war")
             .addAllRuntimeDependencies()
             .getArchive()
-            //TODO: figure out how to not hard code the version here
-            .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
+            .addAsLibraries(RedEggDistribution.getJarFile())
 
             .addClass(TestApplication.class)
             .addClass(WebTargetBuilder.class)

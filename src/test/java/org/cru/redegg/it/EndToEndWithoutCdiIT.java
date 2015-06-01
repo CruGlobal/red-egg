@@ -29,8 +29,7 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
         return DefaultDeployment.withoutCdi("end-to-end-test.war")
             .addAllRuntimeDependencies()
             .getArchive()
-            //TODO: figure out how to not hard code the version here
-            .addAsLibraries(new File("target/red-egg-1-SNAPSHOT.jar"))
+            .addAsLibraries(RedEggDistribution.getJarFile())
 
             .addClass(TestApplication.class)
             .addClass(WebTargetBuilder.class)
