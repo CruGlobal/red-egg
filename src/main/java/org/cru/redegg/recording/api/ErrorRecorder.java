@@ -23,11 +23,19 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordLocalHost(InetAddress localHost);
 
-//    ErrorRecorder recordEnvironmentName(String environmentName);
-
-
-
     ErrorRecorder ignoreErrorsFromLogger(String loggerName);
+
+
+    /**
+     * indicates that this the error recorded (if any) was definitely the user/client's fault.
+     *
+     * This is normally inferred by the HTTP status code, but sometimes a 500 has to be
+     * used even if the error is the client's.
+     *
+     * (For example, with SOAP).
+     *
+     */
+    ErrorRecorder userError();
 
     //these three may mark the current request (if any) as an error request
 
@@ -41,6 +49,8 @@ public interface ErrorRecorder {
     ErrorRecorder recordThrown(Throwable thrown);
 
     ErrorRecorder recordLogRecord(LogRecord record);
+
+
 
     /**
      * May trigger an error report immediately,

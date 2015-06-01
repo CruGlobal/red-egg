@@ -2,7 +2,6 @@ package org.cru.redegg.recording.jul;
 
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
-import org.cru.redegg.util.ErrorLog;
 
 import java.util.Set;
 import java.util.logging.Handler;

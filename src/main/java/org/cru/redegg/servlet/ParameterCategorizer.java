@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.Logger;
+import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ public class ParameterCategorizer
     private final ParameterSanitizer sanitizer;
 
     @Inject
-    public ParameterCategorizer(ParameterSanitizer sanitizer)
+    public ParameterCategorizer(@Selected ParameterSanitizer sanitizer)
     {
         this.sanitizer = sanitizer;
     }

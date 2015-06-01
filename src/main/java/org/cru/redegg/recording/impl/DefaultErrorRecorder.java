@@ -28,8 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
-import static com.google.common.base.Preconditions.checkState;
-
 /**
  * @author Matt Drees
  */
@@ -326,9 +324,10 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return new TreeMap<String, String>(environmentVariables);
     }
 
-    public void userError()
+    public DefaultErrorRecorder userError()
     {
         userError = true;
+        return this;
     }
 
     private class StacktraceSimplifier

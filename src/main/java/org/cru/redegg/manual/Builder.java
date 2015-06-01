@@ -1,13 +1,17 @@
 package org.cru.redegg.manual;
 
 import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
+import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.gson.GsonSerializer;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
+import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
+import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
+import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
 import org.cru.redegg.reporting.InMemoryErrorQueue;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
@@ -34,15 +38,24 @@ public class Builder
     }
 
     /**
-     * Start off the app with a very conservative sanitizer,
+     * Start off the app with a very conservative parameter sanitizer,
      * because we don't know at what point the app will do its own initialization logic
-     * that installs its own custom sanitizer.
+     * that installs its own custom parameter sanitizer.
      * That logic may not execute until the first request comes in.
-     * By this point, we need to have a sanitizer in place already,
+     * By this point, we need to have a parameter sanitizer in place already,
      * and since we don't know what is sensitive and what is not,
      * so we will just assume everything is sensitive.
      */
-    private final ReplaceableParameterSanitizer sanitizer = new ReplaceableParameterSanitizer(new HyperConservativeParameterSanitizer());
+    private final ReplaceableParameterSanitizer parameterSanitizer =
+        new ReplaceableParameterSanitizer(new HyperConservativeParameterSanitizer());
+
+
+    /**
+     * Start off with a very conservative entity sanitizer, as {@link #parameterSanitizer} does.
+     */
+    private final ReplaceableEntitySanitizer entitySanitizer =
+        new ReplaceableEntitySanitizer(new HyperConservativeEntitySanitizer());
+
     private volatile ErrbitConfig errbitConfig;
     private volatile InMemoryErrorQueue queue;
 
@@ -52,12 +65,12 @@ public class Builder
         listener.setClock(Clock.system());
         listener.setLifecycle(buildLifecycle());
         listener.setRecorderFactory(buildRecorderFactory());
-        listener.setSanitizer(sanitizer);
+        listener.setSanitizer(parameterSanitizer);
     }
 
     ParameterCategorizer buildParameterCategorizer()
     {
-        return new ParameterCategorizer(sanitizer);
+        return new ParameterCategorizer(parameterSanitizer);
     }
 
     Lifecycle buildLifecycle()
@@ -82,7 +95,8 @@ public class Builder
         return new DefaultWebErrorRecorder(
             buildDefaultErrorRecorder(),
             buildQueue(),
-            buildErrorLog());
+            buildErrorLog(),
+            entitySanitizer);
     }
 
     DefaultErrorRecorder buildDefaultErrorRecorder()
@@ -130,7 +144,12 @@ public class Builder
 
     public void setParameterSanitizer(ParameterSanitizer sanitizer)
     {
-        this.sanitizer.replace(sanitizer);
+        this.parameterSanitizer.replace(sanitizer);
+    }
+
+    public void setEntitySanitizer(EntitySanitizer sanitizer)
+    {
+        this.entitySanitizer.replace(sanitizer);
     }
 
     public void setErrbitConfig(ErrbitConfig errbitConfig)
@@ -155,5 +174,10 @@ public class Builder
     public RecorderFactory getRecorderFactory()
     {
         return buildRecorderFactory();
+    }
+
+    public void init(RecordingReaderInterceptor interceptor)
+    {
+        interceptor.setFactory(buildRecorderFactory());
     }
 }

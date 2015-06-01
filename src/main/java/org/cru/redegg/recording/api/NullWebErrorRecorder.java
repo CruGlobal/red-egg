@@ -127,6 +127,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public ErrorRecorder userError()
+    {
+        return this;
+    }
+
+    @Override
     public ErrorRecorder mustNotify()
     {
         return this;

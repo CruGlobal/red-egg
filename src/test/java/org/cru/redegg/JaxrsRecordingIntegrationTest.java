@@ -4,22 +4,14 @@ package org.cru.redegg;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
-import org.cru.redegg.recording.api.NoOpParameterSanitizer;
-import org.cru.redegg.recording.api.ParameterSanitizer;
-import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.cru.redegg.test.WebTargetBuilder;
-import org.cru.redegg.util.Clock;
 import org.hamcrest.Matcher;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -27,13 +19,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -43,7 +29,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -56,10 +41,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 @RunWith(Arquillian.class)
@@ -69,13 +52,9 @@ public class JaxrsRecordingIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("jaxrs-test.war")
+            .addCorePackages()
+            .addRecordingSanitizerClasses()
             .getArchive()
-            .addPackage(RedEggServletListener.class.getPackage())
-            .addPackage(Lifecycle.class.getPackage())
-            .addPackage(Clock.class.getPackage())
-            .addPackage(RecorderFactory.class.getPackage())
-            .addPackage(RedEggHandler.class.getPackage())
-            .addPackage(RedEggAppender.class.getPackage())
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())
 
@@ -87,13 +66,14 @@ public class JaxrsRecordingIntegrationTest
             .addClass(Fruit.class)
             .addClass(FruitResource.class)
             .addClass(AnswerWithSelf.class)
+            .addClass(RecordingMocks.class)
            ;
     }
 
     @Inject
     WebErrorRecorder recorder;
 
-    @Inject Mocks mocks;
+    @Inject RecordingMocks mocks;
 
     @Before
     public void setup()
@@ -281,39 +261,5 @@ public class JaxrsRecordingIntegrationTest
         }
 
     }
-
-    @ApplicationScoped
-    public static class Mocks
-    {
-
-        @Produces
-        @Mock
-        RecorderFactory factory;
-
-        @Produces
-        WebErrorRecorder recorder;
-
-        @Produces
-        ParameterSanitizer sanitizer = new NoOpParameterSanitizer();
-
-        @PostConstruct
-        public void init()
-        {
-            MockitoAnnotations.initMocks(this);
-            recorder = mock(WebErrorRecorder.class, new AnswerWithSelf(WebErrorRecorder.class));
-            reset();
-        }
-
-        public void reset()
-        {
-            // we use Mockito.reset() instead of building new mocks, because the servlet listener is only initialized
-            // once for this test class, and there is no easy way to modify its reference to a new mock
-            Mockito.reset(recorder, factory);
-            when(factory.getRecorder()).thenReturn(recorder);
-            when(factory.getWebRecorder()).thenReturn(recorder);
-        }
-
-    }
-
 
 }

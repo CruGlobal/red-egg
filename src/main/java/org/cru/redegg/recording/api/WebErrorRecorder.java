@@ -19,6 +19,17 @@ public interface WebErrorRecorder extends ErrorRecorder {
     WebErrorRecorder recordRequestUrl(URL url);
     WebErrorRecorder recordRequestUrl(URI uri);
 
+    /**
+     * Indicate that, for this request, the given method is the main 'action',
+     * and that the method's containing class is the main 'component'.
+     *
+     * In other words, if there is one method that, more than any other method,
+     * defines what interesting logic happens in this request, that method should be recorded here.
+     *
+     * This generally will duplicate the information in the request URI and/or post body,
+     * but it is often convenient to record this nonetheless, as the mapping rules may not
+     * be obvious.
+     */
     WebErrorRecorder recordComponent(Method method);
 
     WebErrorRecorder recordRequestStart(DateTime dateTime);

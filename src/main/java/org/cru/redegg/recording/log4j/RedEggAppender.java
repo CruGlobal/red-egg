@@ -6,7 +6,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
-import org.cru.redegg.util.ErrorLog;
 
 import java.util.Set;
 import java.util.logging.LogRecord;
