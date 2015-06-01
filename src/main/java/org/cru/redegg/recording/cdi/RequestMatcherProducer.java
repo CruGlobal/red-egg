@@ -18,14 +18,14 @@ public class RequestMatcherProducer
     @Produces
     @Selected
     @EntityStreamPreservation
-    RequestMatcher selectParameterSanitizer(
-        @Default @EntityStreamPreservation Instance<RequestMatcher> defaultSanitizer,
-        @Fallback @EntityStreamPreservation RequestMatcher fallbackSanitizer)
+    RequestMatcher selectEntityStreamPreservationRequestMatcher(
+        @Default @EntityStreamPreservation Instance<RequestMatcher> defaultMatcher,
+        @Fallback @EntityStreamPreservation RequestMatcher fallbackMatcher)
     {
-        if (!defaultSanitizer.isUnsatisfied())
-            return defaultSanitizer.get();
+        if (!defaultMatcher.isUnsatisfied())
+            return defaultMatcher.get();
         else
-            return fallbackSanitizer;
+            return fallbackMatcher;
     }
 
 }
