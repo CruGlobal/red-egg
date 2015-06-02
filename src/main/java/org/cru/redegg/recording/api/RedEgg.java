@@ -3,6 +3,8 @@ package org.cru.redegg.recording.api;
 import org.cru.redegg.manual.Builder;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 
+import javax.servlet.ServletRequest;
+
 /**
  * If you are not using CDI, use this class to configure Red Egg and to obtain a RecorderFactory
  *
@@ -57,6 +59,16 @@ public class RedEgg
     public RedEgg setEntitySanitizer(EntitySanitizer sanitizer)
     {
         builder.setEntitySanitizer(sanitizer);
+        return this;
+    }
+
+    /**
+     * Configures a matcher that identifies which request must retain the ability to call
+     * {@link ServletRequest#getInputStream()} and {@link ServletRequest#getReader()}.
+     */
+    public RedEgg setEntityStreamPreservationMatcher(RequestMatcher matcher)
+    {
+        builder.setEntityStreamPreservationMatcher(matcher);
         return this;
     }
 }

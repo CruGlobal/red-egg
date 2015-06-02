@@ -35,7 +35,7 @@ public class RedEggAppenderIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi()
-            .addRecordingSanitizerClasses()
+            .addRecordingConfigurationClasses()
             .getArchive()
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)

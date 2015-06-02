@@ -9,6 +9,7 @@ import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.util.Clock;
+import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
@@ -68,10 +69,12 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     private void requestInitialized(HttpServletRequest request)
     {
+        // capture the current time as early as possible
+        DateTime requestStart = clock.dateTime();
+
         lifecycle.beginRequest();
         WebErrorRecorder recorder = recorderFactory.getWebRecorder()
-            // capture the current time as early as possible
-            .recordRequestStart(clock.dateTime())
+            .recordRequestStart(requestStart)
             .recordRequestUrl(request.getRequestURL().toString())
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));

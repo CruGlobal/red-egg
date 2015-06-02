@@ -5,6 +5,8 @@ import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.api.RequestMatcher;
+import org.cru.redegg.recording.api.RequestMatchers;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.gson.GsonSerializer;
@@ -56,6 +58,9 @@ public class Builder
     private final ReplaceableEntitySanitizer entitySanitizer =
         new ReplaceableEntitySanitizer(new HyperConservativeEntitySanitizer());
 
+    private final ReplaceableRequestMatcher streamPreservationMatcher = new ReplaceableRequestMatcher(
+        RequestMatchers.none());
+
     private volatile ErrbitConfig errbitConfig;
     private volatile InMemoryErrorQueue queue;
 
@@ -70,7 +75,7 @@ public class Builder
 
     ParameterCategorizer buildParameterCategorizer()
     {
-        return new ParameterCategorizer(parameterSanitizer);
+        return new ParameterCategorizer(parameterSanitizer, streamPreservationMatcher);
     }
 
     Lifecycle buildLifecycle()
@@ -179,5 +184,10 @@ public class Builder
     public void init(RecordingReaderInterceptor interceptor)
     {
         interceptor.setFactory(buildRecorderFactory());
+    }
+
+    public void setEntityStreamPreservationMatcher(RequestMatcher matcher)
+    {
+        streamPreservationMatcher.replace(matcher);
     }
 }
