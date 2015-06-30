@@ -123,6 +123,9 @@ public class ErrorReport {
         this.webContext = webContext;
     }
 
+    /**
+     * Returns the exception that is at the root of the 'exception chain' that is first in the 'thrown' list.
+     */
     public Optional<Throwable> getRootException()
     {
 
