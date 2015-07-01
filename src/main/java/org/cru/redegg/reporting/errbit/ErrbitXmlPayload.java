@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.common.Payload;
 import org.cru.redegg.util.RedEggCollections;
 import org.cru.redegg.util.RedEggVersion;
 
@@ -22,7 +23,7 @@ import static org.cru.redegg.util.RedEggStrings.truncate;
 /**
  * @author Matt Drees
  */
-public class ErrbitXmlPayload
+public class ErrbitXmlPayload implements Payload
 {
     private ErrorReport report;
     private ErrbitConfig config;
@@ -36,7 +37,7 @@ public class ErrbitXmlPayload
         this.config = config;
     }
 
-    public void writeXmlTo(Writer underlyingWriter)
+    public void writeTo(Writer underlyingWriter)
     {
         try
         {

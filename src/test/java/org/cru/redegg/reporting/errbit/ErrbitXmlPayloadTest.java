@@ -38,7 +38,7 @@ public class ErrbitXmlPayloadTest
     {
         buildSampleReport();
         ErrbitXmlPayload payload = new ErrbitXmlPayload(report, config);
-        payload.writeXmlTo(writer);
+        payload.writeTo(writer);
         checkXmlContent();
     }
 
