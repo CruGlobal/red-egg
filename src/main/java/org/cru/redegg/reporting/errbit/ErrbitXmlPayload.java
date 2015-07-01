@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.common.Payload;
+import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
 import org.cru.redegg.util.RedEggVersion;
 
@@ -323,29 +324,13 @@ public class ErrbitXmlPayload implements Payload
 
     private void writeComponentIfPossible(WebContext webContext) throws XMLStreamException
     {
-        if (webContext.getComponent() != null)
+        Method component = webContext.getComponent();
+        if (component != null)
         {
-            Class<?> declaringClass = webContext.getComponent().getDeclaringClass();
+            Class<?> declaringClass = component.getDeclaringClass();
             writeElementWithContent("component", declaringClass.getSimpleName());
-            Method method = webContext.getComponent();
-            writeElementWithContent("action", buildSimplifiedMethodName(declaringClass, method));
+            writeElementWithContent("action", Reporters.buildSimplifiedMethodName(component));
         }
-    }
-
-    private String buildSimplifiedMethodName(Class<?> declaringClass, Method method)
-    {
-        return method.getName() + "(" + simpleParamList(method) + ")";
-    }
-
-    private String simpleParamList(Method method)
-    {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        List<String> parameterTypeNames = Lists.newArrayListWithCapacity(parameterTypes.length);
-        for (Class<?> aClass : parameterTypes)
-        {
-            parameterTypeNames.add(aClass.getSimpleName());
-        }
-        return Joiner.on(',').join(parameterTypeNames);
     }
 
     private void writeServerEnvironment() throws XMLStreamException
