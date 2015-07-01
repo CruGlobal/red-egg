@@ -1,4 +1,4 @@
-package org.cru.redegg.reporting.errbit;
+package org.cru.redegg.reporting;
 
 /**
  * This class should not change much,

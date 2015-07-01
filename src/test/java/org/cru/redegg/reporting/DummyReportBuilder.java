@@ -1,10 +1,8 @@
-package org.cru.redegg.reporting.errbit;
+package org.cru.redegg.reporting;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
-import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.WebContext;
 import org.joda.time.DateTime;
 
 import java.net.URI;

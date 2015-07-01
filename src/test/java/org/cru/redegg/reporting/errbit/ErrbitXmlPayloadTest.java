@@ -1,6 +1,8 @@
 package org.cru.redegg.reporting.errbit;
 
+import org.cru.redegg.reporting.DummyReportBuilder;
 import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.TestExceptions;
 import org.junit.Before;
 import org.junit.Test;
 
