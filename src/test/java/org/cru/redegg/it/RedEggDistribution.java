@@ -1,11 +1,8 @@
 package org.cru.redegg.it;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.DefaultModelReader;
+import org.cru.redegg.util.RedEggVersion;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 
 /**
  * @author Matt Drees
@@ -15,21 +12,7 @@ class RedEggDistribution
 
     public static File getJarFile()
     {
-        File pomFile = new File("pom.xml");
-
-        DefaultModelReader reader = new DefaultModelReader();
-        Model model;
-        try
-        {
-            model = reader.read(pomFile, Collections.<String, Object>emptyMap());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("unable to read pom.xml", e);
-        }
-        String version = model.getVersion();
-
-        return new File("target/red-egg-" + version + ".jar");
+        return new File("target/red-egg-" + RedEggVersion.get() + ".jar");
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.util.RedEggCollections;
+import org.cru.redegg.util.RedEggVersion;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -84,7 +85,7 @@ public class ErrbitXmlPayload
     {
         writer.writeStartElement("notifier");
         writeElementWithContent("name", "red-egg");
-        writeElementWithContent("version", "1-SNAPSHOT"); //TODO: programmatically drive this
+        writeElementWithContent("version", RedEggVersion.get());
         writeElementWithContent("url", "https://github.com/CruGlobal/red-egg");
         writer.writeEndElement();
     }

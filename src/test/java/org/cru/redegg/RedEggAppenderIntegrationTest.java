@@ -14,6 +14,7 @@ import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.RedEggVersion;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -42,7 +43,7 @@ public class RedEggAppenderIntegrationTest
             .addClass(RedEggHandler.class)
             .addClass(RedEggAppender.class)
             .addClass(ErrorLog.class)
-            .addClass(Clock.class)
+            .addPackage(Clock.class.getPackage())
             .addPackage(Lifecycle.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
