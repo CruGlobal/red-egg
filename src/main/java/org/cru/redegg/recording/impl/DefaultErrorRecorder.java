@@ -33,6 +33,7 @@ import java.util.logging.SimpleFormatter;
  */
 public class DefaultErrorRecorder implements ErrorRecorder {
 
+    private static final int LOG_RECORD_LIMIT = 100;
     private ErrorQueue queue;
     private Serializer serializer;
 
@@ -92,7 +93,8 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         checkNotSent();
         if (logRecords == null)
             logRecords = Lists.newLinkedList();
-        logRecords.add(record);
+        if (logRecords.size() < LOG_RECORD_LIMIT)
+            logRecords.add(record);
         if (isErrorLog(record) && isNotIgnored(record.getLoggerName()))
         {
             if (record.getThrown() != null)
