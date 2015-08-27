@@ -302,6 +302,13 @@ public class DefaultErrorRecorder implements ErrorRecorder {
                 simplifier.restoreOriginalStacktraces();
             }
         }
+        if (logRecords.size() == LOG_RECORD_LIMIT)
+        {
+            serializedLogRecords.add(
+                "<limit of " +
+                LOG_RECORD_LIMIT +
+                " was reached; any further log records were not recorded>");
+        }
         return serializedLogRecords;
     }
 
