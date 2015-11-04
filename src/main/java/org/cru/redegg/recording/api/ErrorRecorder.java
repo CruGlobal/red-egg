@@ -25,7 +25,9 @@ public interface ErrorRecorder {
 
     ErrorRecorder ignoreErrorsFromLogger(String loggerName);
 
+    ErrorRecorder includeEnvironmentVariables(boolean includeEnvironmentVariables);
 
+    ErrorRecorder includeSystemProperties(boolean includeSystemProperties);
     /**
      * indicates that this the error recorded (if any) was definitely the user/client's fault.
      *

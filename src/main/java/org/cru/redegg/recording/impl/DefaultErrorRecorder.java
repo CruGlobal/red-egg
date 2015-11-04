@@ -42,7 +42,9 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private LinkedHashSet<Throwable> thrown;
     private LinkedList<LogRecord> logRecords;
     private InetAddress localHost;
+    private boolean includeEnvironmentVariables = false;
     private Map<String, String> environmentVariables;
+    private boolean includeSystemProperties = false;
     private Properties systemProperties;
     private Set<String> loggersToIgnore;
 
@@ -119,6 +121,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     public ErrorRecorder recordSystemProperties(Properties systemProperties) {
         checkNotSent();
         this.systemProperties = systemProperties;
+        this.includeSystemProperties = true;
         return this;
     }
 
@@ -126,6 +129,23 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     public ErrorRecorder recordEnvironmentVariables(Map<String, String> variables) {
         checkNotSent();
         this.environmentVariables = variables;
+        this.includeEnvironmentVariables = true;
+        return this;
+    }
+
+    @Override
+    public ErrorRecorder includeEnvironmentVariables(boolean includeEnvironmentVariables)
+    {
+        checkNotSent();
+        this.includeEnvironmentVariables = includeEnvironmentVariables;
+        return this;
+    }
+
+    @Override
+    public ErrorRecorder includeSystemProperties(boolean includeSystemProperties)
+    {
+        checkNotSent();
+        this.includeSystemProperties = includeSystemProperties;
         return this;
     }
 
@@ -177,7 +197,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     public void addAdditionalContextIfPossible()
     {
         addLocalHost();
-        if (systemProperties == null)
+        if (includeSystemProperties && systemProperties == null)
         {
             try
             {
@@ -187,7 +207,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             {
             }
         }
-        if (environmentVariables == null)
+        if (includeEnvironmentVariables && environmentVariables == null)
         {
             try
             {
