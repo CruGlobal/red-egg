@@ -44,7 +44,6 @@ public abstract class AbstractEndToEndIT
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(500));
 
-        waitABit();
         String report = getReport();
 
         assertThat(report, containsString("<api-key>abc</api-key>"));
@@ -70,7 +69,6 @@ public abstract class AbstractEndToEndIT
 
         assertThat(appResponse.getStatus(), equalTo(500));
 
-        waitABit();
         String report = getReport();
 
         assertThat(report, containsString("<api-key>abc</api-key>"));
@@ -108,7 +106,6 @@ public abstract class AbstractEndToEndIT
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(204));
 
-        waitABit();
         String report = getReport();
 
         assertThat(report, containsString("<api-key>abc</api-key>"));
@@ -118,27 +115,33 @@ public abstract class AbstractEndToEndIT
         assertThat(report, not(containsString("letmein")));
     }
 
+    private String getReport() throws InterruptedException
+    {
+        WebTarget path = getWebTarget().path("dummyapi/notices");
+
+        Response reportResponse;
+        do
+        {
+            waitABit();
+            reportResponse = path.request().get();
+
+        } while (reportResponse.getStatus() == 204);
+
+        assertThat(reportResponse.getStatus(), equalTo(200));
+
+        String report = reportResponse.readEntity(String.class);
+        System.out.println(report.replace("><", ">\n<"));
+        return report;
+    }
+
     /**
-     * On wildfly, this wait is necessary.
-     * Otherwise the error queueing & reporting takes a hair longer than the tests' followup getReport() request,
+     * Sometimes the error queueing & reporting takes a little longer than the tests' followup getReport() request,
      * and the dummy api won't have received the report yet.
+     * So we need to wait a little.
      */
     private void waitABit() throws InterruptedException
     {
         TimeUnit.MILLISECONDS.sleep(500);
-    }
-
-    private String getReport()
-    {
-        Response reportResponse = getWebTarget().path("dummyapi/notices")
-            .request()
-            .get();
-        String report = reportResponse.readEntity(String.class);
-
-        assertThat(reportResponse.getStatus(), equalTo(200));
-
-        System.out.println(report.replace("><", ">\n<"));
-        return report;
     }
 
     private WebTarget getWebTarget()
