@@ -45,6 +45,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
@@ -151,7 +152,16 @@ public class JaxrsRecordingIntegrationTest
         assertThat(response.getStatus(), equalTo(200));
 
         verify(recorder).recordEntityRepresentation(anyString());
-        verify(recorder).recordRequestPostParameters(ImmutableMultimap.<String, String>of());
+
+        ImmutableMultimap<String, String> expected = ImmutableMultimap.of();
+        /* Note: it would be nice to verify this happen occurred exactly once,
+         * but unfortunately arquillian occasionally makes its own POST requests
+         * (with no post parameters) to the ArquillianServletRunner during test executions.
+         * This causes the recorder to record more than one request,
+         * which would fail that verification.
+         * So, we use atLeastOnce() which is good enough.
+         */
+        verify(recorder, atLeastOnce()).recordRequestPostParameters(expected);
     }
 
     @Test
@@ -192,7 +202,8 @@ public class JaxrsRecordingIntegrationTest
         verify(recorder).recordEntityRepresentation(anyString());
 
         Multimap<String, String> expected = ImmutableMultimap.of();
-        verify(recorder).recordRequestPostParameters(expected);
+        // See note in testSimpleJsonJaxrsPostJsonRequest()
+        verify(recorder, atLeastOnce()).recordRequestPostParameters(expected);
     }
 
     private WebTarget getWebTarget()
