@@ -13,15 +13,17 @@ public class DummyErrbitApi
     volatile static String report;
 
     @POST
-    public void postNotice(String xmlPayload)
+    public synchronized void postNotice(String xmlPayload)
     {
         report = xmlPayload;
     }
 
     @GET
-    public String getMostRecentReport()
+    public synchronized String getMostRecentReport()
     {
-        return report;
+        String returnedReport = report;
+        report = null;
+        return returnedReport;
     }
 
 }

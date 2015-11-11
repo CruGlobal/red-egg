@@ -187,16 +187,6 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             {
             }
         }
-        if (environmentVariables == null)
-        {
-            try
-            {
-                environmentVariables = System.getenv();
-            }
-            catch (SecurityException ignored)
-            {
-            }
-        }
     }
 
     private void addLocalHost()

@@ -194,6 +194,16 @@ You can optionally record additional context information that will make your err
 Inject a WebErrorRecorder into an appropriate class (likely an interceptor or decorator),
 and use the `recordContext()` and/or `recordUser()` methods.
 
+You may wish to record the JVM's environment variables; use `recordEnvironmentVariables()` for this.
+They are not recorded automatically, since (at least in Docker apps) they often contain credentials.
+You can, of course, sanitize the values before recording them, but Red Egg doesn't do this for you.
+
+System properties, on the other hand, are recorded automatically.
+If you wish to disable this, call `recordSystemProperties()` with an empty map.
+(Or you may sanitize the properties and then record them.)
+
+The hostname is recorded automatically, but you can override it with `recordLocalHost()`.
+
 
 Building this project
 =====================
