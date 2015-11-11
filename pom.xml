@@ -10,10 +10,10 @@
 
 
   <properties>
-    <version.arquillian_core>1.1.2.Final</version.arquillian_core>
+    <version.arquillian_core>1.1.10.Final</version.arquillian_core>
     <wildfly.arquillian.version>8.2.1.Final</wildfly.arquillian.version>
     <jboss.as.arquillian.version>7.2.0.Final</jboss.as.arquillian.version>
-    <resteasy.version>3.0.5.Final</resteasy.version>
+    <resteasy.version>3.0.12.Final</resteasy.version>
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
