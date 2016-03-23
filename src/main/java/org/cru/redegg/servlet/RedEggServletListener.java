@@ -31,6 +31,7 @@ import static org.cru.redegg.servlet.ParameterCategorizer.Categorization;
 @WebListener
 public class RedEggServletListener implements ServletContextListener, ServletRequestListener {
 
+    private final String ASYNC_CONTEXT = getClass().getName() + ".asyncContext";
 
     @Inject
     RecorderFactory recorderFactory;
@@ -69,6 +70,11 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     private void requestInitialized(HttpServletRequest request)
     {
+        // if we are in an async contextual state, then the request has already been initialized
+        if(isAsyncContext(request)) {
+            return;
+        }
+
         // capture the current time as early as possible
         DateTime requestStart = clock.dateTime();
 
@@ -108,11 +114,16 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
-        recorderFactory.getWebRecorder()
-            .recordRequestComplete(clock.dateTime());
-        lifecycle.endRequest();
+        // if we are in an async contextual state, then the request has not yet completed
+        if(isAsyncContext(sre.getServletRequest())) {
+            sre.getServletRequest().setAttribute(ASYNC_CONTEXT, "true");
+        } else {
+            sre.getServletRequest().setAttribute(ASYNC_CONTEXT, null);
+            recorderFactory.getWebRecorder()
+                    .recordRequestComplete(clock.dateTime());
+            lifecycle.endRequest();
+        }
     }
-
 
     public void setRecorderFactory(RecorderFactory recorderFactory)
     {
@@ -137,5 +148,18 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     public void setSanitizer(ParameterSanitizer sanitizer)
     {
         this.sanitizer = sanitizer;
+    }
+
+    private boolean isAsyncContext(ServletRequest request) {
+        try {
+            request.getAsyncContext();
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    private boolean isAsyncContext(HttpServletRequest request) {
+        return request.getAttribute(ASYNC_CONTEXT) != null && request.getAttribute(ASYNC_CONTEXT).equals("true");
     }
 }
