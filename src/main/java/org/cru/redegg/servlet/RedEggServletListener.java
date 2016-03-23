@@ -31,8 +31,6 @@ import static org.cru.redegg.servlet.ParameterCategorizer.Categorization;
 @WebListener
 public class RedEggServletListener implements ServletContextListener, ServletRequestListener {
 
-    private final String ASYNC_CONTEXT = getClass().getName() + ".asyncContext";
-
     @Inject
     RecorderFactory recorderFactory;
 
@@ -115,13 +113,13 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
         // if we are in an async contextual state, then the request has not yet completed
-        if(isAsyncContext(sre.getServletRequest())) {
-            sre.getServletRequest().setAttribute(ASYNC_CONTEXT, "true");
+        if(sre.getServletRequest().isAsyncStarted()) {
+            setAsyncContext(sre.getServletRequest(), true);
         } else {
-            sre.getServletRequest().setAttribute(ASYNC_CONTEXT, null);
             recorderFactory.getWebRecorder()
                     .recordRequestComplete(clock.dateTime());
             lifecycle.endRequest();
+            setAsyncContext(sre.getServletRequest(), false);
         }
     }
 
@@ -150,16 +148,17 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         this.sanitizer = sanitizer;
     }
 
+    /**
+     * Async context state management
+     */
+    private final String ASYNC_CONTEXT = getClass().getName() + ".asyncContext";
+
     private boolean isAsyncContext(ServletRequest request) {
-        try {
-            request.getAsyncContext();
-            return true;
-        } catch (IllegalStateException e) {
-            return false;
-        }
+        return request.getAttribute(ASYNC_CONTEXT) != null &&
+                request.getAttribute(ASYNC_CONTEXT).equals(Boolean.toString(true));
     }
 
-    private boolean isAsyncContext(HttpServletRequest request) {
-        return request.getAttribute(ASYNC_CONTEXT) != null && request.getAttribute(ASYNC_CONTEXT).equals("true");
+    private void setAsyncContext(ServletRequest request, boolean asyncContext) {
+        request.setAttribute(ASYNC_CONTEXT, Boolean.toString(asyncContext));
     }
 }
