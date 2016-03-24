@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * @author Matt Drees
  */
-@WebFilter(urlPatterns = "/*")
+@WebFilter(urlPatterns = "/*", asyncSupported = true)
 public class RedEggFilter implements Filter {
 
     @Inject
