@@ -99,7 +99,6 @@ public class InMemoryErrorQueue implements ErrorQueue
         }
         catch (RejectedExecutionException e)
         {
-            System.out.println("submission rejected");
             errorLog.error("unable to submit error report to queue; using fallback reporter", e);
 
             // run on this thread
@@ -134,9 +133,7 @@ public class InMemoryErrorQueue implements ErrorQueue
     {
         try
         {
-            System.out.println("sending fallback");
             fallbackReporter.send(report);
-            System.out.println("sent fallback");
         }
         catch (Throwable t2)
         {
