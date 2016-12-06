@@ -73,6 +73,7 @@ public class DefaultDeployment {
 
 
     private DefaultDeployment(String archiveName) {
+        // TODO: use configureResolver().workOffline(boolean)
         resolver = Maven.resolver().offline().loadPomFromFile("pom.xml");
 
         webArchive = getWebArchive(archiveName);
