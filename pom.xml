@@ -58,6 +58,18 @@
     </dependency>
 
     <dependency>
+      <groupId>com.rollbar</groupId>
+      <artifactId>rollbar-payload</artifactId>
+      <version>0.5.3-crufork-1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rollbar</groupId>
+      <artifactId>rollbar-sender</artifactId>
+      <version>0.5.3-crufork-1</version>
+    </dependency>
+
+    <dependency>
       <!-- guava is a useful and well-adopted library -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

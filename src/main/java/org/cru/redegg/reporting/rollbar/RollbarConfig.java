@@ -1,5 +1,7 @@
 package org.cru.redegg.reporting.rollbar;
 
+import com.rollbar.sender.PayloadSender;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -8,7 +10,6 @@ import java.net.URISyntaxException;
  */
 public class RollbarConfig
 {
-    public static final String ROLLBAR_DEFAULT_ENDPOINT = "https://api.rollbar.com/api/1/item/";
 
     private String accessToken;
     private URI endpoint;
@@ -27,7 +28,7 @@ public class RollbarConfig
     {
         try
         {
-            endpoint = new URI(ROLLBAR_DEFAULT_ENDPOINT);
+            endpoint = new URI(PayloadSender.DEFAULT_API_ENDPOINT);
         }
         catch (URISyntaxException e)
         {

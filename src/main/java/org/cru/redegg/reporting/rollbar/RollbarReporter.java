@@ -1,11 +1,13 @@
 package org.cru.redegg.reporting.rollbar;
 
+import com.google.common.base.Throwables;
+import com.rollbar.sender.PayloadSender;
+import com.rollbar.sender.RollbarResponse;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
-import org.cru.redegg.reporting.common.HttpPayloadSender;
 
 import javax.inject.Inject;
-import java.io.IOException;
+import java.net.MalformedURLException;
 
 /**
  * @author Matt Drees
@@ -16,28 +18,33 @@ public class RollbarReporter implements ErrorReporter
 
     private final RollbarConfig config;
     private final FileNameResolver resolver;
+    private final PayloadSender sender;
 
     @Inject
     public RollbarReporter(RollbarConfig config, FileNameResolver resolver)
     {
         this.config = config;
         this.resolver = resolver;
+        try
+        {
+            this.sender = new PayloadSender(config.getEndpoint().toURL());
+        }
+        catch (MalformedURLException e)
+        {
+            throw Throwables.propagate(e);
+        }
     }
 
 
     @Override
     public void send(ErrorReport report)
     {
-        RollbarJsonPayload payload = new RollbarJsonPayload(report, config, resolver);
+        RollbarPayloadBuilder builder = new RollbarPayloadBuilder(config, report);
 
-        try
+        RollbarResponse response = sender.send(builder.build());
+        if (!response.isSuccessful())
         {
-            new HttpPayloadSender(config.getEndpoint(), "application/json").send(payload);
+            throw new RuntimeException("unsuccessful attempt to send rollbar report: " + response.errorMessage());
         }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
     }
 }
