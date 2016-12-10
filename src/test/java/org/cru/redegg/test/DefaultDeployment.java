@@ -9,7 +9,12 @@ import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
 import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
 import org.cru.redegg.recording.interceptor.ActionRecordingInterceptor;
 import org.cru.redegg.recording.jul.RedEggHandler;
+import org.cru.redegg.boot.Log4jLogging;
+import org.cru.redegg.recording.log4j.Log4jRecorder;
 import org.cru.redegg.recording.log4j.RedEggLog4jAppender;
+import org.cru.redegg.boot.LogbackLogging;
+import org.cru.redegg.recording.logback.LogbackRecorder;
+import org.cru.redegg.recording.logback.RedEggLogbackAppender;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.util.Clock;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -118,7 +123,16 @@ public class DefaultDeployment {
     }
 
     /**
-     * Adds the boot, servlet, util, api, jul, and log4j packages
+     * Adds the core and log4j packages
+     */
+    public DefaultDeployment addCoreWildflyPackages()
+    {
+        addCorePackages();
+        return addLog4j();
+    }
+
+    /**
+     * Adds the boot, servlet, util, api packages
      */
     public DefaultDeployment addCorePackages()
     {
@@ -126,9 +140,35 @@ public class DefaultDeployment {
             .addPackage(boot())
             .addPackage(servlet())
             .addPackage(util())
-            .addPackage(recordingApi())
-            .addPackage(recordingJul())
-            .addPackage(recordingLog4j());
+            .addPackage(recordingApi());
+
+        return this;
+    }
+
+    /**
+     * Adds log4j package
+     */
+    public DefaultDeployment addLog4j()
+    {
+        getArchive().addPackage(recordingLog4j());
+        return this;
+    }
+
+    /**
+     * Adds jul package
+     */
+    public DefaultDeployment addJul()
+    {
+        getArchive().addPackage(recordingJul());
+        return this;
+    }
+
+    /**
+     * Adds logback package
+     */
+    public DefaultDeployment addLogback()
+    {
+        getArchive().addPackage(recordingLogback());
         return this;
     }
 
@@ -160,6 +200,11 @@ public class DefaultDeployment {
     private Package recordingLog4j()
     {
         return RedEggLog4jAppender.class.getPackage();
+    }
+
+    private Package recordingLogback()
+    {
+        return RedEggLogbackAppender.class.getPackage();
     }
 
     public DefaultDeployment addRecordingConfigurationClasses()

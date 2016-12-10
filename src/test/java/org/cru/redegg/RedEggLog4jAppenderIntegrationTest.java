@@ -37,11 +37,10 @@ public class RedEggLog4jAppenderIntegrationTest
 
         return DefaultDeployment.withCdi()
             .addRecordingConfigurationClasses()
+            .addLog4j()
             .getArchive()
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
-            .addClass(RedEggHandler.class)
-            .addClass(RedEggLog4jAppender.class)
             .addClass(ErrorLog.class)
             .addPackage(Clock.class.getPackage())
             .addPackage(Lifecycle.class.getPackage())

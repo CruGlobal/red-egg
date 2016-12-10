@@ -1,10 +1,8 @@
 package org.cru.redegg.boot;
 
 import com.google.common.collect.ImmutableSet;
+import org.cru.redegg.recording.api.LoggingRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
-import org.cru.redegg.recording.jul.JulRecorder;
-import org.cru.redegg.recording.log4j.Log4jAvailability;
-import org.cru.redegg.recording.log4j.Log4jRecorder;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
@@ -44,45 +42,34 @@ public class Lifecycle
         recorderFactory = null;
     }
 
-    private Log4jRecorder log4JRecorder;
-    private JulRecorder julRecorder;
+    private LoggingRecorder recorder;
 
     public void beginApplication()
     {
         // load this eagerly since its xpath usage can get thrown off by TCCL changes
         RedEggVersion.get();
 
-        addLog4jAppender();
-        addJulHandler();
+        if (LogbackLogging.isAvailable())
+        {
+            recorder = LogbackLogging.addLogbackAppender(recorderFactory, ignoredLoggers);
+        }
+        else if (Log4jLogging.isAvailable())
+        {
+            recorder = Log4jLogging.addLog4jAppender(recorderFactory, ignoredLoggers);
+        }
+        else // J.U.L. is always available
+        {
+            recorder = JulLogging.addJulHandler(recorderFactory, ignoredLoggers);
+        }
     }
 
     public void endApplication()
     {
-        if (log4JRecorder != null)
+        if (recorder != null)
         {
-            removeLog4jAppender();
+            recorder.remove();
+            recorder = null;
         }
-        removeJulHandler();
-    }
-
-    private void addLog4jAppender() {
-        log4JRecorder = Log4jRecorder.add(recorderFactory, ignoredLoggers);
-    }
-
-    private void addJulHandler() {
-        julRecorder = JulRecorder.add(recorderFactory, ignoredLoggers);
-    }
-
-    private void removeJulHandler()
-    {
-        julRecorder.remove();
-        julRecorder = null;
-    }
-
-    private void removeLog4jAppender()
-    {
-        log4JRecorder.remove();
-        log4JRecorder = null;
     }
 
     public void beginRequest()

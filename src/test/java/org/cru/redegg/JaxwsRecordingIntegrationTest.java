@@ -50,7 +50,7 @@ public class JaxwsRecordingIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("jaxws-test.war")
-            .addCorePackages()
+            .addCoreWildflyPackages()
             .addRecordingConfigurationClasses()
             .getArchive()
 

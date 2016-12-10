@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.log4j;
 
 import org.apache.log4j.Logger;
+import org.cru.redegg.recording.api.LoggingRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 
 import java.util.Enumeration;
@@ -11,7 +12,7 @@ import java.util.Set;
  *
  * @author Matt Drees
  */
-public class Log4jRecorder
+public class Log4jRecorder implements LoggingRecorder
 {
     private Logger root;
     private RedEggLog4jAppender appender;

@@ -1,5 +1,6 @@
 package org.cru.redegg.recording.jul;
 
+import org.cru.redegg.recording.api.LoggingRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 
 import java.util.Set;
@@ -7,7 +8,7 @@ import java.util.Set;
 /**
  * @author Matt Drees
  */
-public class JulRecorder
+public class JulRecorder implements LoggingRecorder
 {
     private java.util.logging.Logger root;
     private RedEggHandler julHandler;
