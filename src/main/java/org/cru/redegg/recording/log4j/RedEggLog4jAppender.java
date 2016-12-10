@@ -15,12 +15,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Matt Drees
  */
-public class RedEggAppender extends AppenderSkeleton {
+public class RedEggLog4jAppender extends AppenderSkeleton {
 
     private final RecorderFactory factory;
     private final Set<String> ignoredLoggerNames;
 
-    public RedEggAppender(RecorderFactory factory, Set<String> ignoredLoggerNames) {
+    public RedEggLog4jAppender(RecorderFactory factory, Set<String> ignoredLoggerNames) {
         this.factory = checkNotNull(factory);
         this.ignoredLoggerNames = checkNotNull(ignoredLoggerNames);
         setThreshold(Level.DEBUG);

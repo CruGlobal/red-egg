@@ -5,7 +5,7 @@ import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.recording.log4j.RedEggLog4jAppender;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 
 @RunWith(Arquillian.class)
-public class RedEggAppenderIntegrationTest
+public class RedEggLog4jAppenderIntegrationTest
 {
     @Deployment
     public static WebArchive deployment()  {
@@ -41,7 +41,7 @@ public class RedEggAppenderIntegrationTest
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
             .addClass(RedEggHandler.class)
-            .addClass(RedEggAppender.class)
+            .addClass(RedEggLog4jAppender.class)
             .addClass(ErrorLog.class)
             .addPackage(Clock.class.getPackage())
             .addPackage(Lifecycle.class.getPackage())

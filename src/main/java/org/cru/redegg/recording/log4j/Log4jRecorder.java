@@ -14,19 +14,19 @@ import java.util.Set;
 public class Log4jRecorder
 {
     private Logger root;
-    private RedEggAppender log4jAppender;
+    private RedEggLog4jAppender appender;
 
     public static Log4jRecorder add(RecorderFactory recorderFactory, Set<String> ignoredLoggers)
     {
         return new Log4jRecorder(recorderFactory, ignoredLoggers);
     }
 
-    public Log4jRecorder(RecorderFactory recorderFactory, Set<String> ignoredLoggers)
+    private Log4jRecorder(RecorderFactory recorderFactory, Set<String> ignoredLoggers)
     {
-        log4jAppender = new RedEggAppender(recorderFactory, ignoredLoggers);
+        appender = new RedEggLog4jAppender(recorderFactory, ignoredLoggers);
         root = Logger.getRootLogger();
         root.info("adding log4j appender");
-        root.addAppender(log4jAppender);
+        root.addAppender(appender);
         Enumeration allAppenders = root.getAllAppenders();
         boolean none = !allAppenders.hasMoreElements();
         if (none)
@@ -36,6 +36,6 @@ public class Log4jRecorder
     public void remove()
     {
         root.info("removing log4j appender");
-        root.removeAppender(log4jAppender);
+        root.removeAppender(appender);
     }
 }

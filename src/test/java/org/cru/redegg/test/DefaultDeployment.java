@@ -9,7 +9,7 @@ import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
 import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
 import org.cru.redegg.recording.interceptor.ActionRecordingInterceptor;
 import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggAppender;
+import org.cru.redegg.recording.log4j.RedEggLog4jAppender;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.util.Clock;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -159,7 +159,7 @@ public class DefaultDeployment {
 
     private Package recordingLog4j()
     {
-        return RedEggAppender.class.getPackage();
+        return RedEggLog4jAppender.class.getPackage();
     }
 
     public DefaultDeployment addRecordingConfigurationClasses()
