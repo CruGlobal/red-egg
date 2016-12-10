@@ -1,9 +1,10 @@
 package org.cru.redegg.reporting.errbit;
 
-import org.apache.log4j.Logger;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.common.HttpPayloadSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class NativeErrbitReporter implements ErrorReporter
 {
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LoggerFactory.getLogger(getClass());
 
     ErrbitConfig config;
 
@@ -42,7 +43,7 @@ public class NativeErrbitReporter implements ErrorReporter
 
     private void logUserWarning(ErrorReport report)
     {
-        log.info("user error: " + report.getRootErrorMessage().or("<message not available>"));
+        log.info("user error: {}", report.getRootErrorMessage().or("<message not available>"));
     }
 
 

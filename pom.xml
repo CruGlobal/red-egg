@@ -50,11 +50,13 @@
     </dependency>
 
     <dependency>
-      <!-- all Cru (java) apps use log4j, so for now we treat this as a hard dependency -->
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <!-- 1.2.16 is the version used by jboss 7.1.1.Final -->
-      <version>1.2.16</version>
+      <!--
+        All Cru (java) apps use slf4j, so for now we treat this as a hard dependency.
+        It is used for internal error logging.
+       -->
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.12</version>
     </dependency>
 
     <dependency>
@@ -88,6 +90,14 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.2.4</version>
+    </dependency>
+
+    <dependency>
+      <!-- log4j can be used to report errors -->
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.16</version>
+      <optional>true</optional>
     </dependency>
 
 

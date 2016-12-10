@@ -1,6 +1,8 @@
 package org.cru.redegg.util;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matt Drees
@@ -17,7 +19,7 @@ public class ErrorLog
     final Logger log;
 
     public ErrorLog() {
-        this.log = Logger.getLogger(NAME);
+        this.log = LoggerFactory.getLogger(NAME);
     }
 
     /**

@@ -1,8 +1,9 @@
 package org.cru.redegg.jaxws;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 public class RecordingSoapHandler implements SOAPHandler<SOAPMessageContext>
 {
-    private Logger log = Logger.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     //TODO: not sure we can rely on this working
     @Inject
