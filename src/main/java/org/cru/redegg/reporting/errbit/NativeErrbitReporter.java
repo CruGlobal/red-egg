@@ -5,7 +5,6 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.common.HttpPayloadSender;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 /**
@@ -23,7 +22,6 @@ public class NativeErrbitReporter implements ErrorReporter
 
     ErrbitConfig config;
 
-    @Inject
     public NativeErrbitReporter(ErrbitConfig config)
     {
         this.config = config;

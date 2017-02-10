@@ -6,7 +6,6 @@ import com.rollbar.sender.RollbarResponse;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 
-import javax.inject.Inject;
 import java.net.MalformedURLException;
 
 /**
@@ -19,7 +18,6 @@ public class RollbarReporter implements ErrorReporter
     private final RollbarConfig config;
     private final PayloadSender sender;
 
-    @Inject
     public RollbarReporter(RollbarConfig config)
     {
         this.config = config;

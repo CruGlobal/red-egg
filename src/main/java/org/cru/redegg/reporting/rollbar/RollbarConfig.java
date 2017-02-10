@@ -1,6 +1,7 @@
 package org.cru.redegg.reporting.rollbar;
 
 import com.rollbar.sender.PayloadSender;
+import org.cru.redegg.reporting.errbit.Empty;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -8,6 +9,7 @@ import java.net.URISyntaxException;
 /**
  * @author Matt Drees
  */
+@Empty
 public class RollbarConfig
 {
 
