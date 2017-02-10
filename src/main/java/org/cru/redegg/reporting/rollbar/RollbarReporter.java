@@ -17,14 +17,12 @@ public class RollbarReporter implements ErrorReporter
 
 
     private final RollbarConfig config;
-    private final FileNameResolver resolver;
     private final PayloadSender sender;
 
     @Inject
-    public RollbarReporter(RollbarConfig config, FileNameResolver resolver)
+    public RollbarReporter(RollbarConfig config)
     {
         this.config = config;
-        this.resolver = resolver;
         try
         {
             this.sender = new PayloadSender(config.getEndpoint().toURL());

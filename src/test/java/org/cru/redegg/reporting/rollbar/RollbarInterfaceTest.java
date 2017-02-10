@@ -32,21 +32,21 @@ public class RollbarInterfaceTest
         config.setBranch("add-rollbar-support");
         config.setIdentifyingUserProperty("guid");
         config.setCodeVersion(RedEggVersion.get());
-        return new RollbarReporter(config, new HardCodedFileNameResolver());
+        return new RollbarReporter(config /*, new HardCodedFileNameResolver()*/ );
     }
 
 
-    private static class HardCodedFileNameResolver implements FileNameResolver
-    {
-        @Override
-        public String addPath(String fileName, String className)
-        {
-            if (className.startsWith("org.cru.redegg.reporting.rollbar"))
-                return "org/cru/redegg/reporting/rollbar/" + fileName;
-            else if (className.startsWith("org.cru.redegg.reporting"))
-                return "org/cru/redegg/reporting/" + fileName;
-            else
-                return fileName;
-        }
-    }
+//    private static class HardCodedFileNameResolver implements FileNameResolver
+//    {
+//        @Override
+//        public String addPath(String fileName, String className)
+//        {
+//            if (className.startsWith("org.cru.redegg.reporting.rollbar"))
+//                return "org/cru/redegg/reporting/rollbar/" + fileName;
+//            else if (className.startsWith("org.cru.redegg.reporting"))
+//                return "org/cru/redegg/reporting/" + fileName;
+//            else
+//                return fileName;
+//        }
+//    }
 }
