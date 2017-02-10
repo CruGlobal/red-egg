@@ -126,4 +126,13 @@ public class RollbarConfig
     {
         this.branch = branch;
     }
+
+    public void validate()
+    {
+        if (accessToken == null)
+            throw new IllegalArgumentException("rollbar access token is required");
+        if (environmentName == null)
+            throw new IllegalArgumentException("rollbar environment name is required");
+    }
+
 }

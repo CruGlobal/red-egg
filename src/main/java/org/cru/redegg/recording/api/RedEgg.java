@@ -2,6 +2,7 @@ package org.cru.redegg.recording.api;
 
 import org.cru.redegg.manual.Builder;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
+import org.cru.redegg.reporting.rollbar.RollbarConfig;
 
 import javax.servlet.ServletRequest;
 
@@ -31,12 +32,25 @@ public class RedEgg
      * Enables Errbit reporting.
      *
      * At minimum, the Errbit url and the api key must be present.
-     * If this method is not called, red-egg will simply log failures.
+     * If neither this method nor setRollbarConfig is called, red-egg will simply log failures.
      */
     public RedEgg setErrbitConfig(ErrbitConfig config)
     {
         config.validate();
         builder.setErrbitConfig(config);
+        return this;
+    }
+
+    /**
+     * Enables Rollbar reporting.
+     *
+     * At minimum, the access token and the environment name must be present.
+     * If neither this method nor setErrbitConfig is called, red-egg will simply log failures.
+     */
+    public RedEgg setRollbarConfig(RollbarConfig config)
+    {
+        config.validate();
+        builder.setRollbarConfig(config);
         return this;
     }
 
