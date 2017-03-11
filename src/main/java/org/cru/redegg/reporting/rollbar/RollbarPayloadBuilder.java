@@ -2,8 +2,7 @@ package org.cru.redegg.reporting.rollbar;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -19,6 +18,7 @@ import com.rollbar.payload.data.body.BodyContents;
 import com.rollbar.payload.data.body.Message;
 import com.rollbar.payload.data.body.TraceChain;
 import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.ExceptionDetailsExtractor;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
@@ -129,6 +129,17 @@ class RollbarPayloadBuilder
             }
             customData.put("other_trace_chains", otherTraceChains);
         }
+
+        List<String> allDetails = Lists.newArrayList();
+        ExceptionDetailsExtractor extractor = new ExceptionDetailsExtractor();
+        for (Throwable throwable : thrown)
+        {
+            for (Throwable link : Throwables.getCausalChain(throwable))
+            {
+                allDetails.addAll(extractor.extractDetails(link));
+            }
+        }
+        customData.put("exception_details", Joiner.on("\n").join(allDetails));
 
         customData.put("log_messages", report.getLogRecords());
         return customData;
