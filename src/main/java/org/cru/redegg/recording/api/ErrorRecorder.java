@@ -63,5 +63,5 @@ public interface ErrorRecorder {
      * a web error recorder.
      * (For those, errors are always sent at the end of the request)
      */
-    public void sendReportIfNecessary();
+    void sendReportIfNecessary();
 }
