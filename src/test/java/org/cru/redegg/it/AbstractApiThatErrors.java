@@ -19,6 +19,8 @@ public abstract class AbstractApiThatErrors
     @Path("throw")
     public void throwBoom()
     {
+        Logger logger = Logger.getLogger(getClass());
+        logger.debug("joe is logged in");
         recorder().recordUser(new User(42, "joe.staffguy@cru.org"));
         recorder().recordContext("fun fact:", "I'm about to blow");
         throw new IllegalStateException("kablooie!");
