@@ -12,6 +12,7 @@ import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
+import org.cru.redegg.util.RedEggStrings;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -285,7 +286,9 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             simplifier.replaceStacktraceIfRedundant();
             try
             {
-                serializedLogRecords.add(formatter.format(logRecord));
+                String formatted = formatter.format(logRecord);
+                String truncated = RedEggStrings.truncate(formatted, 2000, "...");
+                serializedLogRecords.add(truncated);
             }
             finally
             {
