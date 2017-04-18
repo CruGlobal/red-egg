@@ -1,6 +1,7 @@
 package org.cru.redegg.it;
 
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
+import com.google.gson.JsonObject;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -12,10 +13,11 @@ import org.junit.runner.RunWith;
 
 import javax.enterprise.inject.Produces;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -56,15 +58,33 @@ public class EndToEndManualCheck
 
     @Test
     @RunAsClient
-    public void testThrown()
+    public void testThrownWithFormBody()
     {
-        WebTarget target = getWebTarget().path("explosions/throw");
+        WebTarget target = getWebTarget().path("explosions/throw")
+            .queryParam("explosion-size", "on-the-smaller-side");
         Form form = new Form()
             .param("secret", "letmein")
             .param("well-known-fact", "matt's a swell guy");
         Response appResponse = target
             .request()
             .post(form(form));
+        assertThat(appResponse.getStatus(), equalTo(500));
+    }
+
+    @Test
+    @RunAsClient
+    public void testThrownWithJsonBody()
+    {
+        WebTarget target = getWebTarget().path("explosions/throw")
+            .queryParam("explosion-size", "on-the-smaller-side");
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("secret", "letmein");
+        jsonObject.addProperty("well-known-fact", "matt's a swell guy");
+        Entity<String> entity =
+            Entity.entity(jsonObject.toString(), MediaType.APPLICATION_JSON_TYPE);
+        Response appResponse = target
+            .request()
+            .post(entity);
         assertThat(appResponse.getStatus(), equalTo(500));
     }
 
