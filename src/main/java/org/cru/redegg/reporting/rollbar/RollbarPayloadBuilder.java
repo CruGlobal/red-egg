@@ -3,6 +3,7 @@ package org.cru.redegg.reporting.rollbar;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -27,6 +28,8 @@ import org.cru.redegg.util.RedEggVersion;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -201,8 +204,18 @@ class RollbarPayloadBuilder
         //TODO: get the raw string from the servlet container
 //        if (query != null) requestData = requestData.queryString();
 
-        // TODO: user ip
-//        requestData.userIp()
+        if (!Strings.isNullOrEmpty(webContext.getRemoteIpAddress()))
+        {
+            try
+            {
+                InetAddress address = InetAddress.getByName(webContext.getRemoteIpAddress());
+                requestData = requestData.userIp(address);
+            }
+            catch (UnknownHostException e)
+            {
+                // ignore
+            }
+        }
 
         // TODO: protocol ?
 

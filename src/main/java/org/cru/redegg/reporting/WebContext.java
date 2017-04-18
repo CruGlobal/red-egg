@@ -23,6 +23,7 @@ public class WebContext {
     private DateTime finish;
     private Integer responseStatus;
     private Method component;
+    private String remoteIpAddress;
 
 
     public Multimap<String, String> getCombinedQueryAndPostParameters()
@@ -118,5 +119,15 @@ public class WebContext {
     public void setResponseStatus(Integer responseStatus)
     {
         this.responseStatus = responseStatus;
+    }
+
+    public void setRemoteIpAddress(String remoteIpAddress)
+    {
+        this.remoteIpAddress = remoteIpAddress;
+    }
+
+    public String getRemoteIpAddress()
+    {
+        return remoteIpAddress;
     }
 }

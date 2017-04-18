@@ -157,6 +157,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress)
+    {
+        checkState(!completed);
+        webContext.setRemoteIpAddress(remoteIpAddress);
+        return this;
+    }
+
+    @Override
     public void recordRequestComplete(DateTime finish) {
         checkState(!completed);
         completed = true;

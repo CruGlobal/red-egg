@@ -46,6 +46,7 @@ public interface WebErrorRecorder extends ErrorRecorder {
 
     WebErrorRecorder recordResponseStatus(int responseStatus);
 
+    WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress);
 
     void recordRequestComplete(DateTime dateTime);
 }

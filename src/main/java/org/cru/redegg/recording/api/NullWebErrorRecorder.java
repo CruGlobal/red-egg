@@ -86,6 +86,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress)
+    {
+        return this;
+    }
+
+    @Override
     public void recordRequestComplete(DateTime dateTime)
     {
     }
