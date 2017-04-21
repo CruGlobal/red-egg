@@ -178,16 +178,6 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     public void addAdditionalContextIfPossible()
     {
         addLocalHost();
-        if (systemProperties == null)
-        {
-            try
-            {
-                systemProperties = System.getProperties();
-            }
-            catch (SecurityException ignored)
-            {
-            }
-        }
     }
 
     private void addLocalHost()
