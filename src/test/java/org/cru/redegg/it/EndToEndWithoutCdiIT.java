@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.io.File;
 import java.net.URISyntaxException;
 
 /**
@@ -35,7 +34,7 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
             .addClass(WebTargetBuilder.class)
             .addClass(AbstractApiThatErrors.class)
             .addClass(ApiWithoutCdiThatErrors.class)
-            .addClass(DummyErrbitApi.class)
+            .addClass(DummyRollbarApi.class)
             .addClass(TestParameterSanitizer.class)
             .addClass(TestEntitySanitizer.class)
             .addClass(ConfigProducer.class)
@@ -51,17 +50,10 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
         @Override
         public void contextInitialized(ServletContextEvent sce)
         {
-            try
-            {
-                RedEgg.configure()
-                    .setParameterSanitizer(new TestParameterSanitizer())
-                    .setEntitySanitizer(new TestEntitySanitizer())
-                    .setErrbitConfig(new ConfigProducer().buildConfig());
-            }
-            catch (URISyntaxException e)
-            {
-                throw new AssertionError(e);
-            }
+            RedEgg.configure()
+                .setParameterSanitizer(new TestParameterSanitizer())
+                .setEntitySanitizer(new TestEntitySanitizer())
+                .setRollbarConfig(new ConfigProducer().buildConfig());
         }
 
         @Override

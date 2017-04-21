@@ -1,7 +1,7 @@
 package org.cru.redegg.it;
 
-import org.cru.redegg.reporting.errbit.ErrbitConfig;
 import com.google.gson.JsonObject;
+import org.cru.redegg.reporting.rollbar.RollbarConfig;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -19,7 +19,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
@@ -28,12 +27,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * This allows you to run against a real errbit instance.
+ * This allows you to test against the rollbar api.
  * It is not run as part of the build.
  *
- * The appserver must be running with these two system properties defined:
- * * errbit.url
- * * errbit.key
+ * The appserver must be running with this system property defined:
+ * * rollbar.accessToken
  *
  * @author Matt Drees
  */
@@ -120,14 +118,11 @@ public class EndToEndManualCheck
     public static class ConfigProducer
     {
         @Produces
-        public ErrbitConfig buildConfig() throws URISyntaxException
+        public RollbarConfig buildConfig() throws URISyntaxException
         {
-            ErrbitConfig config = new ErrbitConfig();
-            config.setEndpoint(new URI(System.getProperty("errbit.url")));
-            config.setKey(System.getProperty("errbit.key"));
+            RollbarConfig config = new RollbarConfig();
+            config.setAccessToken(System.getProperty("rollbar.accessToken"));
             config.setEnvironmentName("manual-testing");
-            config.getApplicationBasePackages().add("org.cru.redegg.it");
-            config.setSourcePrefix("src/test/java");
             return config;
         }
     }
