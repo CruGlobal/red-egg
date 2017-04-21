@@ -8,6 +8,7 @@ import org.cru.redegg.recording.log4j.RedEggAppender;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
+import org.cru.redegg.util.RedEggVersion;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -51,6 +52,9 @@ public class Lifecycle
 
     public void beginApplication()
     {
+        // load this eagerly since its xpath usage can get thrown off by TCCL changes
+        RedEggVersion.get();
+
         addLog4jAppender();
         addJulHandler();
     }
