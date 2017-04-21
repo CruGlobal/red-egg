@@ -8,6 +8,7 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.LogRecord;
 
@@ -36,7 +37,11 @@ public class RedEggLogbackAppender extends UnsynchronizedAppenderBase<ILoggingEv
         ErrorRecorder recorder = factory.getRecorder();
 
         if (event.getLevel().toInt() >= Level.ERROR.toInt()) {
-            recorder.recordContext("logback MDC", event.getMDCPropertyMap());
+            Map<String, String> properties = event.getMDCPropertyMap();
+            for (Map.Entry<String, String> entry : properties.entrySet())
+            {
+                recorder.recordContext(entry.getKey(), entry.getValue());
+            }
         }
 
         recorder

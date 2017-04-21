@@ -7,6 +7,7 @@ import org.apache.log4j.spi.ThrowableInformation;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.RecorderFactory;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.LogRecord;
 
@@ -34,9 +35,16 @@ public class RedEggLog4jAppender extends AppenderSkeleton {
         ErrorRecorder recorder = factory.getRecorder();
 
         if (event.getLevel().toInt() >= Level.ERROR.toInt()) {
-            recorder
-                .recordContext("log4j MDC", event.getProperties())
-                .recordContext("log4j NDC", event.getNDC());
+
+            @SuppressWarnings("unchecked") //log4j API is not generic
+            Map<String, Object> properties = event.getProperties();
+
+            for (Map.Entry<String, Object> entry : properties.entrySet())
+            {
+                recorder.recordContext(entry.getKey(), entry.getValue());
+            }
+
+            recorder.recordContext("log4j NDC", event.getNDC());
         }
 
         recorder
