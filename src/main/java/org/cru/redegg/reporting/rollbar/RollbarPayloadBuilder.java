@@ -26,6 +26,8 @@ import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
 import org.cru.redegg.util.RedEggStrings;
 import org.cru.redegg.util.RedEggVersion;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
@@ -234,9 +236,17 @@ class RollbarPayloadBuilder
 
         requestData = requestData.body(webContext.getEntityRepresentation());
 
-        requestData = requestData
-            .put("start", webContext.getStart().toString())
-            .put("finish", webContext.getFinish().toString());
+        DateTime start = webContext.getStart();
+        DateTime finish = webContext.getFinish();
+
+        Duration  duration = new Duration(start, finish);
+
+        String timing =
+            "start: " + start + "\n" +
+            "finish: " + finish + "\n" +
+            "duration: " + duration;
+
+        requestData = requestData.put("timing", timing);
 
         String responseStatus = webContext.getResponseStatus() == null ?
             "unknown" :
