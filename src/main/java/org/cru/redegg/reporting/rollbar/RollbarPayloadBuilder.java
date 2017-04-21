@@ -224,9 +224,12 @@ class RollbarPayloadBuilder
 
         requestData = requestData
             .put("start", webContext.getStart().toString())
-            .put("finish", webContext.getFinish().toString())
-            .put("response_status_code", webContext.getResponseStatus().toString());
+            .put("finish", webContext.getFinish().toString());
 
+        String responseStatus = webContext.getResponseStatus() == null ?
+            "unknown" :
+            webContext.getResponseStatus().toString();
+        requestData = requestData.put("response_status_code", responseStatus);
 
         return requestData;
     }
