@@ -50,7 +50,8 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private InetAddress localHost;
     private Map<String, String> environmentVariables;
     private Properties systemProperties;
-    private Set<String> loggersToIgnore;
+    private Set<String> loggersToIgnoreErrors;
+    private Set<String> loggersToIgnoreEntirely;
 
     private NotificationLevel level = NONE;
     private boolean sentError;
@@ -93,11 +94,13 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     @Override
     public ErrorRecorder recordLogRecord(LogRecord record) {
         checkNotSent();
-        if (logRecords == null)
-            logRecords = Lists.newLinkedList();
-        if (logRecords.size() < LOG_RECORD_LIMIT)
-            logRecords.add(record);
-        if (isNotIgnored(record.getLoggerName()))
+        String loggerName = record.getLoggerName();
+        if (messagesFromLoggerShouldBeIgnored(loggerName))
+            return this;
+
+        addRecordToList(record);
+
+        if (errorsFromLoggerShouldTriggerNotification(loggerName))
         {
             if (isErrorLog(record))
             {
@@ -113,10 +116,24 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return this;
     }
 
-    private boolean isNotIgnored(String loggerName)
+    private boolean messagesFromLoggerShouldBeIgnored(String loggerName)
     {
-        return loggersToIgnore == null ||
-               !loggersToIgnore.contains(loggerName);
+        return loggersToIgnoreEntirely != null &&
+               loggersToIgnoreEntirely.contains(loggerName);
+    }
+
+    private void addRecordToList(LogRecord record)
+    {
+        if (logRecords == null)
+            logRecords = Lists.newLinkedList();
+        if (logRecords.size() < LOG_RECORD_LIMIT)
+            logRecords.add(record);
+    }
+
+    private boolean errorsFromLoggerShouldTriggerNotification(String loggerName)
+    {
+        return loggersToIgnoreErrors == null ||
+               !loggersToIgnoreErrors.contains(loggerName);
     }
 
     private boolean isErrorLog(LogRecord record) {
@@ -173,12 +190,22 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder ignoreLogger(String loggerName)
+    {
+        checkNotSent();
+        if (loggersToIgnoreEntirely == null)
+            loggersToIgnoreEntirely = Sets.newHashSetWithExpectedSize(1);
+        loggersToIgnoreEntirely.add(loggerName);
+        return this;
+    }
+
+    @Override
     public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
     {
         checkNotSent();
-        if (loggersToIgnore == null)
-            loggersToIgnore = Sets.newHashSetWithExpectedSize(1);
-        loggersToIgnore.add(loggerName);
+        if (loggersToIgnoreErrors == null)
+            loggersToIgnoreErrors = Sets.newHashSetWithExpectedSize(1);
+        loggersToIgnoreErrors.add(loggerName);
         return this;
     }
 

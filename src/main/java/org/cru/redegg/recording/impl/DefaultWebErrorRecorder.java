@@ -250,6 +250,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder ignoreLogger(String loggerName)
+    {
+        checkState(!completed);
+        defaultRecorder.ignoreLogger(loggerName);
+        return this;
+    }
+
+    @Override
     public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
     {
         checkState(!completed);
