@@ -119,8 +119,7 @@ class RollbarPayloadBuilder
 
     private Map<String, Object> getCustomData()
     {
-        Map<String, Object> customData = new HashMap<String, Object>();
-        customData.put("context", RedEggCollections.flatten(report.getContext()));
+        Map<String, Object> customData = RedEggCollections.flatten(report.getContext());
 
         List<Throwable> thrown = report.getThrown();
         if (thrown.size() > 1)
@@ -144,7 +143,7 @@ class RollbarPayloadBuilder
         }
         customData.put("exception_details", Joiner.on("\n").join(allDetails));
 
-        customData.put("log_messages", report.getLogRecords());
+        customData.put("log_messages", Joiner.on("\n").join(report.getLogRecords()));
         return customData;
     }
 
