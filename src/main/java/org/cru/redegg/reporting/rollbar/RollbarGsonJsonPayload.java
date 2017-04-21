@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
+
 /**
  *
  * @author Matt Drees
@@ -80,9 +82,9 @@ public class RollbarGsonJsonPayload implements Payload
         writeEnvironment();
         writeBody();
 
-        if (report.isUserError())
+        if (report.getNotificationLevel() == WARNING)
         {
-            writer.name("level").value("info");
+            writer.name("level").value("warning");
         }
 
         //TODO: timestamp

@@ -18,6 +18,7 @@ import com.rollbar.payload.data.body.Body;
 import com.rollbar.payload.data.body.BodyContents;
 import com.rollbar.payload.data.body.Message;
 import com.rollbar.payload.data.body.TraceChain;
+import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.ExceptionDetailsExtractor;
 import org.cru.redegg.reporting.WebContext;
@@ -33,12 +34,8 @@ import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.rollbar.payload.data.Level.ERROR;
-import static com.rollbar.payload.data.Level.WARNING;
 
 /**
  * @author Matt Drees
@@ -64,7 +61,7 @@ class RollbarPayloadBuilder
     Payload build() {
 
         Body body = new Body(getBody());
-        Level level = report.isUserError() ? WARNING : ERROR;
+        Level level = determineLevel(report.getNotificationLevel());
         Data data = new Data(config.getEnvironmentName(), body)
             .level(level)
             .platform(config.getPlatform())
@@ -100,6 +97,21 @@ class RollbarPayloadBuilder
             .codeVersion(config.getCodeVersion());
 
         return new Payload(config.getAccessToken(), data);
+    }
+
+    private Level determineLevel(NotificationLevel notificationLevel)
+    {
+        switch (notificationLevel)
+        {
+            case NONE:
+                throw new IllegalArgumentException("report should not have level NONE");
+            case WARNING:
+                return Level.WARNING;
+            case ERROR:
+                return Level.ERROR;
+            default:
+                throw new IllegalArgumentException("unexpected level: " + notificationLevel);
+        }
     }
 
     private String getContext()

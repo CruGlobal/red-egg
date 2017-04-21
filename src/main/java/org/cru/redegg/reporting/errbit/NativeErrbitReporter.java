@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
+
 /**
  * Reports errors to an Errbit instance using the v2.4 xml api.
  *
@@ -31,7 +33,7 @@ public class NativeErrbitReporter implements ErrorReporter
     public void send(ErrorReport report)
     {
         config.validate();
-        if (report.isUserError())
+        if (report.getNotificationLevel() == WARNING)
         {
             logUserWarning(report);
             if (report.isMustNotify())

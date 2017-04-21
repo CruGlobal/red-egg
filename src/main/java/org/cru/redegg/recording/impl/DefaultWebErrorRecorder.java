@@ -25,6 +25,7 @@ import java.util.logging.LogRecord;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
 
 /**
  * @author Matt Drees
@@ -62,7 +63,6 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
 
     private final WebContext webContext = new WebContext();
 
-    private boolean error;
     private boolean completed;
 
     @Override
@@ -169,7 +169,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         completed = true;
         webContext.setFinish(finish);
-        if (error || defaultRecorder.wereErrorsAdded())
+        if (defaultRecorder.shouldNotificationBeSent())
         {
             if (wasClientError())
             {
@@ -268,7 +268,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     @Override
     public void error() {
         checkState(!completed);
-        error = true;
+        defaultRecorder.ensureNotificationLevel(ERROR);
     }
 
     @Override

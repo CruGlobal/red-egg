@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.impl;
 
 import org.cru.redegg.recording.api.EntitySanitizer;
+import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
@@ -17,6 +18,8 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
 
@@ -94,23 +97,24 @@ public class DefaultWebErrorRecorderTest
 
     private static class ErrorReportTypeSafeDiagnosingMatcher extends TypeSafeDiagnosingMatcher<ErrorReport>
     {
-        private boolean expectedUserError;
+        private NotificationLevel expectedLevel;
 
         public ErrorReportTypeSafeDiagnosingMatcher(boolean expectedUserError)
         {
-            this.expectedUserError = expectedUserError;
+            this.expectedLevel = expectedUserError ? WARNING : ERROR;
         }
 
         @Override
         protected boolean matchesSafely(
             ErrorReport item, Description mismatchDescription)
         {
-            if (item.isUserError() == expectedUserError) return true;
+            NotificationLevel level = item.getNotificationLevel();
+            if (level == expectedLevel) return true;
             else
             {
                 mismatchDescription
-                    .appendText("userError is ")
-                    .appendValue(item.isUserError());
+                    .appendText("notificationLevel is ")
+                    .appendValue(level);
                 return false;
             }
         }
@@ -119,8 +123,8 @@ public class DefaultWebErrorRecorderTest
         public void describeTo(Description description)
         {
             description
-                .appendText("a report whose userError property is ")
-                .appendValue(expectedUserError);
+                .appendText("a report whose notificationLevel property is ")
+                .appendValue(expectedLevel);
         }
     }
 }

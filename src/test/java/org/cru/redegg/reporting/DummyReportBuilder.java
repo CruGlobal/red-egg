@@ -8,11 +8,14 @@ import org.joda.time.DateTime;
 import java.net.URI;
 import java.util.List;
 
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
+
 public class DummyReportBuilder
 {
     public ErrorReport buildDummyReport()
     {
         ErrorReport report = new ErrorReport();
+        report.setNotificationLevel(ERROR);
         report.setLocalHostName("testserver.cru.org");
         report.setLocalHostAddress("10.10.10.10");
         List<String> logRecords = ImmutableList.of(

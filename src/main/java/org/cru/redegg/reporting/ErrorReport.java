@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.recording.api.NotificationLevel;
 
 import java.util.List;
 import java.util.Map;
@@ -24,10 +25,10 @@ public class ErrorReport {
     private String localHostAddress;
     private Map<String, String> environmentVariables;
     private Map<String, String> systemProperties;
-    private boolean userError;
 
     private WebContext webContext;
     private boolean mustNotify;
+    private NotificationLevel notificationLevel;
 
     public void addWebContext(WebContext webContext) {
         this.webContext = webContext;
@@ -180,16 +181,6 @@ public class ErrorReport {
             return Optional.of(logRecords.get(0));
     }
 
-    public void setUserError(boolean userError)
-    {
-        this.userError = userError;
-    }
-
-    public boolean isUserError()
-    {
-        return userError;
-    }
-
     public void setMustNotify(boolean mustNotify)
     {
         this.mustNotify = mustNotify;
@@ -198,5 +189,15 @@ public class ErrorReport {
     public boolean isMustNotify()
     {
         return mustNotify;
+    }
+
+    public void setNotificationLevel(NotificationLevel notificationLevel)
+    {
+        this.notificationLevel = notificationLevel;
+    }
+
+    public NotificationLevel getNotificationLevel()
+    {
+        return notificationLevel;
     }
 }
