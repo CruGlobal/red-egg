@@ -8,6 +8,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -54,6 +56,12 @@ public class EndToEndManualCheck
             .addClass(TestParameterSanitizer.class)
             .addClass(ConfigProducer.class)
             ;
+    }
+
+    @AfterClass
+    public static void waitForAsyncQueueToSendToRollbar() throws InterruptedException
+    {
+        TimeUnit.SECONDS.sleep(2);
     }
 
     @Test
