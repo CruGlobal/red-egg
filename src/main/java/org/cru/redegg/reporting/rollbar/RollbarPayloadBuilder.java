@@ -138,12 +138,13 @@ class RollbarPayloadBuilder
         List<Throwable> thrown = report.getThrown();
         if (thrown.size() > 1)
         {
-            List<Object> otherTraceChains = Lists.newArrayList();
+            List<String> otherTraceChains = Lists.newArrayList();
             for (int i = 1; i < thrown.size(); i++)
             {
-                otherTraceChains.add(TraceChain.fromThrowable(thrown.get(i)));
+                Throwable throwable = thrown.get(i);
+                otherTraceChains.add(Throwables.getStackTraceAsString(throwable));
             }
-            customData.put("other_trace_chains", otherTraceChains);
+            customData.put("other_exceptions", Joiner.on("\n\n").join(otherTraceChains));
         }
 
         List<String> allDetails = Lists.newArrayList();
