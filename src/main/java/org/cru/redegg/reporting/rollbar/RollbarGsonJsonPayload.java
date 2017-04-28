@@ -505,10 +505,10 @@ public class RollbarGsonJsonPayload implements Payload
     {
         writer.name("log_messages");
         writer.beginArray();
-        List<String> logRecords = report.getLogRecords();
-        for (String logRecord : logRecords)
+        List<ErrorReport.LogRecord> logRecords = report.getLogRecords();
+        for (ErrorReport.LogRecord logRecord : logRecords)
         {
-            writer.value(logRecord);
+            writer.value(logRecord.toString());
         }
         writer.endArray();
     }

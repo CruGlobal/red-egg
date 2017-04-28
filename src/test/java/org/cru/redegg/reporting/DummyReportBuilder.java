@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.List;
 
 import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
 
 public class DummyReportBuilder
 {
@@ -18,9 +19,9 @@ public class DummyReportBuilder
         report.setNotificationLevel(ERROR);
         report.setLocalHostName("testserver.cru.org");
         report.setLocalHostAddress("10.10.10.10");
-        List<String> logRecords = ImmutableList.of(
-            "03:41:42.004 - WARN - Things looking bad...",
-            "03:41:42.292 - ERROR - Yep, definitely bad!"
+        ImmutableList<ErrorReport.LogRecord> logRecords = ImmutableList.of(
+            new ErrorReport.LogRecord(WARNING, "03:41:42.004", "Things looking bad..."),
+            new ErrorReport.LogRecord(ERROR, "03:41:42.292", "Yep, definitely bad!")
         );
         report.setLogRecords(logRecords);
         report.setEnvironmentVariables(

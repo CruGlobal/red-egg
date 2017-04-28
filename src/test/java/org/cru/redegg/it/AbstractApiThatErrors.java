@@ -52,7 +52,9 @@ public abstract class AbstractApiThatErrors
         MDC.put("purpose", "error testing");
         NDC.push("level 0");
 
-        Logger.getLogger(getClass()).error("kablooie!");
+        Logger logger = Logger.getLogger(getClass());
+        logger.info("minding my own business when...");
+        logger.error("kablooie!");
         NDC.pop();
     }
 

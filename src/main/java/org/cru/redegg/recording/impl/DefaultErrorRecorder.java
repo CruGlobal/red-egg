@@ -14,6 +14,7 @@ import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.RedEggStrings;
+import org.joda.time.format.ISODateTimeFormat;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -40,6 +41,9 @@ import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
 public class DefaultErrorRecorder implements ErrorRecorder {
 
     private static final int LOG_RECORD_LIMIT = 100;
+
+    private static final SimpleFormatter SIMPLE_FORMATTER = new SimpleFormatter();
+
     private ErrorQueue queue;
     private Serializer serializer;
 
@@ -316,13 +320,12 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return filtered;
     }
 
-    private List<String> serializeLogRecords()
+    private List<ErrorReport.LogRecord> serializeLogRecords()
     {
         if (logRecords == null)
             return Collections.emptyList();
 
-        List<String> serializedLogRecords = Lists.newArrayListWithCapacity(logRecords.size());
-        SimpleFormatter formatter = new SimpleFormatter();
+        List<ErrorReport.LogRecord> serializedLogRecords = Lists.newArrayListWithCapacity(logRecords.size());
 
         for (LogRecord logRecord : logRecords)
         {
@@ -330,9 +333,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             simplifier.replaceStacktraceIfRedundant();
             try
             {
-                String formatted = formatter.format(logRecord);
-                String truncated = RedEggStrings.truncate(formatted, 2000, "...");
-                serializedLogRecords.add(truncated);
+                serializedLogRecords.add(buildErrorReportLogRecord(logRecord));
             }
             finally
             {
@@ -341,12 +342,58 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         }
         if (logRecords.size() == LOG_RECORD_LIMIT)
         {
-            serializedLogRecords.add(
+            String message =
                 "<limit of " +
                 LOG_RECORD_LIMIT +
-                " was reached; any further log records were not recorded>");
+                " was reached; any further log records were not recorded>";
+
+            ErrorReport.LogRecord warningMessage =
+                new ErrorReport.LogRecord(NotificationLevel.NONE, "", message);
+            serializedLogRecords.add(warningMessage);
         }
         return serializedLogRecords;
+    }
+
+    private ErrorReport.LogRecord buildErrorReportLogRecord(LogRecord logRecord)
+    {
+        String header = buildHeader(logRecord);
+        String formattedMessage = SIMPLE_FORMATTER.formatMessage(logRecord);
+        String message = RedEggStrings.truncate(formattedMessage, 2000, "...");
+
+        NotificationLevel level = logLevelToNotificationLevel(logRecord);
+
+        return new ErrorReport.LogRecord(level, header, message);
+    }
+
+    private String buildHeader(LogRecord logRecord)
+    {
+        long millis = logRecord.getMillis();
+        return ISODateTimeFormat.time().print(millis) + " " + logRecord.getLoggerName();
+    }
+
+    private NotificationLevel logLevelToNotificationLevel(LogRecord logRecord)
+    {
+        Level logLevel = logRecord.getLevel();
+        if (logLevel.intValue() >= Level.SEVERE.intValue())
+        {
+            return NotificationLevel.ERROR;
+        }
+        else if (logLevel.intValue() >= Level.WARNING.intValue())
+        {
+            return NotificationLevel.WARNING;
+        }
+        else if (logLevel.intValue() >= Level.INFO.intValue())
+        {
+            return NotificationLevel.INFO;
+        }
+        else if (logLevel.intValue() >= Level.FINEST.intValue())
+        {
+            return NotificationLevel.DEBUG;
+        }
+        else
+        {
+            return NotificationLevel.NONE;
+        }
     }
 
     private Map<String, String> getSystemProperties()

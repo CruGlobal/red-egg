@@ -6,6 +6,8 @@ package org.cru.redegg.recording.api;
 public enum NotificationLevel
 {
     NONE,
+    DEBUG,
+    INFO,
     WARNING,
     ERROR
 }

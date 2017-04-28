@@ -2,8 +2,8 @@ package org.cru.redegg.reporting.rollbar;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -158,7 +158,7 @@ class RollbarPayloadBuilder
         }
         customData.put("exception_details", Joiner.on("\n").join(allDetails));
 
-        customData.put("log_messages", Joiner.on("\n").join(report.getLogRecords()));
+        customData.put("log_messages", Joiner.on("\n\n").join(report.getLogRecords()));
         return customData;
     }
 
