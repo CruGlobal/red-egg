@@ -19,6 +19,8 @@ public interface WebErrorRecorder extends ErrorRecorder {
     WebErrorRecorder recordRequestUrl(URL url);
     WebErrorRecorder recordRequestUrl(URI uri);
 
+    WebErrorRecorder recordRequestQueryString(String queryString);
+
     /**
      * Indicate that, for this request, the given method is the main 'action',
      * and that the method's containing class is the main 'component'.

@@ -38,6 +38,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public WebErrorRecorder recordRequestQueryString(String queryString)
+    {
+        return this;
+    }
+
+    @Override
     public WebErrorRecorder recordComponent(Method method)
     {
         return this;

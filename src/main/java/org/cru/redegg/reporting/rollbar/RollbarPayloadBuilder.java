@@ -215,8 +215,7 @@ class RollbarPayloadBuilder
         requestData = requestData.post(Collections.<String, Object>unmodifiableMap(
             flattenToCommaSeparatedValues(webContext.getPostParameters())));
 
-        //TODO: get the raw string from the servlet container
-//        if (query != null) requestData = requestData.queryString();
+        requestData = requestData.queryString(webContext.getQueryString());
 
         if (!Strings.isNullOrEmpty(webContext.getRemoteIpAddress()))
         {

@@ -17,6 +17,7 @@ public class WebContext implements Cloneable {
     // Note: all fields must be immutable; see clone()
 
     private URI url;
+    private String queryString;
     private DateTime start;
     private Multimap<String, String> headers;
     private String method;
@@ -73,6 +74,16 @@ public class WebContext implements Cloneable {
 
     public URI getUrl() {
         return url;
+    }
+
+    public void setQueryString(String queryString)
+    {
+        this.queryString = queryString;
+    }
+
+    public String getQueryString()
+    {
+        return queryString;
     }
 
     public void setStart(DateTime start) {
@@ -152,4 +163,5 @@ public class WebContext implements Cloneable {
     {
         return remoteIpAddress;
     }
+
 }
