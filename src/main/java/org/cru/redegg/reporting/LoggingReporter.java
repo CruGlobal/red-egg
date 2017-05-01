@@ -90,6 +90,7 @@ public class LoggingReporter implements ErrorReporter
 
         builder.appendLine("Method", webContext.getMethod());
         builder.appendLine("URL", webContext.getUrl());
+        builder.appendLine("Query String", webContext.getQueryString());
 
         addMultimapEntries(builder, webContext.getQueryParameters(), "Query Parameters");
         addMultimapEntries(builder, webContext.getPostParameters(), "Post Parameters");

@@ -81,6 +81,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             .recordRequestStart(requestStart)
             .recordRequestRemoteIpAddress(request.getRemoteAddr())
             .recordRequestUrl(request.getRequestURL().toString())
+            .recordRequestQueryString(request.getQueryString())
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));
 

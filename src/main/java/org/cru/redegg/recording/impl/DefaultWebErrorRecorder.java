@@ -101,6 +101,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public WebErrorRecorder recordRequestQueryString(String queryString)
+    {
+        checkState(!completed);
+        webContext.setQueryString(queryString);
+        return this;
+    }
+
+    @Override
     public WebErrorRecorder recordComponent(Method method)
     {
         checkState(!completed);
