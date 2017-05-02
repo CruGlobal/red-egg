@@ -9,9 +9,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.cru.redegg.recording.api.ErrorRecorder;
+import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorQueue;
+import org.cru.redegg.util.RedEggStrings;
+import org.joda.time.format.ISODateTimeFormat;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -28,12 +31,19 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
+import static org.cru.redegg.recording.api.NotificationLevel.NONE;
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
+
 /**
  * @author Matt Drees
  */
 public class DefaultErrorRecorder implements ErrorRecorder {
 
     private static final int LOG_RECORD_LIMIT = 100;
+
+    private static final SimpleFormatter SIMPLE_FORMATTER = new SimpleFormatter();
+
     private ErrorQueue queue;
     private Serializer serializer;
 
@@ -44,11 +54,11 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private InetAddress localHost;
     private Map<String, String> environmentVariables;
     private Properties systemProperties;
-    private Set<String> loggersToIgnore;
+    private Set<String> loggersToIgnoreErrors;
+    private Set<String> loggersToIgnoreEntirely;
 
-    private boolean error;
+    private NotificationLevel level = NONE;
     private boolean sentError;
-    private boolean userError;
     private boolean mustNotify;
 
     @Inject
@@ -80,39 +90,72 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     @Override
     public ErrorRecorder recordThrown(Throwable throwable) {
         checkNotSent();
-        if (thrown == null)
-            thrown = Sets.newLinkedHashSetWithExpectedSize(4);
-        this.thrown.add(throwable);
-
-        error = true;
+        addToThrownSet(throwable);
+        ensureNotificationLevel(ERROR);
         return this;
     }
 
     @Override
     public ErrorRecorder recordLogRecord(LogRecord record) {
         checkNotSent();
-        if (logRecords == null)
-            logRecords = Lists.newLinkedList();
-        if (logRecords.size() < LOG_RECORD_LIMIT)
-            logRecords.add(record);
-        if (isErrorLog(record) && isNotIgnored(record.getLoggerName()))
+        String loggerName = record.getLoggerName();
+        if (messagesFromLoggerShouldBeIgnored(loggerName))
+            return this;
+
+        addRecordToList(record);
+
+        if (errorsFromLoggerShouldTriggerNotification(loggerName))
         {
+            if (isErrorLog(record))
+            {
+                ensureNotificationLevel(ERROR);
+            }
+            else if (isWarningLog(record))
+            {
+                ensureNotificationLevel(WARNING);
+            }
             if (record.getThrown() != null)
-                recordThrown(record.getThrown());
-            else
-                error = true;
+                addToThrownSet(record.getThrown());
         }
         return this;
     }
 
-    private boolean isNotIgnored(String loggerName)
+    private boolean messagesFromLoggerShouldBeIgnored(String loggerName)
     {
-        return loggersToIgnore == null ||
-               !loggersToIgnore.contains(loggerName);
+        return loggersToIgnoreEntirely != null &&
+               loggersToIgnoreEntirely.contains(loggerName);
+    }
+
+    private void addRecordToList(LogRecord record)
+    {
+        if (logRecords == null)
+            logRecords = Lists.newLinkedList();
+        if (logRecords.size() < LOG_RECORD_LIMIT)
+            logRecords.add(record);
+    }
+
+    private boolean errorsFromLoggerShouldTriggerNotification(String loggerName)
+    {
+        return loggersToIgnoreErrors == null ||
+               !loggersToIgnoreErrors.contains(loggerName);
     }
 
     private boolean isErrorLog(LogRecord record) {
         return record.getLevel().intValue() >= Level.SEVERE.intValue();
+    }
+
+    private boolean isWarningLog(LogRecord record) {
+        int levelAsInt = record.getLevel().intValue();
+        return
+            levelAsInt >= Level.WARNING.intValue() &&
+            levelAsInt < Level.SEVERE.intValue();
+    }
+
+    private void addToThrownSet(Throwable throwable)
+    {
+        if (thrown == null)
+            thrown = Sets.newLinkedHashSetWithExpectedSize(4);
+        this.thrown.add(throwable);
     }
 
     @Override
@@ -141,52 +184,58 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     {
         checkNotSent();
         this.mustNotify = true;
-        this.error = true;
+        ensureNotificationLevel(ERROR);
         return this;
     }
 
 
-    public boolean wereErrorsAdded() {
-        return error;
+    public boolean shouldNotificationBeSent() {
+        return level != NONE;
+    }
+
+    @Override
+    public ErrorRecorder ignoreLogger(String loggerName)
+    {
+        checkNotSent();
+        if (loggersToIgnoreEntirely == null)
+            loggersToIgnoreEntirely = Sets.newHashSetWithExpectedSize(1);
+        loggersToIgnoreEntirely.add(loggerName);
+        return this;
     }
 
     @Override
     public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
     {
         checkNotSent();
-        if (loggersToIgnore == null)
-            loggersToIgnore = Sets.newHashSetWithExpectedSize(1);
-        loggersToIgnore.add(loggerName);
+        if (loggersToIgnoreErrors == null)
+            loggersToIgnoreErrors = Sets.newHashSetWithExpectedSize(1);
+        loggersToIgnoreErrors.add(loggerName);
         return this;
     }
 
     @Override
     public void error() {
         checkNotSent();
+        ensureNotificationLevel(ERROR);
+        sendReport();
+    }
+
+    @Override
+    public void sendReportIfNecessary() {
+        if (shouldNotificationBeSent())
+            sendReport();
+    }
+
+    private void sendReport()
+    {
         addAdditionalContextIfPossible();
         queue.enqueue(buildReport());
         sentError = true;
     }
 
-    @Override
-    public void sendReportIfNecessary() {
-        if (wereErrorsAdded())
-            error();
-    }
-
     public void addAdditionalContextIfPossible()
     {
         addLocalHost();
-        if (systemProperties == null)
-        {
-            try
-            {
-                systemProperties = System.getProperties();
-            }
-            catch (SecurityException ignored)
-            {
-            }
-        }
     }
 
     private void addLocalHost()
@@ -218,8 +267,8 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
         report.setEnvironmentVariables(getEnvironmentVariables());
         report.setSystemProperties(getSystemProperties());
-        report.setUserError(userError);
         report.setMustNotify(mustNotify);
+        report.setNotificationLevel(level);
 
         return report;
     }
@@ -271,13 +320,12 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         return filtered;
     }
 
-    private List<String> serializeLogRecords()
+    private List<ErrorReport.LogRecord> serializeLogRecords()
     {
         if (logRecords == null)
             return Collections.emptyList();
 
-        List<String> serializedLogRecords = Lists.newArrayListWithCapacity(logRecords.size());
-        SimpleFormatter formatter = new SimpleFormatter();
+        List<ErrorReport.LogRecord> serializedLogRecords = Lists.newArrayListWithCapacity(logRecords.size());
 
         for (LogRecord logRecord : logRecords)
         {
@@ -285,7 +333,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             simplifier.replaceStacktraceIfRedundant();
             try
             {
-                serializedLogRecords.add(formatter.format(logRecord));
+                serializedLogRecords.add(buildErrorReportLogRecord(logRecord));
             }
             finally
             {
@@ -294,12 +342,58 @@ public class DefaultErrorRecorder implements ErrorRecorder {
         }
         if (logRecords.size() == LOG_RECORD_LIMIT)
         {
-            serializedLogRecords.add(
+            String message =
                 "<limit of " +
                 LOG_RECORD_LIMIT +
-                " was reached; any further log records were not recorded>");
+                " was reached; any further log records were not recorded>";
+
+            ErrorReport.LogRecord warningMessage =
+                new ErrorReport.LogRecord(NotificationLevel.NONE, "", message);
+            serializedLogRecords.add(warningMessage);
         }
         return serializedLogRecords;
+    }
+
+    private ErrorReport.LogRecord buildErrorReportLogRecord(LogRecord logRecord)
+    {
+        String header = buildHeader(logRecord);
+        String formattedMessage = SIMPLE_FORMATTER.formatMessage(logRecord);
+        String message = RedEggStrings.truncate(formattedMessage, 2000, "...");
+
+        NotificationLevel level = logLevelToNotificationLevel(logRecord);
+
+        return new ErrorReport.LogRecord(level, header, message);
+    }
+
+    private String buildHeader(LogRecord logRecord)
+    {
+        long millis = logRecord.getMillis();
+        return ISODateTimeFormat.time().print(millis) + " " + logRecord.getLoggerName();
+    }
+
+    private NotificationLevel logLevelToNotificationLevel(LogRecord logRecord)
+    {
+        Level logLevel = logRecord.getLevel();
+        if (logLevel.intValue() >= Level.SEVERE.intValue())
+        {
+            return NotificationLevel.ERROR;
+        }
+        else if (logLevel.intValue() >= Level.WARNING.intValue())
+        {
+            return NotificationLevel.WARNING;
+        }
+        else if (logLevel.intValue() >= Level.INFO.intValue())
+        {
+            return NotificationLevel.INFO;
+        }
+        else if (logLevel.intValue() >= Level.FINEST.intValue())
+        {
+            return NotificationLevel.DEBUG;
+        }
+        else
+        {
+            return NotificationLevel.NONE;
+        }
     }
 
     private Map<String, String> getSystemProperties()
@@ -325,8 +419,17 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
     public DefaultErrorRecorder userError()
     {
-        userError = true;
+        level = WARNING;
         return this;
+    }
+
+    /** sets the notification level if it is higher than the current level */
+    public void ensureNotificationLevel(NotificationLevel level)
+    {
+        if (this.level.compareTo(level) < 0)
+        {
+            this.level = level;
+        }
     }
 
     private class StacktraceSimplifier

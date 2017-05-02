@@ -5,7 +5,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.common.Payload;
+import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
+import org.cru.redegg.util.RedEggVersion;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -21,7 +24,7 @@ import static org.cru.redegg.util.RedEggStrings.truncate;
 /**
  * @author Matt Drees
  */
-public class ErrbitXmlPayload
+public class ErrbitXmlPayload implements Payload
 {
     private ErrorReport report;
     private ErrbitConfig config;
@@ -35,7 +38,7 @@ public class ErrbitXmlPayload
         this.config = config;
     }
 
-    public void writeXmlTo(Writer underlyingWriter)
+    public void writeTo(Writer underlyingWriter)
     {
         try
         {
@@ -84,7 +87,7 @@ public class ErrbitXmlPayload
     {
         writer.writeStartElement("notifier");
         writeElementWithContent("name", "red-egg");
-        writeElementWithContent("version", "1-SNAPSHOT"); //TODO: programmatically drive this
+        writeElementWithContent("version", RedEggVersion.get());
         writeElementWithContent("url", "https://github.com/CruGlobal/red-egg");
         writer.writeEndElement();
     }
@@ -321,29 +324,13 @@ public class ErrbitXmlPayload
 
     private void writeComponentIfPossible(WebContext webContext) throws XMLStreamException
     {
-        if (webContext.getComponent() != null)
+        Method component = webContext.getComponent();
+        if (component != null)
         {
-            Class<?> declaringClass = webContext.getComponent().getDeclaringClass();
+            Class<?> declaringClass = component.getDeclaringClass();
             writeElementWithContent("component", declaringClass.getSimpleName());
-            Method method = webContext.getComponent();
-            writeElementWithContent("action", buildSimplifiedMethodName(declaringClass, method));
+            writeElementWithContent("action", Reporters.buildSimplifiedMethodName(component));
         }
-    }
-
-    private String buildSimplifiedMethodName(Class<?> declaringClass, Method method)
-    {
-        return method.getName() + "(" + simpleParamList(method) + ")";
-    }
-
-    private String simpleParamList(Method method)
-    {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        List<String> parameterTypeNames = Lists.newArrayListWithCapacity(parameterTypes.length);
-        for (Class<?> aClass : parameterTypes)
-        {
-            parameterTypeNames.add(aClass.getSimpleName());
-        }
-        return Joiner.on(',').join(parameterTypeNames);
     }
 
     private void writeServerEnvironment() throws XMLStreamException

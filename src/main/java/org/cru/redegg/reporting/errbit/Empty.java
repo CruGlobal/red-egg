@@ -6,6 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * A qualifier that mainly just prevents a class from getting the @Default qualifier;
+ * that is, the class by itself is not intended to be injected.
+ * Instead, the @Default qualifier should be used by some producer method that populates the bean.
+ *
  * @author Matt Drees
  */
 @Qualifier

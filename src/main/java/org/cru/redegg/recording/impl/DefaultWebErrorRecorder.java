@@ -25,6 +25,7 @@ import java.util.logging.LogRecord;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
 
 /**
  * @author Matt Drees
@@ -62,7 +63,6 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
 
     private final WebContext webContext = new WebContext();
 
-    private boolean error;
     private boolean completed;
 
     @Override
@@ -157,11 +157,19 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress)
+    {
+        checkState(!completed);
+        webContext.setRemoteIpAddress(remoteIpAddress);
+        return this;
+    }
+
+    @Override
     public void recordRequestComplete(DateTime finish) {
         checkState(!completed);
         completed = true;
         webContext.setFinish(finish);
-        if (error || defaultRecorder.wereErrorsAdded())
+        if (defaultRecorder.shouldNotificationBeSent())
         {
             if (wasClientError())
             {
@@ -242,6 +250,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
+    public ErrorRecorder ignoreLogger(String loggerName)
+    {
+        checkState(!completed);
+        defaultRecorder.ignoreLogger(loggerName);
+        return this;
+    }
+
+    @Override
     public ErrorRecorder ignoreErrorsFromLogger(String loggerName)
     {
         checkState(!completed);
@@ -260,7 +276,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     @Override
     public void error() {
         checkState(!completed);
-        error = true;
+        defaultRecorder.ensureNotificationLevel(ERROR);
     }
 
     @Override

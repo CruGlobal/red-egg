@@ -79,6 +79,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         lifecycle.beginRequest();
         WebErrorRecorder recorder = recorderFactory.getWebRecorder()
             .recordRequestStart(requestStart)
+            .recordRequestRemoteIpAddress(request.getRemoteAddr())
             .recordRequestUrl(request.getRequestURL().toString())
             .recordRequestMethod(request.getMethod())
             .recordHeaders(getHeadersAsMultimap(request));

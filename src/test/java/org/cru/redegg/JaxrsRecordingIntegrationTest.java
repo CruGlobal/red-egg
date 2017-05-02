@@ -57,7 +57,7 @@ public class JaxrsRecordingIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("jaxrs-test.war")
-            .addCorePackages()
+            .addCoreWildflyPackages()
             .addRecordingConfigurationClasses()
             .getArchive()
 

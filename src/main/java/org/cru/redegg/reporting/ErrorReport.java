@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.recording.api.NotificationLevel;
 
 import java.util.List;
 import java.util.Map;
@@ -19,15 +20,15 @@ public class ErrorReport {
     Multimap<String, String> context;
     Map<String, String> user;
     private List<Throwable> thrown;
-    private List<String> logRecords;
+    private List<LogRecord> logRecords;
     private String localHostName;
     private String localHostAddress;
     private Map<String, String> environmentVariables;
     private Map<String, String> systemProperties;
-    private boolean userError;
 
     private WebContext webContext;
     private boolean mustNotify;
+    private NotificationLevel notificationLevel;
 
     public void addWebContext(WebContext webContext) {
         this.webContext = webContext;
@@ -63,14 +64,34 @@ public class ErrorReport {
         this.thrown = thrown;
     }
 
-    public List<String> getLogRecords()
+    public List<LogRecord> getLogRecords()
     {
         return logRecords;
     }
 
-    public void setLogRecords(List<String> logRecords)
+    public void setLogRecords(List<LogRecord> logRecords)
     {
         this.logRecords = logRecords;
+    }
+
+    public static class LogRecord
+    {
+        public final NotificationLevel level;
+        public final String header;
+        public final String message;
+
+        public LogRecord(NotificationLevel level, String header, String message)
+        {
+            this.level = level;
+            this.header = header;
+            this.message = message;
+        }
+
+        @Override
+        public String toString()
+        {
+            return header + " " + level + " " + message;
+        }
     }
 
     public String getLocalHostName()
@@ -123,6 +144,9 @@ public class ErrorReport {
         this.webContext = webContext;
     }
 
+    /**
+     * Returns the exception that is at the root of the 'exception chain' that is first in the 'thrown' list.
+     */
     public Optional<Throwable> getRootException()
     {
 
@@ -144,7 +168,7 @@ public class ErrorReport {
         }
         else
         {
-            return shortenLogMessage(getFirstLogMessage());
+            return shortenLogMessage(getFirstHighestLevelLogMessage());
         }
     }
 
@@ -155,7 +179,7 @@ public class ErrorReport {
             public String apply(String input)
             {
                 String stripped = stripStacktrace(input);
-                return truncate(stripped, 100, "...");
+                return truncate(stripped, 200, "...");
             }
 
             private String stripStacktrace(String input)
@@ -169,22 +193,23 @@ public class ErrorReport {
         });
     }
 
-    private Optional<String> getFirstLogMessage()
+    private Optional<String> getFirstHighestLevelLogMessage()
     {
         if (logRecords.isEmpty())
             return Optional.absent();
         else
-            return Optional.of(logRecords.get(0));
-    }
+        {
+            LogRecord highestLevelSoFar = logRecords.get(0);
+            for (LogRecord logRecord : logRecords)
+            {
+                if (logRecord.level.compareTo(highestLevelSoFar.level) > 1)
+                {
+                    highestLevelSoFar = logRecord;
+                }
+            }
 
-    public void setUserError(boolean userError)
-    {
-        this.userError = userError;
-    }
-
-    public boolean isUserError()
-    {
-        return userError;
+            return Optional.of(highestLevelSoFar.message);
+        }
     }
 
     public void setMustNotify(boolean mustNotify)
@@ -195,5 +220,15 @@ public class ErrorReport {
     public boolean isMustNotify()
     {
         return mustNotify;
+    }
+
+    public void setNotificationLevel(NotificationLevel notificationLevel)
+    {
+        this.notificationLevel = notificationLevel;
+    }
+
+    public NotificationLevel getNotificationLevel()
+    {
+        return notificationLevel;
     }
 }

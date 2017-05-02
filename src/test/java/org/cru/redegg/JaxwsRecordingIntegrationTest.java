@@ -50,7 +50,7 @@ public class JaxwsRecordingIntegrationTest
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("jaxws-test.war")
-            .addCorePackages()
+            .addCoreWildflyPackages()
             .addRecordingConfigurationClasses()
             .getArchive()
 
@@ -103,7 +103,7 @@ public class JaxwsRecordingIntegrationTest
         catch (SOAPFaultException expected)
         {
             /*
-             * Note: in wildfly 8, the CXF client unmarshals the fault wrong and tries to use
+             * Note: in wildfly 8-10, the CXF client unmarshals the fault wrong and tries to use
              * constructor that doesn't exist. This ends up creating a soap fault as we want,
              * but the message from the server isn't preserved. Oh well.
              */

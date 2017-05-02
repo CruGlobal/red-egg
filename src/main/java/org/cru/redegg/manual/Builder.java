@@ -19,6 +19,8 @@ import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.errbit.ErrbitConfig;
 import org.cru.redegg.reporting.errbit.NativeErrbitReporter;
+import org.cru.redegg.reporting.rollbar.RollbarConfig;
+import org.cru.redegg.reporting.rollbar.RollbarReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggFilter;
 import org.cru.redegg.servlet.RedEggServletListener;
@@ -62,6 +64,7 @@ public class Builder
         RequestMatchers.none());
 
     private volatile ErrbitConfig errbitConfig;
+    private volatile RollbarConfig rollbarConfig;
     private volatile InMemoryErrorQueue queue;
 
     public void init(RedEggServletListener listener)
@@ -131,10 +134,14 @@ public class Builder
 
     ErrorReporter buildPrimaryErrorReporter()
     {
-        if (errbitConfig == null)
-            return buildFallbackErrorReporter();
-        else
+        if (errbitConfig != null)
             return new NativeErrbitReporter(errbitConfig);
+        else if (rollbarConfig != null)
+        {
+            return new RollbarReporter(rollbarConfig);
+        }
+        else
+            return buildFallbackErrorReporter();
     }
 
     LoggingReporter buildFallbackErrorReporter()
@@ -165,6 +172,13 @@ public class Builder
          */
         shutdownQueue();
         this.errbitConfig = errbitConfig;
+    }
+
+    public void setRollbarConfig(RollbarConfig rollbarConfig)
+    {
+        /* see note in setErrbitConfig() */
+        shutdownQueue();
+        this.rollbarConfig = rollbarConfig;
     }
 
     private void shutdownQueue()

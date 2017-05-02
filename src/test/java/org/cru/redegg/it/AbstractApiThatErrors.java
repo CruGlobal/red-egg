@@ -1,6 +1,8 @@
 package org.cru.redegg.it;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.NDC;
 import org.cru.redegg.recording.api.ErrorRecorder;
 
 import javax.ws.rs.Consumes;
@@ -19,9 +21,16 @@ public abstract class AbstractApiThatErrors
     @Path("throw")
     public void throwBoom()
     {
-        recorder().recordUser(new User(42, "joe.staffguy@cru.org"));
+        Logger logger = Logger.getLogger(getClass());
+        logger.debug("joe is logged in");
+        recordUser();
         recorder().recordContext("fun fact:", "I'm about to blow");
-        throw new IllegalStateException("kablooie!");
+        throw new IllegalStateException(createBoom());
+    }
+
+    private BoomException createBoom()
+    {
+        return new BoomException(500, "kablooie!");
     }
 
     @POST
@@ -38,22 +47,62 @@ public abstract class AbstractApiThatErrors
     @Path("log")
     public void logBoom()
     {
-        recorder().recordUser(new User(42, "joe.staffguy@cru.org"));
+        recordUser();
         recorder().recordContext("fun fact:", "I'm about to blow");
-        Logger.getLogger(getClass()).error("kablooie!");
+        MDC.put("purpose", "error testing");
+        NDC.push("level 0");
+
+        Logger logger = Logger.getLogger(getClass());
+        logger.info("minding my own business when...");
+        logger.error("kablooie!");
+        NDC.pop();
+    }
+
+    private void recordUser()
+    {
+        recorder().recordUser(new User(
+            42,
+            "joe.staffguy@cru.org",
+            "joe.staffguy@gmail.com",
+            "12345678-abcd-abcd-abcd-1234567890ab"));
     }
 
     protected abstract ErrorRecorder recorder();
 
     public static class User
     {
-        int id;
-        String name;
+        final int id;
+        final String username;
+        final String email;
+        final String relayGuid;
 
-        public User(int id, String name)
+        public User(
+            int id,
+            String username,
+            String email,
+            String relayGuid)
         {
             this.id = id;
-            this.name = name;
+            this.username = username;
+            this.email = email;
+            this.relayGuid = relayGuid;
+        }
+    }
+
+    public static class BoomException extends Exception
+    {
+        private final int boomCode;
+
+        public BoomException(int boomCode, String message)
+        {
+            super(message);
+            this.boomCode = boomCode;
+        }
+
+        @SuppressWarnings("unused")
+        public int getBoomCode()
+        {
+            return boomCode;
         }
     }
 }

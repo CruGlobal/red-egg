@@ -23,6 +23,18 @@ public interface ErrorRecorder {
 
     ErrorRecorder recordLocalHost(InetAddress localHost);
 
+    /**
+     * Indicates that no messages from the given logger should be recorded.
+     * (Perhaps they are too big, are not useful, or contain sensitive info)
+     */
+    ErrorRecorder ignoreLogger(String loggerName);
+
+    /**
+     * Indicates that messages from the given logger should not trigger notifications,
+     * even if the level is WARN or ERROR.
+     *
+     * (Perhaps the messages are faulty for some reason, and should be suppressed.)
+     */
     ErrorRecorder ignoreErrorsFromLogger(String loggerName);
 
 
@@ -63,5 +75,5 @@ public interface ErrorRecorder {
      * a web error recorder.
      * (For those, errors are always sent at the end of the request)
      */
-    public void sendReportIfNecessary();
+    void sendReportIfNecessary();
 }

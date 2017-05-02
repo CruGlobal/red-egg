@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
+import org.cru.redegg.reporting.DummyReportBuilder;
 import org.cru.redegg.reporting.ErrorReport;
 
 import java.net.URI;

@@ -3,11 +3,12 @@ package org.cru.redegg.servlet;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.log4j.Logger;
-import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.qualifier.EntityStreamPreservation;
+import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RequestMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import java.util.Set;
 public class ParameterCategorizer
 {
 
-    private static Logger log = Logger.getLogger(RedEggServletListener.class);
+    private static Logger log = LoggerFactory.getLogger(RedEggServletListener.class);
 
     private final ParameterSanitizer sanitizer;
     private final RequestMatcher streamPreservationMatcher;
@@ -136,8 +137,8 @@ public class ParameterCategorizer
         }
         else
         {
-            log.warn(String.format("parameter not in query string in %s request: %s", request.getMethod(),
-                parameter));
+            log.warn("parameter not in query string in {} request: {}", request.getMethod(),
+                parameter);
         }
     }
 

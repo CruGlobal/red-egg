@@ -12,7 +12,7 @@ import java.net.URL;
  */
 public interface WebErrorRecorder extends ErrorRecorder {
 
-    public static final WebErrorRecorder NULL_RECORDER = new NullWebErrorRecorder(null);
+    WebErrorRecorder NULL_RECORDER = new NullWebErrorRecorder(null);
 
 
     WebErrorRecorder recordRequestUrl(String url);
@@ -46,6 +46,7 @@ public interface WebErrorRecorder extends ErrorRecorder {
 
     WebErrorRecorder recordResponseStatus(int responseStatus);
 
+    WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress);
 
     void recordRequestComplete(DateTime dateTime);
 }

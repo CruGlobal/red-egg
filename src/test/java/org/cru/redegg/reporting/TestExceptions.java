@@ -1,4 +1,4 @@
-package org.cru.redegg.reporting.errbit;
+package org.cru.redegg.reporting;
 
 /**
  * This class should not change much,
@@ -21,6 +21,11 @@ public class TestExceptions
 
     public static String filename()
     {
-        return TestExceptions.class.getPackage().getName().replace(".", "/") + "/" + TestExceptions.class.getSimpleName() + ".java";
+        return TestExceptions.class.getPackage().getName().replace(".", "/") + "/" + simpleFilename();
+    }
+
+    public static String simpleFilename()
+    {
+        return TestExceptions.class.getSimpleName() + ".java";
     }
 }

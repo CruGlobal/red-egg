@@ -46,7 +46,7 @@ public abstract class AbstractEndToEndIT
 
         String report = getReport();
 
-        assertThat(report, containsString("<api-key>abc</api-key>"));
+        assertThat(report, containsString("\"access_token\":\"abc\""));
         assertThat(report, containsString("kablooie!"));
         assertThat(report, containsString("matt's a swell guy"));
         assertThat(report, not(containsString("letmein")));
@@ -71,7 +71,7 @@ public abstract class AbstractEndToEndIT
 
         String report = getReport();
 
-        assertThat(report, containsString("<api-key>abc</api-key>"));
+        assertThat(report, containsString("\"access_token\":\"abc\""));
         assertThat(report, containsString("kablooie!"));
         assertThat(report, containsString("matt's a swell guy"));
         assertThat(report, not(containsString("letmein")));
@@ -108,7 +108,7 @@ public abstract class AbstractEndToEndIT
 
         String report = getReport();
 
-        assertThat(report, containsString("<api-key>abc</api-key>"));
+        assertThat(report, containsString("\"access_token\":\"abc\""));
         assertThat(report, containsString("kablooie!"));
         assertThat(report, containsString("matt's got a swell wife"));
         assertThat(report, containsString("204"));

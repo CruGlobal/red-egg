@@ -142,7 +142,7 @@ public class DefaultErrorRecorderTest
         record.setLoggerName("some.dumb.logger");
         recorder.recordLogRecord(record);
 
-        assertThat(recorder.wereErrorsAdded(), is(false));
+        assertThat(recorder.shouldNotificationBeSent(), is(false));
     }
 
 

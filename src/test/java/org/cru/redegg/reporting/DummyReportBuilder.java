@@ -1,25 +1,27 @@
-package org.cru.redegg.reporting.errbit;
+package org.cru.redegg.reporting;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
-import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.WebContext;
 import org.joda.time.DateTime;
 
 import java.net.URI;
 import java.util.List;
+
+import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
+import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
 
 public class DummyReportBuilder
 {
     public ErrorReport buildDummyReport()
     {
         ErrorReport report = new ErrorReport();
+        report.setNotificationLevel(ERROR);
         report.setLocalHostName("testserver.cru.org");
         report.setLocalHostAddress("10.10.10.10");
-        List<String> logRecords = ImmutableList.of(
-            "03:41:42.004 - WARN - Things looking bad...",
-            "03:41:42.292 - ERROR - Yep, definitely bad!"
+        ImmutableList<ErrorReport.LogRecord> logRecords = ImmutableList.of(
+            new ErrorReport.LogRecord(WARNING, "03:41:42.004", "Things looking bad..."),
+            new ErrorReport.LogRecord(ERROR, "03:41:42.292", "Yep, definitely bad!")
         );
         report.setLogRecords(logRecords);
         report.setEnvironmentVariables(

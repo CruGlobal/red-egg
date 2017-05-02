@@ -2,6 +2,7 @@ package org.cru.redegg.reporting;
 
 import com.google.common.base.Throwables;
 import org.cru.redegg.qualifier.Fallback;
+import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.util.ErrorLog;
@@ -33,7 +34,7 @@ public class InMemoryErrorQueue implements ErrorQueue
 
     @Inject
     public InMemoryErrorQueue(
-        ErrorReporter primaryErrorReporter,
+        @Selected ErrorReporter primaryErrorReporter,
         @Fallback ErrorReporter fallbackReporter,
         ErrorLog errorLog)
     {

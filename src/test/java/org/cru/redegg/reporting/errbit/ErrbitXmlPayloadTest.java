@@ -1,6 +1,8 @@
 package org.cru.redegg.reporting.errbit;
 
+import org.cru.redegg.reporting.DummyReportBuilder;
 import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.TestExceptions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +40,7 @@ public class ErrbitXmlPayloadTest
     {
         buildSampleReport();
         ErrbitXmlPayload payload = new ErrbitXmlPayload(report, config);
-        payload.writeXmlTo(writer);
+        payload.writeTo(writer);
         checkXmlContent();
     }
 
@@ -49,16 +51,15 @@ public class ErrbitXmlPayloadTest
 
     private void checkXmlContent()
     {
-        String xml = writer.toString();
-
-        System.out.println(xml.replace("><", ">\n<"));
+        String xml = writer.toString().replace("><", ">\n<"); //rough pretty printing
 
         assertThat(xml, startsWith("<?xml "));
         assertThat(xml, containsString("<notice version=\"2.4\">"));
         assertThat(xml, containsString("<api-key>secrets</api-key>"));
         assertThat(xml, containsString("<class>java.lang.NullPointerException</class>"));
         assertThat(xml, containsString("<message>java.lang.NullPointerException</message>"));
-        assertThat(xml, containsString("<backtrace><line number=\"13\" file=\"[PROJECT_ROOT]/src/test/java/" + TestExceptions.filename() + "\" method=\"" + TestExceptions.class.getName() + ".boom\"></line>"));
+        assertThat(xml, containsString("<backtrace>\n<line number=\"13\" file=\"[PROJECT_ROOT]/src/test/java/" + TestExceptions
+            .filename() + "\" method=\"" + TestExceptions.class.getName() + ".boom\">\n</line>"));
         assertThat(xml, containsString("java.lang.RuntimeException"));
         assertThat(xml, containsString("<component>TestResource</component>"));
         assertThat(xml, containsString("<action>doSomething(String)</action>"));

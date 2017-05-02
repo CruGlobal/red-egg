@@ -3,11 +3,12 @@ package org.cru.redegg.reporting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import org.apache.log4j.Logger;
 import org.cru.redegg.qualifier.Fallback;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class LoggingReporter implements ErrorReporter
         return NAME;
     }
 
-    Logger errorLogger = Logger.getLogger(NAME);
+    Logger errorLogger = LoggerFactory.getLogger(NAME);
 
 
     @Override
@@ -36,12 +37,12 @@ public class LoggingReporter implements ErrorReporter
 
         if (report.getThrown().isEmpty())
         {
-            errorLogger.error("error context:\n" + message);
+            errorLogger.error("error context:\n{}", message);
         }
         else
         {
             errorLogger.error("error:", report.getThrown().get(0));
-            errorLogger.error("error context:\n" + message);
+            errorLogger.error("error context:\n{}", message);
         }
     }
 
