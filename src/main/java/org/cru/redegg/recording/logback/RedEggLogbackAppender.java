@@ -36,7 +36,7 @@ public class RedEggLogbackAppender extends UnsynchronizedAppenderBase<ILoggingEv
 
         ErrorRecorder recorder = factory.getRecorder();
 
-        if (event.getLevel().toInt() >= Level.ERROR.toInt()) {
+        if (event.getLevel().toInt() >= Level.WARN.toInt()) {
             Map<String, String> properties = event.getMDCPropertyMap();
             for (Map.Entry<String, String> entry : properties.entrySet())
             {

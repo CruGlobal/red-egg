@@ -34,7 +34,7 @@ public class RedEggLog4jAppender extends AppenderSkeleton {
 
         ErrorRecorder recorder = factory.getRecorder();
 
-        if (event.getLevel().toInt() >= Level.ERROR.toInt()) {
+        if (event.getLevel().toInt() >= Level.WARN.toInt()) {
 
             @SuppressWarnings("unchecked") //log4j API is not generic
             Map<String, Object> properties = event.getProperties();

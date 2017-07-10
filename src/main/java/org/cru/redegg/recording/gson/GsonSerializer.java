@@ -28,6 +28,8 @@ public class GsonSerializer implements Serializer
     {
         if (value instanceof String)
             return (String) value;
+        else if (value instanceof JsonPrimitive)
+            return ((JsonPrimitive) value).getAsString();
         else
             return gson.toJson(value);
     }
