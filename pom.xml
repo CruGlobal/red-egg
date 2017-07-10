@@ -6,7 +6,7 @@
 
   <groupId>org.ccci</groupId>
   <artifactId>red-egg</artifactId>
-  <version>6-SNAPSHOT</version>
+  <version>6</version>
 
 
   <properties>
