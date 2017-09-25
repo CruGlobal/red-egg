@@ -114,7 +114,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
         // if we are in an async contextual state, then the request has not yet completed
-        if(sre.getServletRequest().isAsyncStarted()) {
+        if(isAsyncStarted(sre)) {
             setAsyncContext(sre.getServletRequest(), true);
         } else {
             recorderFactory.getWebRecorder()
@@ -122,6 +122,12 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             lifecycle.endRequest();
             setAsyncContext(sre.getServletRequest(), false);
         }
+    }
+
+    private boolean isAsyncStarted(ServletRequestEvent event)
+    {
+        return event.getServletContext().getMajorVersion() >= 3 &&
+               event.getServletRequest().isAsyncStarted();
     }
 
     public void setRecorderFactory(RecorderFactory recorderFactory)
