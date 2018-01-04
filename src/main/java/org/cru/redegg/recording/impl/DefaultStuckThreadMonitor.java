@@ -165,7 +165,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
                 if (overdue && !request.notified.get())
                 {
                     request.notified.set(true);
-                    reportOverdue(request, entry.getKey(), now);
+                    reportOverdue(request, request.webContext, now);
                 }
             }
         }
