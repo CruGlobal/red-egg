@@ -1,12 +1,15 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Lists;
+import org.cru.redegg.recording.api.NotificationLevel;
+import org.cru.redegg.recording.impl.DefaultStuckThreadMonitor.StuckThreadException;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.Clock;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.joda.time.Period;
 import org.junit.After;
@@ -19,14 +22,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
-import static org.junit.Assert.assertThat;
+import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeatureValue;
 
 /**
  * @author Matt Drees
@@ -34,8 +40,8 @@ import static org.junit.Assert.assertThat;
 public class DefaultStuckThreadMonitorTest
 {
 
-    // 10 ms is too small; it causes fastRequestsAreNotNoticed() to fail occasionally
-    private static final int TEST_THRESHOLD_MILLIS = 50;
+    // 50 ms is too small; it causes fastRequestsAreNotNoticed() to fail occasionally
+    private static final int TEST_THRESHOLD_MILLIS = 100;
     private static final int TEST_PERIOD_MILLIS = 5;
 
     DefaultStuckThreadMonitor monitor;
@@ -56,28 +62,20 @@ public class DefaultStuckThreadMonitorTest
 
         public void assertNothingEnqueued() throws InterruptedException
         {
-            // sleep long enough that anything should be reported by now
-            Thread.sleep(50);
-
+            waitALittle();
             assertThat(reports, is(empty()));
         }
 
-        public void assertSomethingEnqueued() throws InterruptedException
+        public void assertEnqueued(List<Matcher<? super ErrorReport>> expectedReport) throws InterruptedException
         {
-            // sleep long enough that anything should be reported by now
-            Thread.sleep(50);
-
-            assertThat(reports, contains(expectedReport()));
+            waitALittle();
+            assertThat(reports, contains(expectedReport));
         }
 
-        private List<Matcher<? super ErrorReport>> expectedReport()
+        /** sleep long enough that anything should be reported by now */
+        private void waitALittle() throws InterruptedException
         {
-            List<Matcher<? super ErrorReport>> list = Lists.newArrayList();
-            Matcher<ErrorReport> matcher = compose("an error report with", hasFeature("one thrown", ErrorReport::getThrown, contains(instanceOf(DefaultStuckThreadMonitor.StuckThreadException.class))))
-
-            list.add(matcher);
-
-            return list;
+            Thread.sleep(TEST_THRESHOLD_MILLIS);
         }
     }
 
@@ -121,12 +119,114 @@ public class DefaultStuckThreadMonitorTest
     {
         WebContext webContext = createWebContext();
         monitor.startMonitoringRequest(webContext);
-        Thread.sleep(TEST_THRESHOLD_MILLIS + TEST_PERIOD_MILLIS);
+
+        // Need to make sure the monitor scan runs at least once after the threshold is up.
+        // Also, we need to make sure the monitor has enough time to capture this thread
+        // while it is still at Thread.sleep(),
+        // otherwise the test assertion will fail -- it will see a different frame at the top.
+        // So we need a little more than just TEST_PERIOD_MILLIS by itself.
+        // 15 milliseconds is not enough.
+        long extra = 45;
+        Thread.sleep(TEST_THRESHOLD_MILLIS + TEST_PERIOD_MILLIS + extra);
+
         monitor.finishMonitoringRequest(webContext);
 
-        queue.assertNothingEnqueued();
+        queue.assertEnqueued(expectedReport(webContext));
     }
 
+
+
+    private List<Matcher<? super ErrorReport>> expectedReport(WebContext webContext)
+    {
+        List<Matcher<? super ErrorReport>> list = Lists.newArrayList();
+        Matcher<ErrorReport> matcher = compose(
+            "an error report with",
+            hasFeature(
+                "notification level",
+                ErrorReport::getNotificationLevel,
+                equalTo(NotificationLevel.ERROR))
+        ).and(
+            hasFeature(
+                "thrown list",
+                ErrorReport::getThrown,
+                is(contains(isStuckThreadException())))
+        ).and(
+            hasFeature(
+                "web context",
+                ErrorReport::getWebContext,
+                isDistinctCopyOf(webContext))
+        );
+
+        list.add(matcher);
+        return list;
+    }
+
+    private Matcher<Throwable> isStuckThreadException()
+    {
+        return compose(
+            "a throwable that",
+            Matchers.<Throwable>is(instanceOf(StuckThreadException.class))
+        ).and(
+            hasFeature(
+                "has a stack trace",
+                Throwable::getStackTrace,
+                thatIsSleeping())
+        );
+    }
+
+    private Matcher<StackTraceElement[]> thatIsSleeping()
+    {
+        return new TypeSafeDiagnosingMatcher<StackTraceElement[]>()
+        {
+            @Override
+            public void describeTo(Description description)
+            {
+                description.appendText("whose top method is Thread.sleep()");
+            }
+
+            @Override
+            protected boolean matchesSafely(
+                StackTraceElement[] elements, Description mismatchDescription)
+            {
+                if (elements.length == 0)
+                {
+                    mismatchDescription.appendText("is empty");
+                    return false;
+                }
+                StackTraceElement topElement = elements[0];
+                if (!topElement.getClassName().equals(Thread.class.getName()) ||
+                    !topElement.getMethodName().equals("sleep"))
+                {
+                    mismatchDescription
+                        .appendText("that is is not sleeping:")
+                        .appendValueList("\n  ", "\n  ", "\n", elements);
+
+                    return false;
+                }
+
+                return true;
+            }
+        };
+    }
+
+    private Matcher<WebContext> isDistinctCopyOf(WebContext webContext)
+    {
+        return compose(
+            "with",
+            hasFeatureValue(
+                "start",
+                WebContext::getStart,
+                webContext.getStart())
+        ).and(
+            hasFeatureValue(
+                "url",
+                WebContext::getUrl,
+                webContext.getUrl())
+        ).and(
+            // for threadsafe access, the reported WebContext is a distinct copy
+            is(not(sameInstance(webContext)))
+        );
+    }
 
 
 }
