@@ -27,6 +27,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
@@ -255,7 +256,7 @@ public class JaxwsRecordingIntegrationTest
                 SOAPFactory factory = SOAPFactory.newInstance();
                 fault = factory.createFault(
                     "That's some bad fruit",
-                    new QName("http://schemas.xmlsoap.org/soap/envelope/", code));
+                    new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, code));
             }
             catch (SOAPException e)
             {
