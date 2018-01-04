@@ -27,14 +27,18 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
+import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import static javax.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
+import static javax.xml.soap.SOAPConstants.SOAP_RECEIVER_FAULT;
+import static javax.xml.soap.SOAPConstants.SOAP_SENDER_FAULT;
+import static javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -230,6 +234,7 @@ public class JaxwsRecordingIntegrationTest
         serviceName = "FruitService",
         targetNamespace = namespace
     )
+    @BindingType(value = SOAP12HTTP_BINDING)
     @HandlerChain(file = "handlers.xml")
     @Action
     public static class FruitServiceImpl implements FruitService
@@ -244,19 +249,19 @@ public class JaxwsRecordingIntegrationTest
         @Override
         public Fruit getBadFruit(boolean clientOrServer) throws SOAPFaultException
         {
-            SOAPFault fault = createSoapFault(clientOrServer ? "Client" : "Server");
+            SOAPFault fault =
+                createSoapFault(clientOrServer ? SOAP_SENDER_FAULT : SOAP_RECEIVER_FAULT);
+
             throw new SOAPFaultException(fault);
         }
 
-        private SOAPFault createSoapFault(String code)
+        private SOAPFault createSoapFault(QName faultCode)
         {
             SOAPFault fault;
             try
             {
-                SOAPFactory factory = SOAPFactory.newInstance();
-                fault = factory.createFault(
-                    "That's some bad fruit",
-                    new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, code));
+                SOAPFactory factory = SOAPFactory.newInstance(SOAP_1_2_PROTOCOL);
+                fault = factory.createFault("That's some bad fruit", faultCode);
             }
             catch (SOAPException e)
             {

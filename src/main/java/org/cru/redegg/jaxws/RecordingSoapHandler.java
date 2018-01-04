@@ -15,6 +15,9 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.util.Collections;
 import java.util.Set;
 
+import static javax.xml.soap.SOAPConstants.SOAP_SENDER_FAULT;
+import static javax.xml.soap.SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE;
+
 /**
  * A jax-ws {@link SOAPHandler} that records soap faults.
  * If the client is at fault (hah!), the error is recorded as a user error
@@ -31,9 +34,13 @@ public class RecordingSoapHandler implements SOAPHandler<SOAPMessageContext>
 {
     private Logger log = LoggerFactory.getLogger(getClass());
 
+    /** SOAP 1.2 Client Fault */
+    private static final QName SOAP_1_1_CLIENT_CODE = new QName(URI_NS_SOAP_1_1_ENVELOPE, "Client");
+
     //TODO: not sure we can rely on this working
     @Inject
     WebErrorRecorder recorder;
+
 
     @Override
     public Set<QName> getHeaders()
@@ -75,14 +82,8 @@ public class RecordingSoapHandler implements SOAPHandler<SOAPMessageContext>
     {
         QName faultCode = soapBody.getFault().getFaultCodeAsQName();
 
-        /* the Soap 1.1 "user error" code */
-        QName clientCode = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Client");
-
-        /* the Soap 1.2 "user error" code */
-        QName senderCode = new QName("http://www.w3.org/2003/05/soap-envelope", "Sender");
-
-        if (faultCode.equals(clientCode) ||
-            faultCode.equals(senderCode))
+        if (faultCode.equals(SOAP_1_1_CLIENT_CODE) ||
+            faultCode.equals(SOAP_SENDER_FAULT))
         {
             recorder.userError();
         }
