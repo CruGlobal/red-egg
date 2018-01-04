@@ -225,6 +225,7 @@ public class JaxwsRecordingIntegrationTest
     }
 
 
+    @SuppressWarnings("WSReferenceInspection") // intellij doesn't like the $ syntax, but CXF does
     @WebService(
         endpointInterface = "org.cru.redegg.JaxwsRecordingIntegrationTest$FruitService",
         serviceName = "FruitService",
