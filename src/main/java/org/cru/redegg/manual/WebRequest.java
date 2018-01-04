@@ -5,6 +5,9 @@ import org.cru.redegg.recording.api.WebErrorRecorder;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
+ * A thread-local manager for keeping the 'current' WebRequest.
+ * This is used when CDI contexts can't be used.
+ *
  * @author Matt Drees
  */
 public class WebRequest

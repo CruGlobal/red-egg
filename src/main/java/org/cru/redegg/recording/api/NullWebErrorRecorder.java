@@ -92,6 +92,11 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
+    public void startMonitoringRequestForTimeliness()
+    {
+    }
+
+    @Override
     public void recordRequestComplete(DateTime dateTime)
     {
     }

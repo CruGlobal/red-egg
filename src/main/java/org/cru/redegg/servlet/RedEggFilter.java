@@ -52,6 +52,7 @@ public class RedEggFilter implements Filter {
         throws IOException, ServletException {
         RecordingResponse recordingResponse = new RecordingResponse(response);
         RecordingRequest recordingRequest = new RecordingRequest(request, errorLog, getRecorder());
+        getRecorder().startMonitoringRequestForTimeliness();
         try {
             chain.doFilter(recordingRequest, recordingResponse);
         } catch (IOException e) {
