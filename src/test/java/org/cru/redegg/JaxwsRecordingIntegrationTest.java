@@ -40,6 +40,7 @@ import static javax.xml.soap.SOAPConstants.SOAP_RECEIVER_FAULT;
 import static javax.xml.soap.SOAPConstants.SOAP_SENDER_FAULT;
 import static javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.argThat;
@@ -107,12 +108,8 @@ public class JaxwsRecordingIntegrationTest
         }
         catch (SOAPFaultException expected)
         {
-            /*
-             * Note: in wildfly 8-10, the CXF client unmarshals the fault wrong and tries to use
-             * constructor that doesn't exist. This ends up creating a soap fault as we want,
-             * but the message from the server isn't preserved. Oh well.
-             */
-//            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getFault().getFaultCodeAsQName(), equalTo(SOAP_SENDER_FAULT));
         }
 
         verify(recorder).recordResponseStatus(500);
@@ -128,8 +125,8 @@ public class JaxwsRecordingIntegrationTest
         }
         catch (SOAPFaultException expected)
         {
-            //see note in testJaxwsRequestClientFailure()
-//            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getFault().getFaultCodeAsQName(), equalTo(SOAP_RECEIVER_FAULT));
         }
 
         verify(recorder).recordResponseStatus(500);
@@ -224,8 +221,7 @@ public class JaxwsRecordingIntegrationTest
         public Fruit getFruit(@WebParam(name = "color") String color);
 
         @WebMethod
-        public Fruit getBadFruit(@WebParam(name = "clientOrServer") boolean clientOrServer)
-            throws SOAPFaultException;
+        public Fruit getBadFruit(@WebParam(name = "clientOrServer") boolean clientOrServer);
     }
 
 
@@ -247,7 +243,7 @@ public class JaxwsRecordingIntegrationTest
         }
 
         @Override
-        public Fruit getBadFruit(boolean clientOrServer) throws SOAPFaultException
+        public Fruit getBadFruit(boolean clientOrServer)
         {
             SOAPFault fault =
                 createSoapFault(clientOrServer ? SOAP_SENDER_FAULT : SOAP_RECEIVER_FAULT);
