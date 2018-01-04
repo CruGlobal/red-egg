@@ -88,7 +88,8 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
         recorder
             .recordRequestQueryParameters(categorization.queryParameters)
-            .recordRequestPostParameters(categorization.postParameters);
+            .recordRequestPostParameters(categorization.postParameters)
+            .startMonitoringRequestForTimeliness();
     }
 
     private Multimap<String, String> getHeadersAsMultimap(HttpServletRequest request) {
@@ -113,12 +114,13 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
 
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
+        final WebErrorRecorder recorder = recorderFactory.getWebRecorder();
         // if we are in an async contextual state, then the request has not yet completed
         if(isAsyncStarted(sre)) {
             setAsyncContext(sre.getServletRequest(), true);
+            recorder.suspendRequestProcessing();
         } else {
-            recorderFactory.getWebRecorder()
-                    .recordRequestComplete(clock.dateTime());
+            recorder.recordRequestComplete(clock.dateTime());
             lifecycle.endRequest();
             setAsyncContext(sre.getServletRequest(), false);
         }

@@ -6,6 +6,7 @@ import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.MoreExecutors;
 import org.cru.redegg.util.ProxyConstructor;
 
 import javax.annotation.PreDestroy;
@@ -73,22 +74,12 @@ public class InMemoryErrorQueue implements ErrorQueue
     @PreDestroy
     public void shutdown()
     {
-        executorService.shutdown();
-        try
-        {
-            int timeout = 20;
-            TimeUnit timeUnit = TimeUnit.SECONDS;
-            boolean completed = executorService.awaitTermination(timeout, timeUnit);
-            if (!completed)
-                errorLog.warn("unable to shut down report executor within " + timeout + " " + timeUnit.name().toLowerCase());
-        }
-        catch (InterruptedException e)
-        {
-            errorLog.error("report executor shutdown interrupted", e);
-            // Lifecycle interceptor methods may not throw checked exceptions.
-            // So to preserve the interruption, we have to set the interrupt flag.
-            Thread.currentThread().interrupt();
-        }
+        MoreExecutors.shutdownAndHandleInterruptions(
+            executorService,
+            20,
+            "report",
+            errorLog
+        );
     }
 
     @Override

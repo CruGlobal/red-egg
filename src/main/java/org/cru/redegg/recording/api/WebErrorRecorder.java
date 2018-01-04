@@ -48,5 +48,29 @@ public interface WebErrorRecorder extends ErrorRecorder {
 
     WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress);
 
+    /**
+     * Begin monitoring the request for 'timeliness'.
+     * After this point, if the request gets stuck, an a report will be sent.
+     *
+     * Should be called after several request attributes (path, query parameters, etc) have been recorded,
+     * but before the application begins to perform business logic.
+     */
+    void startMonitoringRequestForTimeliness();
+
+    /**
+     * Indicates that this request is done processing on this thread,
+     * but is not yet complete.
+     * If the request was monitored for 'timeliness', the request will stop being monitored.
+     */
+    void suspendRequestProcessing();
+
+    /**
+     * Record the completion of this request.
+     *
+     * If any errors were recorded during this request, they will now be enqueued for reporting.
+     * If the request was monitored for 'timeliness', the request will stop being monitored.
+     *
+     * @param dateTime when the request completed
+     */
     void recordRequestComplete(DateTime dateTime);
 }

@@ -52,7 +52,7 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
             RedEgg.configure()
                 .setParameterSanitizer(new TestParameterSanitizer())
                 .setEntitySanitizer(new TestEntitySanitizer())
-                .setRollbarConfig(new ConfigProducer().buildConfig());
+                .setRollbarConfig(new ConfigProducer().buildRollbarConfig());
         }
 
         @Override

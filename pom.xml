@@ -176,6 +176,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.hobsoft.hamcrest</groupId>
+      <artifactId>hamcrest-compose</artifactId>
+      <version>0.3.0</version>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
       <groupId>junit</groupId>

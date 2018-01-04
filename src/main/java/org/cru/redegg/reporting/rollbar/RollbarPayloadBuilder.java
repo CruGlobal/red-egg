@@ -167,7 +167,7 @@ class RollbarPayloadBuilder
         // TODO: record time of actual error.
         // However, rollbar only uses second-level precision, so it's not very helpful to be accurate.
 
-        if (report.getWebContext() != null)
+        if (report.getWebContext() != null && report.getWebContext().getFinish() != null)
         {
             return report.getWebContext().getFinish().toDate();
         }

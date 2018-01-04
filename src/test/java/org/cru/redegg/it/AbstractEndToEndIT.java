@@ -115,7 +115,7 @@ public abstract class AbstractEndToEndIT
         assertThat(report, not(containsString("letmein")));
     }
 
-    private String getReport() throws InterruptedException
+    String getReport() throws InterruptedException
     {
         WebTarget path = getWebTarget().path("dummyapi/notices");
 
@@ -149,7 +149,7 @@ public abstract class AbstractEndToEndIT
         TimeUnit.MILLISECONDS.sleep(500);
     }
 
-    private WebTarget getWebTarget()
+    WebTarget getWebTarget()
     {
         return new WebTargetBuilder().getWebTarget(deploymentURL);
     }

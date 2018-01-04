@@ -1,5 +1,6 @@
 package org.cru.redegg.recording.impl;
 
+import org.cru.redegg.recording.StuckThreadMonitor;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.api.Serializer;
@@ -43,6 +44,9 @@ public class DefaultWebErrorRecorderTest
     @Mock
     EntitySanitizer entitySanitizer;
 
+    @Mock
+    StuckThreadMonitor stuckThreadMonitor;
+
     @Before
     public void setup()
     {
@@ -51,7 +55,8 @@ public class DefaultWebErrorRecorderTest
             new DefaultErrorRecorder(queue, serializer),
             queue,
             errorLog,
-            entitySanitizer);
+            entitySanitizer,
+            stuckThreadMonitor);
     }
 
     @Test
