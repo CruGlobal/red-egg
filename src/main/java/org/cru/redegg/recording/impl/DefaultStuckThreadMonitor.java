@@ -45,6 +45,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
      * Use a weak-keys map so that, on the off chance that a thread doesn't call
      * finishMonitoringRequest() before it finishes a request,
      * the map entry will eventually get garbage collected.
+     * TODO: evaluate this decision
      */
     private final Map<WebContext, Request> currentlyActiveRequests = new MapMaker()
         .initialCapacity(50)
