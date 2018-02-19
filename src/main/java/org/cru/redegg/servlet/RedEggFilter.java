@@ -48,6 +48,7 @@ public class RedEggFilter implements Filter {
         }
     }
 
+    @SuppressWarnings("TryWithIdenticalCatches") // can't use multicatch; it breaks generic record()
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         RecordingResponse recordingResponse = new RecordingResponse(response);
