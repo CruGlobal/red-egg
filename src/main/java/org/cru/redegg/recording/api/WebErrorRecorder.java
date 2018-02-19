@@ -57,5 +57,13 @@ public interface WebErrorRecorder extends ErrorRecorder {
      */
     void startMonitoringRequestForTimeliness();
 
+    /**
+     * Record the completion of this request.
+     *
+     * If any errors were recorded during this request, they will now be enqueued for reporting.
+     * If the request was monitored for 'timeliness', the request will stop being monitored.
+     *
+     * @param dateTime when the request completed
+     */
     void recordRequestComplete(DateTime dateTime);
 }
