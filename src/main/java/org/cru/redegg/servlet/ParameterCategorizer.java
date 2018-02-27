@@ -51,8 +51,7 @@ public class ParameterCategorizer
         void sanitizeQueryString(String parameter)
         {
             assert queryString != null : "should only reach this code if queryString is not null";
-            //TODO: look up query string syntax rules
-            String regex = "((^|&|;)" + Pattern.quote(parameter) + "=)[^&;]*";
+            String regex = "((^|&)" + Pattern.quote(parameter) + "=)[^&]*";
             Matcher matcher = Pattern.compile(regex).matcher(queryString);
 
             StringBuffer newQueryString = new StringBuffer(queryString.length());
@@ -143,7 +142,6 @@ public class ParameterCategorizer
     private boolean isQueryParameter(String param, String queryString) {
         return (queryString.startsWith(param + "=") ||
                 queryString.contains('&' + param + "=") ||
-                queryString.contains(';' + param + "=") || //believe it or not, ';' is a valid query param separator
                 queryString.equals(param) // eg. /soap/MyServiceEndpoint?wsdl
         );
     }
