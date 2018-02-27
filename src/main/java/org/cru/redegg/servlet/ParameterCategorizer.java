@@ -128,6 +128,7 @@ public class ParameterCategorizer
         Categorization categorization)
     {
         String queryString = request.getQueryString();
+        //TODO: this dichotomy isn't completely accurate; a parameter can be both.
         if (queryString != null && isQueryParameter(parameter, queryString))
         {
             addQueryStringParameter(parameter, parameterMap, categorization);
