@@ -8,6 +8,7 @@ import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
@@ -21,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
@@ -318,5 +320,11 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     public void suspendRequestProcessing()
     {
         stuckThreadMonitor.finishMonitoringRequest(webContext);
+    }
+
+    @Override
+    public Optional<ErrorLink> getErrorLink()
+    {
+        return defaultRecorder.getErrorLink();
     }
 }

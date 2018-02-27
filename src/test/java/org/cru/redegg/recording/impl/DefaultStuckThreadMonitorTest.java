@@ -6,6 +6,7 @@ import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.impl.DefaultStuckThreadMonitor.StuckThreadException;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -60,6 +62,12 @@ public class DefaultStuckThreadMonitorTest
         public void enqueue(ErrorReport report)
         {
             reports.add(report);
+        }
+
+        @Override
+        public Optional<ErrorLink> buildLink()
+        {
+            return Optional.empty();
         }
 
         public void assertNothingEnqueued() throws InterruptedException

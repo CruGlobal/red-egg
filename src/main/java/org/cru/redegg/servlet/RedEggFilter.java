@@ -3,6 +3,7 @@ package org.cru.redegg.servlet;
 import org.cru.redegg.boot.Initializer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.util.ErrorLog;
 
 import javax.inject.Inject;
@@ -22,6 +23,14 @@ import java.io.IOException;
  */
 @WebFilter(urlPatterns = "/*", asyncSupported = true)
 public class RedEggFilter implements Filter {
+
+    /**
+     * A private-use (https://tools.ietf.org/html/bcp35#section-3.8) URI
+     * that serves as an extension relation type (https://tools.ietf.org/html/rfc8288#section-2.1.2).
+     * A link of this type refers to a location where more details can be found regarding
+     * the error that caused this request's processing to fail (or degrade).
+     */
+    private static final String CRU_ERROR_DETAILS_REL_TYPE = "org.cru.links:error-details";
 
     @Inject
     RecorderFactory factory;
@@ -71,8 +80,21 @@ public class RedEggFilter implements Filter {
             {
                 getRecorder().recordResponseStatus(statusCode);
             }
+
+            getRecorder().getErrorLink().ifPresent(link -> writeLinkHeader(link, response));
         }
 
+    }
+
+    private void writeLinkHeader(
+        ErrorLink errorLink,
+        HttpServletResponse response)
+    {
+        final String linkValue = String.format(
+            "<%s>; rel=\"%s\"",
+            errorLink.getTarget(),
+            CRU_ERROR_DETAILS_REL_TYPE);
+        response.addHeader("Link", linkValue);
     }
 
     private WebErrorRecorder getRecorder()

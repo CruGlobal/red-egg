@@ -2,6 +2,8 @@ package org.cru.redegg.reporting.api;
 
 import org.cru.redegg.reporting.ErrorReport;
 
+import java.util.Optional;
+
 /**
  * @author Matt Drees
  */
@@ -14,6 +16,13 @@ public interface ErrorQueue {
      * or if some other problem (a number-of-threads OME, for example)
      * prevents the queue from taking an additional element.
      */
-    public void enqueue(ErrorReport report);
+    void enqueue(ErrorReport report);
 
+    /**
+     * Builds a link that can be attached to a ErrorReport,
+     * if the underlying reporter supports such links.
+     *
+     * The link can be used in logs or http responses.
+     */
+    Optional<ErrorLink> buildLink();
 }

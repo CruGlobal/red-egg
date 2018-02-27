@@ -8,6 +8,7 @@ import org.junit.Test;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -18,6 +19,8 @@ import static javax.ws.rs.client.Entity.form;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -105,6 +108,9 @@ public abstract class AbstractEndToEndIT
             .request()
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(204));
+        final Link link = appResponse.getLink("org.cru.links:error-details");
+        assertThat(link, notNullValue());
+        assertThat(link.getUri().toString(), startsWith("https://rollbar.com/occurrence/uuid/?uuid="));
 
         String report = getReport();
 

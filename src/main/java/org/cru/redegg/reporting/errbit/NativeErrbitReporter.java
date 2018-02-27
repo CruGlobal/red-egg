@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting.errbit;
 
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.reporting.common.HttpPayloadSender;
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
 
@@ -41,6 +43,12 @@ public class NativeErrbitReporter implements ErrorReporter
         }
         else
             doSend(report);
+    }
+
+    @Override
+    public Optional<ErrorLink> buildLink()
+    {
+        return Optional.empty();
     }
 
     private void logUserWarning(ErrorReport report)

@@ -62,9 +62,6 @@ public class JaxwsRecordingIntegrationTest
 
             .addPackage(RecordingSoapHandler.class.getPackage())
 
-            .addClass(LoggingReporter.class)
-            .addClass(ErrorReporter.class)
-
             .addClass(TestApplication.class)
             .addClass(PortBuilder.class)
             .addClass(AnswerWithSelf.class)

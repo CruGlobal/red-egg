@@ -12,6 +12,7 @@ import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.RedEggStrings;
 import org.joda.time.format.ISODateTimeFormat;
@@ -24,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -60,6 +62,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
     private NotificationLevel level = NONE;
     private boolean sentError;
     private boolean mustNotify;
+    private ErrorLink errorLink;
 
     @Inject
     public DefaultErrorRecorder(ErrorQueue queue, Serializer serializer) {
@@ -226,6 +229,19 @@ public class DefaultErrorRecorder implements ErrorRecorder {
             sendReport();
     }
 
+    @Override
+    public Optional<ErrorLink> getErrorLink()
+    {
+        if (shouldNotificationBeSent())
+        {
+            if (errorLink == null)
+            {
+                errorLink = queue.buildLink().orElse(null);
+            }
+        }
+        return Optional.ofNullable(errorLink);
+    }
+
     private void sendReport()
     {
         addAdditionalContextIfPossible();
@@ -255,6 +271,7 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
     public ErrorReport buildReport() {
         ErrorReport report = new ErrorReport();
+        report.setErrorLink(errorLink);
         report.setContext(serializeContext());
         report.setUser(serializeUser());
         report.setThrown(getThrown());

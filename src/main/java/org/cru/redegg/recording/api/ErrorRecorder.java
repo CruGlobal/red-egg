@@ -1,7 +1,10 @@
 package org.cru.redegg.recording.api;
 
+import org.cru.redegg.reporting.api.ErrorLink;
+
 import java.net.InetAddress;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
@@ -76,4 +79,10 @@ public interface ErrorRecorder {
      * (For those, errors are always sent at the end of the request)
      */
     void sendReportIfNecessary();
+
+    /**
+     * If an error report will be sent, and if the underlying reporter supports it,
+     * returns a link to the location where the error report will (eventually) be available.
+     */
+    Optional<ErrorLink> getErrorLink();
 }

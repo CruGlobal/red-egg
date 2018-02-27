@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.recording.api.NotificationLevel;
 
 import java.util.Collections;
@@ -31,6 +32,7 @@ public class ErrorReport {
     private WebContext webContext;
     private boolean mustNotify;
     private NotificationLevel notificationLevel;
+    private ErrorLink errorLink;
 
     public void addWebContext(WebContext webContext) {
         this.webContext = webContext;
@@ -232,5 +234,15 @@ public class ErrorReport {
     public NotificationLevel getNotificationLevel()
     {
         return notificationLevel;
+    }
+
+    public ErrorLink getErrorLink()
+    {
+        return errorLink;
+    }
+
+    public void setErrorLink(ErrorLink errorLink)
+    {
+        this.errorLink = errorLink;
     }
 }

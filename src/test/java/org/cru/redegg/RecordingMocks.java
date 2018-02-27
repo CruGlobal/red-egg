@@ -13,6 +13,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +50,7 @@ public class RecordingMocks
         Mockito.reset(recorder, factory);
         when(factory.getRecorder()).thenReturn(recorder);
         when(factory.getWebRecorder()).thenReturn(recorder);
+        when(recorder.getErrorLink()).thenReturn(Optional.empty());
     }
 
 }

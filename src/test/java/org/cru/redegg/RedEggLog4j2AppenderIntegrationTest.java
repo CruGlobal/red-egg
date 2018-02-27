@@ -35,18 +35,15 @@ public class RedEggLog4j2AppenderIntegrationTest
 
         return DefaultDeployment.withCdi()
             .addRecordingConfigurationClasses()
+            .addBootPackage()
             .addLog4j2()
             .getArchive()
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
             .addClass(ErrorLog.class)
             .addPackage(Clock.class.getPackage())
-            .addPackage(Lifecycle.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
-
-            .addClass(LoggingReporter.class)
-            .addClass(ErrorReporter.class)
 
             .addClass(AnswerWithSelf.class)
             .addClass(RecordingMocks.class);

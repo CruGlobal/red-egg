@@ -18,6 +18,7 @@ import com.rollbar.payload.data.body.Body;
 import com.rollbar.payload.data.body.BodyContents;
 import com.rollbar.payload.data.body.Message;
 import com.rollbar.payload.data.body.TraceChain;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.ExceptionDetailsExtractor;
@@ -69,6 +70,12 @@ class RollbarPayloadBuilder
             .platform(config.getPlatform())
             .language(NOTIFIER_LANGUAGE)
             .timestamp(getErrorTimestamp());
+        final ErrorLink errorLink = report.getErrorLink();
+        if (errorLink != null)
+        {
+            RollbarErrorLink rollbarErrorLink = (RollbarErrorLink) errorLink;
+            data = data.uuid(rollbarErrorLink.getId());
+        }
 
         if (report.getContext().containsKey("framework"))
         {

@@ -3,15 +3,19 @@ package org.cru.redegg.reporting;
 import com.google.common.base.Throwables;
 import org.cru.redegg.qualifier.Fallback;
 import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.MoreExecutors;
 import org.cru.redegg.util.ProxyConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -24,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class InMemoryErrorQueue implements ErrorQueue
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryErrorQueue.class);
 
     private final ErrorReporter primaryErrorReporter;
 
@@ -88,6 +94,11 @@ public class InMemoryErrorQueue implements ErrorQueue
         try
         {
             submit(report);
+            final ErrorLink errorLink = report.getErrorLink();
+            if (errorLink != null)
+            {
+                LOG.info("Error details available at {}", errorLink.getTarget());
+            }
         }
         catch (RejectedExecutionException e)
         {
@@ -132,5 +143,11 @@ public class InMemoryErrorQueue implements ErrorQueue
             errorLog.error("unable to send error report with fallback reporter", t2);
             //swallow t2
         }
+    }
+
+    @Override
+    public Optional<ErrorLink> buildLink()
+    {
+        return primaryErrorReporter.buildLink();
     }
 }

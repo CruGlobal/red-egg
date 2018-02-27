@@ -191,6 +191,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         {
             ErrorReport report = new ErrorReport();
             report.setWebContext(webContext);
+            report.setErrorLink(errorQueue.buildLink().orElse(null));
 
             Throwable standInException = buildStandInException(webContext, request, now);
             report.setThrown(Collections.singletonList(standInException));
