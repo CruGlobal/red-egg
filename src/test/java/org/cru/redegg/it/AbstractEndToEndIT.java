@@ -119,11 +119,16 @@ public abstract class AbstractEndToEndIT
     {
         WebTarget path = getWebTarget().path("dummyapi/notices");
 
+        long currentTime = System.currentTimeMillis();
         Response reportResponse;
         do
         {
             waitABit();
             reportResponse = path.request().get();
+            if (System.currentTimeMillis() > currentTime + 30 * 1000)
+            {
+                throw new AssertionError("A report wasn't sent within the required timeframe");
+            }
 
         } while (reportResponse.getStatus() == 204);
 
