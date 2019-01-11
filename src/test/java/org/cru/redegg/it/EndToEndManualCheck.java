@@ -44,7 +44,7 @@ public class EndToEndManualCheck
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withCdi("end-to-end-test.war")
-            .addAllRuntimeDependencies()
+            .addAllRuntimeDependenciesExceptLog4j2()
             .getArchive()
             .addAsLibraries(RedEggDistribution.getJarFile())
 

@@ -49,7 +49,11 @@ public class Lifecycle
         // load this eagerly since its xpath usage can get thrown off by TCCL changes
         RedEggVersion.get();
 
-        if (LogbackLogging.isAvailable())
+        if (Log4j2Logging.isAvailable())
+        {
+            recorder = Log4j2Logging.addLog4j2Appender(recorderFactory, ignoredLoggers);
+        }
+        else if (LogbackLogging.isAvailable())
         {
             recorder = LogbackLogging.addLogbackAppender(recorderFactory, ignoredLoggers);
         }

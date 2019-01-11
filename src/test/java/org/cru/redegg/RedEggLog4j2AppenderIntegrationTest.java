@@ -1,0 +1,76 @@
+package org.cru.redegg;
+
+
+import org.apache.logging.log4j.LogManager;
+import org.cru.redegg.boot.Lifecycle;
+import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.api.WebErrorRecorder;
+import org.cru.redegg.reporting.LoggingReporter;
+import org.cru.redegg.reporting.api.ErrorReporter;
+import org.cru.redegg.servlet.ParameterCategorizer;
+import org.cru.redegg.servlet.RedEggServletListener;
+import org.cru.redegg.test.AnswerWithSelf;
+import org.cru.redegg.test.DefaultDeployment;
+import org.cru.redegg.util.Clock;
+import org.cru.redegg.util.ErrorLog;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import java.util.logging.LogRecord;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+
+@RunWith(Arquillian.class)
+public class RedEggLog4j2AppenderIntegrationTest
+{
+    @Deployment
+    public static WebArchive deployment()  {
+
+        return DefaultDeployment.withCdi()
+            .addRecordingConfigurationClasses()
+            .addLog4j2()
+            .getArchive()
+            .addClass(RedEggServletListener.class)
+            .addClass(ParameterCategorizer.class)
+            .addClass(ErrorLog.class)
+            .addPackage(Clock.class.getPackage())
+            .addPackage(Lifecycle.class.getPackage())
+
+            .addPackage(RecorderFactory.class.getPackage())
+
+            .addClass(LoggingReporter.class)
+            .addClass(ErrorReporter.class)
+
+            .addClass(AnswerWithSelf.class)
+            .addClass(RecordingMocks.class);
+    }
+
+
+    @Inject
+    WebErrorRecorder recorder;
+
+
+    @Inject RecordingMocks mocks;
+
+    @Before
+    public void setup()
+    {
+        mocks.reset();
+    }
+
+    @Test
+    public void testLog4j2ErrorLogging() {
+        LogManager.getRootLogger().error("error from test");
+
+        verify(recorder, atLeast(1)).recordLogRecord(any(LogRecord.class));
+        verify(recorder, atLeast(1)).sendReportIfNecessary();
+    }
+
+}
