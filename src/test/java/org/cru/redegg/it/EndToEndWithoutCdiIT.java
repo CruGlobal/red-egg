@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.net.URISyntaxException;
 
 /**
  * @author Matt Drees
@@ -26,7 +25,7 @@ public class EndToEndWithoutCdiIT extends AbstractEndToEndIT
     public static WebArchive deployment()  {
 
         return DefaultDeployment.withoutCdi("end-to-end-test.war")
-            .addAllRuntimeDependencies()
+            .addAllRuntimeDependenciesExceptLog4j2()
             .getArchive()
             .addAsLibraries(RedEggDistribution.getJarFile())
 

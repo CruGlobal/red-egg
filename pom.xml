@@ -17,6 +17,7 @@
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <log4j2.version>2.11.1</log4j2.version>
   </properties>
 
   <dependencyManagement>
@@ -93,12 +94,28 @@
     </dependency>
 
     <dependency>
+      <!-- log4j2 can be used to report errors -->
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <!-- we need to use some core classes to do runtime-reconfig -->
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <!-- log4j can be used to report errors -->
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.16</version>
       <optional>true</optional>
     </dependency>
+
 
     <dependency>
       <!-- logback can be used to report errors -->
