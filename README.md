@@ -220,3 +220,6 @@ If you are running tests from your IDE,
 generally you will want to instead activate the `arq-wildfly-remote` profile.
 This requires that you fire up wildfly yourself in a terminal window.
 This will run the tests faster and give you quicker feedback as you develop.
+Note: if you have run the `arq-wildfly-managed` profile recently,
+you may need to run `mvn resources:testResources -Parq-wildfly-managed`
+(maybe via the IDE) to ensure the IDE doesn't use a stale arquillian.xml.
