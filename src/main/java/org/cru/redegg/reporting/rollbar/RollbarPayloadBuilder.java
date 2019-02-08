@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -37,6 +38,7 @@ import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -248,10 +250,13 @@ class RollbarPayloadBuilder
 
         Duration  duration = new Duration(start, finish);
 
-        String timing =
-            "start: " + start + "\n" +
-            "finish: " + finish + "\n" +
-            "duration: " + duration;
+        Map<String, String> timing = new HashMap<>();
+        timing.put("start", start.toString());
+        if (finish != null)
+        {
+            timing.put("finish", finish.toString());
+        }
+        timing.put("duration", duration.toString());
 
         requestData = requestData.put("timing", timing);
 
