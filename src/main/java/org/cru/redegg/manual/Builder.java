@@ -16,6 +16,7 @@ import org.cru.redegg.recording.impl.DefaultStuckThreadMonitor;
 import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
 import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
+import org.cru.redegg.reporting.DatadogEnricher;
 import org.cru.redegg.reporting.InMemoryErrorQueue;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
@@ -147,7 +148,8 @@ public class Builder
             queue = new InMemoryErrorQueue(
                 buildPrimaryErrorReporter(),
                 buildFallbackErrorReporter(),
-                buildErrorLog());
+                buildErrorLog(),
+                new DatadogEnricher());
         return queue;
     }
 

@@ -39,16 +39,20 @@ public class InMemoryErrorQueue implements ErrorQueue
 
     private final ExecutorService executorService;
 
+    private final DatadogEnricher enricher;
+
     @Inject
     public InMemoryErrorQueue(
         @Selected ErrorReporter primaryErrorReporter,
         @Fallback ErrorReporter fallbackReporter,
-        ErrorLog errorLog)
+        ErrorLog errorLog,
+        DatadogEnricher enricher)
     {
         this(
             primaryErrorReporter,
             fallbackReporter,
             errorLog,
+            enricher,
             //TODO: this should probably be configurable
             new ThreadPoolExecutor(
                 0,
@@ -69,11 +73,13 @@ public class InMemoryErrorQueue implements ErrorQueue
         ErrorReporter primaryErrorReporter,
         ErrorReporter fallbackReporter,
         ErrorLog errorLog,
+        DatadogEnricher enricher,
         ExecutorService executorService)
     {
         this.primaryErrorReporter = primaryErrorReporter;
         this.fallbackReporter = fallbackReporter;
         this.errorLog = errorLog;
+        this.enricher = enricher;
         this.executorService = executorService;
     }
 
@@ -118,6 +124,7 @@ public class InMemoryErrorQueue implements ErrorQueue
             {
                 try
                 {
+                    enricher.enrich(report);
                     primaryErrorReporter.send(report);
                 }
                 catch (Throwable t)
