@@ -205,6 +205,20 @@ use `recordSystemProperties()` if you wish to.
 The hostname is recorded automatically, but you can override it with `recordLocalHost()`.
 
 
+Error Details Links
+===================
+
+If an error occurs during a servlet request,
+a Link header will be added to the http response with a link to the error details.
+Downstream clients can use this in their logs and/or in their own error reports.
+The Link uses an extension relation type called `org.cru.links:error-details`.
+
+This project includes a JAX-RS client response filter that can be used to
+extract and record this link automatically.
+You will need to create a ClientResponseFilter instance
+and register it with your ClientBuilder, Client, or WebTarget.
+
+
 Building this project
 =====================
 

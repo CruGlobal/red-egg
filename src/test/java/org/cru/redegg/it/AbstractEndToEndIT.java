@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
+import static org.cru.redegg.Links.CRU_ERROR_DETAILS_REL_TYPE;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -108,7 +109,7 @@ public abstract class AbstractEndToEndIT
             .request()
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(204));
-        final Link link = appResponse.getLink("org.cru.links:error-details");
+        final Link link = appResponse.getLink(CRU_ERROR_DETAILS_REL_TYPE);
         assertThat(link, notNullValue());
         assertThat(link.getUri().toString(), startsWith("https://rollbar.com/occurrence/uuid/?uuid="));
 
