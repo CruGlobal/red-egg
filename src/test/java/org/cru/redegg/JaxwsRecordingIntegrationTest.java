@@ -30,11 +30,17 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
+import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import static javax.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
+import static javax.xml.soap.SOAPConstants.SOAP_RECEIVER_FAULT;
+import static javax.xml.soap.SOAPConstants.SOAP_SENDER_FAULT;
+import static javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.argThat;
@@ -55,9 +61,6 @@ public class JaxwsRecordingIntegrationTest
             .getArchive()
 
             .addPackage(RecordingSoapHandler.class.getPackage())
-
-            .addClass(LoggingReporter.class)
-            .addClass(ErrorReporter.class)
 
             .addClass(TestApplication.class)
             .addClass(PortBuilder.class)
@@ -102,12 +105,8 @@ public class JaxwsRecordingIntegrationTest
         }
         catch (SOAPFaultException expected)
         {
-            /*
-             * Note: in wildfly 8-10, the CXF client unmarshals the fault wrong and tries to use
-             * constructor that doesn't exist. This ends up creating a soap fault as we want,
-             * but the message from the server isn't preserved. Oh well.
-             */
-//            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getFault().getFaultCodeAsQName(), equalTo(SOAP_SENDER_FAULT));
         }
 
         verify(recorder).recordResponseStatus(500);
@@ -123,8 +122,8 @@ public class JaxwsRecordingIntegrationTest
         }
         catch (SOAPFaultException expected)
         {
-            //see note in testJaxwsRequestClientFailure()
-//            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getMessage(), containsString("That's some bad fruit"));
+            assertThat(expected.getFault().getFaultCodeAsQName(), equalTo(SOAP_RECEIVER_FAULT));
         }
 
         verify(recorder).recordResponseStatus(500);
@@ -219,16 +218,17 @@ public class JaxwsRecordingIntegrationTest
         public Fruit getFruit(@WebParam(name = "color") String color);
 
         @WebMethod
-        public Fruit getBadFruit(@WebParam(name = "clientOrServer") boolean clientOrServer)
-            throws SOAPFaultException;
+        public Fruit getBadFruit(@WebParam(name = "clientOrServer") boolean clientOrServer);
     }
 
 
+    @SuppressWarnings("WSReferenceInspection") // intellij doesn't like the $ syntax, but CXF does
     @WebService(
         endpointInterface = "org.cru.redegg.JaxwsRecordingIntegrationTest$FruitService",
         serviceName = "FruitService",
         targetNamespace = namespace
     )
+    @BindingType(value = SOAP12HTTP_BINDING)
     @HandlerChain(file = "handlers.xml")
     @Action
     public static class FruitServiceImpl implements FruitService
@@ -241,21 +241,21 @@ public class JaxwsRecordingIntegrationTest
         }
 
         @Override
-        public Fruit getBadFruit(boolean clientOrServer) throws SOAPFaultException
+        public Fruit getBadFruit(boolean clientOrServer)
         {
-            SOAPFault fault = createSoapFault(clientOrServer ? "Client" : "Server");
+            SOAPFault fault =
+                createSoapFault(clientOrServer ? SOAP_SENDER_FAULT : SOAP_RECEIVER_FAULT);
+
             throw new SOAPFaultException(fault);
         }
 
-        private SOAPFault createSoapFault(String code)
+        private SOAPFault createSoapFault(QName faultCode)
         {
             SOAPFault fault;
             try
             {
-                SOAPFactory factory = SOAPFactory.newInstance();
-                fault = factory.createFault(
-                    "That's some bad fruit",
-                    new QName("http://schemas.xmlsoap.org/soap/envelope/", code));
+                SOAPFactory factory = SOAPFactory.newInstance(SOAP_1_2_PROTOCOL);
+                fault = factory.createFault("That's some bad fruit", faultCode);
             }
             catch (SOAPException e)
             {

@@ -44,11 +44,7 @@ public class SimplePomParser
                 stream.close();
             }
         }
-        catch (XPathExpressionException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e)
+        catch (XPathExpressionException | IOException e)
         {
             throw new RuntimeException(e);
         }

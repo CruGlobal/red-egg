@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.cru.redegg.qualifier.Fallback;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -44,6 +46,12 @@ public class LoggingReporter implements ErrorReporter
             errorLogger.error("error:", report.getThrown().get(0));
             errorLogger.error("error context:\n{}", message);
         }
+    }
+
+    @Override
+    public Optional<ErrorLink> buildLink()
+    {
+        return Optional.empty();
     }
 
     private String buildMessage(ErrorReport report)
@@ -90,6 +98,7 @@ public class LoggingReporter implements ErrorReporter
 
         builder.appendLine("Method", webContext.getMethod());
         builder.appendLine("URL", webContext.getUrl());
+        builder.appendLine("Query String", webContext.getQueryString());
 
         addMultimapEntries(builder, webContext.getQueryParameters(), "Query Parameters");
         addMultimapEntries(builder, webContext.getPostParameters(), "Post Parameters");

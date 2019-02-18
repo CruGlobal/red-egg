@@ -2,11 +2,13 @@ package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Multimap;
 import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.recording.StuckThreadMonitor;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
@@ -20,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
@@ -39,18 +42,21 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
 
     private final ErrorLog errorLog;
     private final EntitySanitizer entitySanitizer;
+    private final StuckThreadMonitor stuckThreadMonitor;
 
     @Inject
     public DefaultWebErrorRecorder(
         DefaultErrorRecorder defaultRecorder,
         ErrorQueue queue,
         ErrorLog errorLog,
-        @Selected EntitySanitizer entitySanitizer)
+        @Selected EntitySanitizer entitySanitizer,
+        StuckThreadMonitor stuckThreadMonitor)
     {
         this.defaultRecorder = defaultRecorder;
         this.queue = queue;
         this.errorLog = errorLog;
         this.entitySanitizer = entitySanitizer;
+        this.stuckThreadMonitor = stuckThreadMonitor;
     }
 
     @ProxyConstructor
@@ -59,6 +65,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         queue = null;
         errorLog = null;
         entitySanitizer = null;
+        stuckThreadMonitor = null;
     }
 
     private final WebContext webContext = new WebContext();
@@ -92,6 +99,14 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         checkNotNull(uri);
         webContext.setUrl(uri);
+        return this;
+    }
+
+    @Override
+    public WebErrorRecorder recordRequestQueryString(String queryString)
+    {
+        checkState(!completed);
+        webContext.setQueryString(queryString);
         return this;
     }
 
@@ -168,6 +183,9 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     public void recordRequestComplete(DateTime finish) {
         checkState(!completed);
         completed = true;
+
+        stuckThreadMonitor.finishMonitoringRequest(webContext);
+
         webContext.setFinish(finish);
         if (defaultRecorder.shouldNotificationBeSent())
         {
@@ -290,5 +308,23 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
         checkState(!completed);
         defaultRecorder.userError();
         return this;
+    }
+
+    @Override
+    public void startMonitoringRequestForTimeliness()
+    {
+        stuckThreadMonitor.startMonitoringRequest(webContext);
+    }
+
+    @Override
+    public void suspendRequestProcessing()
+    {
+        stuckThreadMonitor.finishMonitoringRequest(webContext);
+    }
+
+    @Override
+    public Optional<ErrorLink> getErrorLink()
+    {
+        return defaultRecorder.getErrorLink();
     }
 }

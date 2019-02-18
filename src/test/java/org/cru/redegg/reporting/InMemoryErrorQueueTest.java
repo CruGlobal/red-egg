@@ -33,6 +33,9 @@ public class InMemoryErrorQueueTest
     @Mock
     ExecutorService executorService;
 
+    @Mock
+    DatadogEnricher enricher;
+
     InMemoryErrorQueue queue;
 
     @Before
@@ -43,6 +46,7 @@ public class InMemoryErrorQueueTest
             primaryErrorReporter,
             fallbackReporter,
             errorLog,
+            enricher,
             executorService);
     }
 

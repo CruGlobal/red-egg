@@ -1,5 +1,6 @@
 package org.cru.redegg.servlet;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -13,9 +14,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
 * @author Matt Drees
@@ -41,11 +46,44 @@ public class ParameterCategorizer
     {
         Multimap<String, String> queryParameters;
         Multimap<String, String> postParameters;
+        String queryString;
+
+        void sanitizeQueryString(String parameter)
+        {
+            assert queryString != null : "should only reach this code if queryString is not null";
+            String regex = "((^|&)" + Pattern.quote(parameter) + "=)[^&]*";
+            Matcher matcher = Pattern.compile(regex).matcher(queryString);
+
+            StringBuffer newQueryString = new StringBuffer(queryString.length());
+            Iterator<String> sanitizedValues = queryParameters.get(parameter).iterator();
+            String sanitizedValue = null;
+            while (matcher.find())
+            {
+                sanitizedValue = determineSanitizedValue(sanitizedValues, sanitizedValue);
+                String replacement = matcher.group(1) + sanitizedValue;
+                matcher.appendReplacement(newQueryString, Matcher.quoteReplacement(replacement));
+            }
+            matcher.appendTail(newQueryString);
+            queryString = newQueryString.toString();
+        }
+
+        private String determineSanitizedValue(Iterator<String> sanitizedValues, String sanitizedValue)
+        {
+            if (sanitizedValues.hasNext())
+            {
+                sanitizedValue = sanitizedValues.next();
+            }
+            // otherwise, the sanitizer gave back an unexpected number of values.
+            // Just use the last sanitized value that we found,
+            // or nothing if there were no sanitized values.
+
+            return Strings.nullToEmpty(sanitizedValue);
+        }
     }
 
     /**
      * Determines which parameters are query string parameters, and which are form parameters.
-     * The servlet API doesn't readily give this information.
+     * The servlet API doesn't directly give this information.
      */
     Categorization categorize(HttpServletRequest request) {
 
@@ -66,6 +104,7 @@ public class ParameterCategorizer
             categorization.queryParameters = LinkedHashMultimap.create(keys.size(), 1);
             categorization.postParameters = ImmutableMultimap.of();
         }
+        categorization.queryString = request.getQueryString();
 
         for (String param : keys)
         {
@@ -89,6 +128,7 @@ public class ParameterCategorizer
         Categorization categorization)
     {
         String queryString = request.getQueryString();
+        //TODO: this dichotomy isn't completely accurate; a parameter can be both.
         if (queryString != null && isQueryParameter(parameter, queryString))
         {
             addQueryStringParameter(parameter, parameterMap, categorization);
@@ -103,7 +143,6 @@ public class ParameterCategorizer
     private boolean isQueryParameter(String param, String queryString) {
         return (queryString.startsWith(param + "=") ||
                 queryString.contains('&' + param + "=") ||
-                queryString.contains(';' + param + "=") || //believe it or not, ';' is a valid query param separator
                 queryString.equals(param) // eg. /soap/MyServiceEndpoint?wsdl
         );
     }
@@ -113,12 +152,13 @@ public class ParameterCategorizer
         Map<String, String[]> parameterMap,
         Categorization categorization)
     {
-        List<String> sanitized = sanitizer.sanitizeQueryStringParameter(
-            parameter,
-            Arrays.asList(parameterMap.get(parameter)));
-        categorization.queryParameters.putAll(
-            parameter,
-            sanitized);
+        List<String> original = Arrays.asList(parameterMap.get(parameter));
+        List<String> sanitized = sanitizer.sanitizeQueryStringParameter(parameter, original);
+        categorization.queryParameters.putAll(parameter, sanitized);
+        if (!original.equals(sanitized))
+        {
+            categorization.sanitizeQueryString(parameter);
+        }
     }
 
     private void addFormParameter(

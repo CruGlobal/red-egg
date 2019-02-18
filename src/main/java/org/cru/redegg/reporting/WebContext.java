@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.joda.time.DateTime;
@@ -10,10 +11,13 @@ import java.net.URI;
 /**
  * @author Matt Drees
  */
-public class WebContext {
+public class WebContext implements Cloneable {
 
+
+    // Note: all fields must be immutable; see clone()
 
     private URI url;
+    private String queryString;
     private DateTime start;
     private Multimap<String, String> headers;
     private String method;
@@ -35,6 +39,25 @@ public class WebContext {
         return combined;
     }
 
+    /**
+     * Performs a shallow clone.
+     * Because all of the attributes are immutable, the shallow clone is effectively a deep clone.
+     *
+     * @return an identical WebContext that will not share mutable state with this one.
+     */
+    @Override
+    public WebContext clone()
+    {
+        try
+        {
+            return (WebContext) super.clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new AssertionError("this class is Cloneable");
+        }
+    }
+
     public Method getComponent()
     {
         return component;
@@ -53,6 +76,16 @@ public class WebContext {
         return url;
     }
 
+    public void setQueryString(String queryString)
+    {
+        this.queryString = queryString;
+    }
+
+    public String getQueryString()
+    {
+        return queryString;
+    }
+
     public void setStart(DateTime start) {
         this.start = start;
     }
@@ -62,7 +95,7 @@ public class WebContext {
     }
 
     public void setHeaders(Multimap<String, String> headers) {
-        this.headers = headers;
+        this.headers = ImmutableMultimap.copyOf(headers);
     }
 
     public Multimap<String, String> getHeaders() {
@@ -78,7 +111,7 @@ public class WebContext {
     }
 
     public void setQueryParameters(Multimap<String, String> queryParameters) {
-        this.queryParameters = queryParameters;
+        this.queryParameters = ImmutableMultimap.copyOf(queryParameters);
     }
 
     public Multimap<String, String> getQueryParameters() {
@@ -86,7 +119,7 @@ public class WebContext {
     }
 
     public void setPostParameters(Multimap<String, String> postParameters) {
-        this.postParameters = postParameters;
+        this.postParameters = ImmutableMultimap.copyOf(postParameters);
     }
 
     public Multimap<String, String> getPostParameters() {
@@ -130,4 +163,5 @@ public class WebContext {
     {
         return remoteIpAddress;
     }
+
 }

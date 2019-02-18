@@ -36,8 +36,15 @@ public class RedEggVersion
         URL mavenPomLocation = redEggClass.getResource("/META-INF/maven/org.ccci/red-egg/pom.xml");
         if (mavenPomLocation == null)
         {
-            // red egg is probably being run from the maven project layout
             URL classesLocation = redEggClass.getProtectionDomain().getCodeSource().getLocation();
+            if (classesLocation.toString().endsWith("/WEB-INF/classes"))
+            {
+                // it seems we are running in an appserver, but the red-egg pom isn't available;
+                // probably this an arquillian test.
+                return "<unavailable-in-some-arquillian-tests>";
+            }
+
+            // red egg is probably being run from the maven project layout
             try
             {
                 mavenPomLocation = new URL(classesLocation, "../../pom.xml");

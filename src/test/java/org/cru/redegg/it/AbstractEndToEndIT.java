@@ -8,6 +8,7 @@ import org.junit.Test;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,9 +16,12 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
+import static org.cru.redegg.Links.CRU_ERROR_DETAILS_REL_TYPE;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -105,6 +109,9 @@ public abstract class AbstractEndToEndIT
             .request()
             .post(form(form));
         assertThat(appResponse.getStatus(), equalTo(204));
+        final Link link = appResponse.getLink(CRU_ERROR_DETAILS_REL_TYPE);
+        assertThat(link, notNullValue());
+        assertThat(link.getUri().toString(), startsWith("https://rollbar.com/occurrence/uuid/?uuid="));
 
         String report = getReport();
 
@@ -115,7 +122,7 @@ public abstract class AbstractEndToEndIT
         assertThat(report, not(containsString("letmein")));
     }
 
-    private String getReport() throws InterruptedException
+    String getReport() throws InterruptedException
     {
         WebTarget path = getWebTarget().path("dummyapi/notices");
 
@@ -149,7 +156,7 @@ public abstract class AbstractEndToEndIT
         TimeUnit.MILLISECONDS.sleep(500);
     }
 
-    private WebTarget getWebTarget()
+    WebTarget getWebTarget()
     {
         return new WebTargetBuilder().getWebTarget(deploymentURL);
     }

@@ -2,6 +2,7 @@ package org.cru.redegg.reporting.errbit;
 
 import airbrake.AirbrakeNotice;
 import airbrake.AirbrakeNotifier;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 
@@ -9,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * A reporter that uses Airbrake's java client:
@@ -58,5 +60,11 @@ public class AirbrakeReporter implements ErrorReporter
         int responseStatus = notifier.notify(notice);
         if (responseStatus != 200)
             throw new RuntimeException("notice not successfully submitted; response status: " + responseStatus);
+    }
+
+    @Override
+    public Optional<ErrorLink> buildLink()
+    {
+        return Optional.empty();
     }
 }

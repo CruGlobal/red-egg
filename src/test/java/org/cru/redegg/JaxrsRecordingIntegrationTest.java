@@ -63,9 +63,6 @@ public class JaxrsRecordingIntegrationTest
 
             .addPackage(RecordingReaderInterceptor.class.getPackage())
 
-            .addClass(LoggingReporter.class)
-            .addClass(ErrorReporter.class)
-
             .addClass(TestApplication.class)
             .addClass(WebTargetBuilder.class)
             .addClass(AnswerWithSelf.class)

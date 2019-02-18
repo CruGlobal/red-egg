@@ -205,6 +205,20 @@ use `recordSystemProperties()` if you wish to.
 The hostname is recorded automatically, but you can override it with `recordLocalHost()`.
 
 
+Error Details Links
+===================
+
+If an error occurs during a servlet request,
+a Link header will be added to the http response with a link to the error details.
+Downstream clients can use this in their logs and/or in their own error reports.
+The Link uses an extension relation type called `org.cru.links:error-details`.
+
+This project includes a JAX-RS client response filter that can be used to
+extract and record this link automatically.
+You will need to create a ClientResponseFilter instance
+and register it with your ClientBuilder, Client, or WebTarget.
+
+
 Building this project
 =====================
 
@@ -220,3 +234,6 @@ If you are running tests from your IDE,
 generally you will want to instead activate the `arq-wildfly-remote` profile.
 This requires that you fire up wildfly yourself in a terminal window.
 This will run the tests faster and give you quicker feedback as you develop.
+Note: if you have run the `arq-wildfly-managed` profile recently,
+you may need to run `mvn resources:testResources -Parq-wildfly-managed`
+(maybe via the IDE) to ensure the IDE doesn't use a stale arquillian.xml.

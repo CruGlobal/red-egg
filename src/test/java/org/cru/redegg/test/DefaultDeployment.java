@@ -12,6 +12,9 @@ import org.cru.redegg.recording.jul.RedEggHandler;
 import org.cru.redegg.recording.log4j.RedEggLog4jAppender;
 import org.cru.redegg.recording.log4j2.RedEggLog4j2Appender;
 import org.cru.redegg.recording.logback.RedEggLogbackAppender;
+import org.cru.redegg.reporting.LoggingReporter;
+import org.cru.redegg.reporting.api.ErrorLink;
+import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.util.Clock;
 import org.jboss.shrinkwrap.api.Archive;
@@ -148,12 +151,32 @@ public class DefaultDeployment {
      */
     public DefaultDeployment addCorePackages()
     {
+        addBootPackage();
         getArchive()
-            .addPackage(boot())
             .addPackage(servlet())
             .addPackage(util())
             .addPackage(recordingApi());
 
+        return this;
+    }
+
+    /**
+     * Adds the boot package and a few of its dependencies.
+     * (Lifecycle currently has a hard reference to LoggingRecorder)
+     */
+    public DefaultDeployment addBootPackage()
+    {
+        getArchive().addPackage(boot());
+        addLoggingReporter();
+        return this;
+    }
+
+    private DefaultDeployment addLoggingReporter()
+    {
+        getArchive()
+            .addClass(LoggingReporter.class)
+            .addClass(ErrorReporter.class)
+            .addClass(ErrorLink.class);
         return this;
     }
 

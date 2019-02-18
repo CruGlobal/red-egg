@@ -3,14 +3,19 @@ package org.cru.redegg.reporting;
 import com.google.common.base.Throwables;
 import org.cru.redegg.qualifier.Fallback;
 import org.cru.redegg.qualifier.Selected;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.MoreExecutors;
 import org.cru.redegg.util.ProxyConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -24,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 public class InMemoryErrorQueue implements ErrorQueue
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryErrorQueue.class);
+
     private final ErrorReporter primaryErrorReporter;
 
     private final ErrorReporter fallbackReporter;
@@ -32,16 +39,20 @@ public class InMemoryErrorQueue implements ErrorQueue
 
     private final ExecutorService executorService;
 
+    private final DatadogEnricher enricher;
+
     @Inject
     public InMemoryErrorQueue(
         @Selected ErrorReporter primaryErrorReporter,
         @Fallback ErrorReporter fallbackReporter,
-        ErrorLog errorLog)
+        ErrorLog errorLog,
+        DatadogEnricher enricher)
     {
         this(
             primaryErrorReporter,
             fallbackReporter,
             errorLog,
+            enricher,
             //TODO: this should probably be configurable
             new ThreadPoolExecutor(
                 0,
@@ -62,33 +73,25 @@ public class InMemoryErrorQueue implements ErrorQueue
         ErrorReporter primaryErrorReporter,
         ErrorReporter fallbackReporter,
         ErrorLog errorLog,
+        DatadogEnricher enricher,
         ExecutorService executorService)
     {
         this.primaryErrorReporter = primaryErrorReporter;
         this.fallbackReporter = fallbackReporter;
         this.errorLog = errorLog;
+        this.enricher = enricher;
         this.executorService = executorService;
     }
 
     @PreDestroy
     public void shutdown()
     {
-        executorService.shutdown();
-        try
-        {
-            int timeout = 20;
-            TimeUnit timeUnit = TimeUnit.SECONDS;
-            boolean completed = executorService.awaitTermination(timeout, timeUnit);
-            if (!completed)
-                errorLog.warn("unable to shut down report executor within " + timeout + " " + timeUnit.name().toLowerCase());
-        }
-        catch (InterruptedException e)
-        {
-            errorLog.error("report executor shutdown interrupted", e);
-            // Lifecycle interceptor methods may not throw checked exceptions.
-            // So to preserve the interruption, we have to set the interrupt flag.
-            Thread.currentThread().interrupt();
-        }
+        MoreExecutors.shutdownAndHandleInterruptions(
+            executorService,
+            20,
+            "report",
+            errorLog
+        );
     }
 
     @Override
@@ -97,6 +100,11 @@ public class InMemoryErrorQueue implements ErrorQueue
         try
         {
             submit(report);
+            final ErrorLink errorLink = report.getErrorLink();
+            if (errorLink != null)
+            {
+                LOG.info("Error details available at {}", errorLink.getTarget());
+            }
         }
         catch (RejectedExecutionException e)
         {
@@ -116,6 +124,7 @@ public class InMemoryErrorQueue implements ErrorQueue
             {
                 try
                 {
+                    enricher.enrich(report);
                     primaryErrorReporter.send(report);
                 }
                 catch (Throwable t)
@@ -141,5 +150,11 @@ public class InMemoryErrorQueue implements ErrorQueue
             errorLog.error("unable to send error report with fallback reporter", t2);
             //swallow t2
         }
+    }
+
+    @Override
+    public Optional<ErrorLink> buildLink()
+    {
+        return primaryErrorReporter.buildLink();
     }
 }

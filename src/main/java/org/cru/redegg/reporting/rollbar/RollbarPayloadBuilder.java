@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -18,6 +19,7 @@ import com.rollbar.payload.data.body.Body;
 import com.rollbar.payload.data.body.BodyContents;
 import com.rollbar.payload.data.body.Message;
 import com.rollbar.payload.data.body.TraceChain;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.ExceptionDetailsExtractor;
@@ -36,6 +38,7 @@ import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +72,12 @@ class RollbarPayloadBuilder
             .platform(config.getPlatform())
             .language(NOTIFIER_LANGUAGE)
             .timestamp(getErrorTimestamp());
+        final ErrorLink errorLink = report.getErrorLink();
+        if (errorLink != null)
+        {
+            RollbarErrorLink rollbarErrorLink = (RollbarErrorLink) errorLink;
+            data = data.uuid(rollbarErrorLink.getId());
+        }
 
         if (report.getContext().containsKey("framework"))
         {
@@ -167,7 +176,7 @@ class RollbarPayloadBuilder
         // TODO: record time of actual error.
         // However, rollbar only uses second-level precision, so it's not very helpful to be accurate.
 
-        if (report.getWebContext() != null)
+        if (report.getWebContext() != null && report.getWebContext().getFinish() != null)
         {
             return report.getWebContext().getFinish().toDate();
         }
@@ -215,8 +224,7 @@ class RollbarPayloadBuilder
         requestData = requestData.post(Collections.<String, Object>unmodifiableMap(
             flattenToCommaSeparatedValues(webContext.getPostParameters())));
 
-        //TODO: get the raw string from the servlet container
-//        if (query != null) requestData = requestData.queryString();
+        requestData = requestData.queryString(webContext.getQueryString());
 
         if (!Strings.isNullOrEmpty(webContext.getRemoteIpAddress()))
         {
@@ -242,10 +250,13 @@ class RollbarPayloadBuilder
 
         Duration  duration = new Duration(start, finish);
 
-        String timing =
-            "start: " + start + "\n" +
-            "finish: " + finish + "\n" +
-            "duration: " + duration;
+        Map<String, String> timing = new HashMap<>();
+        timing.put("start", start.toString());
+        if (finish != null)
+        {
+            timing.put("finish", finish.toString());
+        }
+        timing.put("duration", duration.toString());
 
         requestData = requestData.put("timing", timing);
 

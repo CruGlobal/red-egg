@@ -2,6 +2,7 @@ package org.cru.redegg.manual;
 
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
+import org.cru.redegg.recording.StuckThreadMonitorConfig;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
@@ -11,9 +12,11 @@ import org.cru.redegg.recording.api.Serializer;
 import org.cru.redegg.recording.api.WebErrorRecorder;
 import org.cru.redegg.recording.gson.GsonSerializer;
 import org.cru.redegg.recording.impl.DefaultErrorRecorder;
+import org.cru.redegg.recording.impl.DefaultStuckThreadMonitor;
 import org.cru.redegg.recording.impl.DefaultWebErrorRecorder;
 import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
 import org.cru.redegg.recording.impl.HyperConservativeParameterSanitizer;
+import org.cru.redegg.reporting.DatadogEnricher;
 import org.cru.redegg.reporting.InMemoryErrorQueue;
 import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorReporter;
@@ -63,17 +66,24 @@ public class Builder
     private final ReplaceableRequestMatcher streamPreservationMatcher = new ReplaceableRequestMatcher(
         RequestMatchers.none());
 
+
     private volatile ErrbitConfig errbitConfig;
     private volatile RollbarConfig rollbarConfig;
+    private volatile DefaultStuckThreadMonitor stuckThreadMonitor;
     private volatile InMemoryErrorQueue queue;
 
     public void init(RedEggServletListener listener)
     {
         listener.setCategorizer(buildParameterCategorizer());
-        listener.setClock(Clock.system());
+        listener.setClock(getClock());
         listener.setLifecycle(buildLifecycle());
         listener.setRecorderFactory(buildRecorderFactory());
         listener.setSanitizer(parameterSanitizer);
+    }
+
+    private Clock getClock()
+    {
+        return Clock.system();
     }
 
     ParameterCategorizer buildParameterCategorizer()
@@ -104,7 +114,8 @@ public class Builder
             buildDefaultErrorRecorder(),
             buildQueue(),
             buildErrorLog(),
-            entitySanitizer);
+            entitySanitizer,
+            buildStuckThreadMonitor());
     }
 
     DefaultErrorRecorder buildDefaultErrorRecorder()
@@ -117,13 +128,28 @@ public class Builder
         return new GsonSerializer();
     }
 
+    DefaultStuckThreadMonitor buildStuckThreadMonitor()
+    {
+        if (stuckThreadMonitor == null)
+        {
+            stuckThreadMonitor = new DefaultStuckThreadMonitor(
+                getClock(),
+                buildQueue(),
+                new StuckThreadMonitorConfig(),
+                buildErrorLog());
+            stuckThreadMonitor.start();
+        }
+        return stuckThreadMonitor;
+    }
+
     synchronized InMemoryErrorQueue buildQueue()
     {
         if (queue == null)
             queue = new InMemoryErrorQueue(
                 buildPrimaryErrorReporter(),
                 buildFallbackErrorReporter(),
-                buildErrorLog());
+                buildErrorLog(),
+                new DatadogEnricher());
         return queue;
     }
 
@@ -152,6 +178,7 @@ public class Builder
     public synchronized void shutdown()
     {
         shutdownQueue();
+        shutdownStuckThreadMonitor();
     }
 
     public void setParameterSanitizer(ParameterSanitizer sanitizer)
@@ -187,6 +214,15 @@ public class Builder
         {
             queue.shutdown();
             queue = null;
+        }
+    }
+
+    private void shutdownStuckThreadMonitor()
+    {
+        if (stuckThreadMonitor != null)
+        {
+            stuckThreadMonitor.stop();
+            stuckThreadMonitor = null;
         }
     }
 

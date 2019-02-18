@@ -9,6 +9,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author Matt Drees
@@ -56,6 +57,16 @@ public abstract class AbstractApiThatErrors
         logger.info("minding my own business when...");
         logger.error("kablooie!");
         NDC.pop();
+    }
+
+
+    @POST
+    @Path("hang")
+    public void hang() throws InterruptedException
+    {
+        Logger logger = Logger.getLogger(getClass());
+        logger.info("sleeping for 2 seconds");
+        TimeUnit.SECONDS.sleep(2);
     }
 
     private void recordUser()

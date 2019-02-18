@@ -1,6 +1,7 @@
 package org.cru.redegg.it;
 
 import com.google.gson.JsonObject;
+import org.cru.redegg.recording.StuckThreadMonitorConfig;
 import org.cru.redegg.reporting.rollbar.RollbarConfig;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
@@ -8,6 +9,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.joda.time.Period;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +21,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.client.Entity.form;
@@ -109,6 +110,20 @@ public class EndToEndManualCheck
     }
 
 
+    @Test
+    @RunAsClient
+    public void testStuck()
+    {
+        WebTarget target = getWebTarget().path("explosions/hang");
+        Form form = new Form()
+            .param("secret", "letmein")
+            .param("note", "this response should be too slow");
+        Response appResponse = target
+            .request()
+            .post(form(form));
+        assertThat(appResponse.getStatus(), equalTo(204));
+    }
+
     private WebTarget getWebTarget()
     {
         return ClientBuilder.newClient().target("http://localhost:8080/end-to-end-test/rest");
@@ -118,11 +133,22 @@ public class EndToEndManualCheck
     public static class ConfigProducer
     {
         @Produces
-        public RollbarConfig buildConfig() throws URISyntaxException
+        public RollbarConfig buildConfig()
         {
             RollbarConfig config = new RollbarConfig();
             config.setAccessToken(System.getProperty("rollbar.accessToken"));
             config.setEnvironmentName("manual-testing");
+            return config;
+        }
+
+        @Produces
+        public StuckThreadMonitorConfig buildStuckThreadMonitorConfig()
+        {
+            StuckThreadMonitorConfig config = new StuckThreadMonitorConfig();
+            config.setThreshold(Period.seconds(1));
+            config.setPeriod(100L);
+            config.setPeriodTimeUnit(TimeUnit.MILLISECONDS);
+
             return config;
         }
     }

@@ -3,6 +3,7 @@ package org.cru.redegg.servlet;
 import org.cru.redegg.boot.Initializer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.util.ErrorLog;
 
 import javax.inject.Inject;
@@ -16,6 +17,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static org.cru.redegg.Links.CRU_ERROR_DETAILS_REL_TYPE;
 
 /**
  * @author Matt Drees
@@ -48,6 +51,7 @@ public class RedEggFilter implements Filter {
         }
     }
 
+    @SuppressWarnings("TryWithIdenticalCatches") // can't use multicatch; it breaks generic record()
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         RecordingResponse recordingResponse = new RecordingResponse(response);
@@ -70,8 +74,21 @@ public class RedEggFilter implements Filter {
             {
                 getRecorder().recordResponseStatus(statusCode);
             }
+
+            getRecorder().getErrorLink().ifPresent(link -> writeLinkHeader(link, response));
         }
 
+    }
+
+    private void writeLinkHeader(
+        ErrorLink errorLink,
+        HttpServletResponse response)
+    {
+        final String linkValue = String.format(
+            "<%s>; rel=\"%s\"",
+            errorLink.getTarget(),
+            CRU_ERROR_DETAILS_REL_TYPE);
+        response.addHeader("Link", linkValue);
     }
 
     private WebErrorRecorder getRecorder()

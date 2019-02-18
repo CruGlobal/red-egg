@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.api;
 
 import com.google.common.collect.Multimap;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.joda.time.DateTime;
 
 import java.lang.reflect.Method;
@@ -8,6 +9,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.LogRecord;
 
@@ -33,6 +35,12 @@ class NullWebErrorRecorder implements WebErrorRecorder
 
     @Override
     public WebErrorRecorder recordRequestUrl(URI uri)
+    {
+        return this;
+    }
+
+    @Override
+    public WebErrorRecorder recordRequestQueryString(String queryString)
     {
         return this;
     }
@@ -89,6 +97,16 @@ class NullWebErrorRecorder implements WebErrorRecorder
     public WebErrorRecorder recordRequestRemoteIpAddress(String remoteIpAddress)
     {
         return this;
+    }
+
+    @Override
+    public void startMonitoringRequestForTimeliness()
+    {
+    }
+
+    @Override
+    public void suspendRequestProcessing()
+    {
     }
 
     @Override
@@ -170,5 +188,11 @@ class NullWebErrorRecorder implements WebErrorRecorder
     @Override
     public void sendReportIfNecessary()
     {
+    }
+
+    @Override
+    public Optional<ErrorLink> getErrorLink()
+    {
+        return Optional.empty();
     }
 }

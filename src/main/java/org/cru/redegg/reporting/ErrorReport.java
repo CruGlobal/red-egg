@@ -3,9 +3,12 @@ package org.cru.redegg.reporting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.recording.api.NotificationLevel;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +20,10 @@ import static org.cru.redegg.util.RedEggStrings.truncate;
 public class ErrorReport {
 
 
-    Multimap<String, String> context;
-    Map<String, String> user;
-    private List<Throwable> thrown;
-    private List<LogRecord> logRecords;
+    private Multimap<String, String> context = ImmutableMultimap.of();
+    private Map<String, String> user = Collections.emptyMap();
+    private List<Throwable> thrown = Collections.emptyList();
+    private List<LogRecord> logRecords = Collections.emptyList();
     private String localHostName;
     private String localHostAddress;
     private Map<String, String> environmentVariables;
@@ -29,6 +32,7 @@ public class ErrorReport {
     private WebContext webContext;
     private boolean mustNotify;
     private NotificationLevel notificationLevel;
+    private ErrorLink errorLink;
 
     public void addWebContext(WebContext webContext) {
         this.webContext = webContext;
@@ -230,5 +234,15 @@ public class ErrorReport {
     public NotificationLevel getNotificationLevel()
     {
         return notificationLevel;
+    }
+
+    public ErrorLink getErrorLink()
+    {
+        return errorLink;
+    }
+
+    public void setErrorLink(ErrorLink errorLink)
+    {
+        this.errorLink = errorLink;
     }
 }
