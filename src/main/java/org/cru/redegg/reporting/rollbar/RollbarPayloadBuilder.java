@@ -5,6 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -195,16 +196,22 @@ class RollbarPayloadBuilder
             customData.put("other_exceptions", Joiner.on("\n\n").join(otherTraceChains));
         }
 
-        List<String> allDetails = Lists.newArrayList();
+        // Note: the Rollbar UI doesn't handle arrays nicely, but it does handle for maps
+        Map<String, Map<String, Object>> allDetails = new HashMap<>();
         ExceptionDetailsExtractor extractor = new ExceptionDetailsExtractor();
+        int i = 0;
         for (Throwable throwable : thrown)
         {
-            for (Throwable link : Throwables.getCausalChain(throwable))
+            for (Throwable link : Lists.reverse(Throwables.getCausalChain(throwable)))
             {
-                allDetails.addAll(extractor.extractDetails(link));
+                final Map<String, Object> details = extractor.extractDetails(link);
+                if (!details.isEmpty()) {
+                    allDetails.put(String.valueOf(i), details);
+                    i++;
+                }
             }
         }
-        customData.put("exception_details", Joiner.on("\n").join(allDetails));
+        customData.put("exception_details", allDetails);
 
         customData.put("log_messages", Joiner.on("\n\n").join(report.getLogRecords()));
         return customData;

@@ -10,9 +10,15 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Matt Drees
@@ -20,13 +26,13 @@ import java.util.List;
 public class ExceptionDetailsExtractor
 {
 
-    public List<String> extractDetails(Throwable throwable)
+    public Map<String, Object> extractDetails(Throwable throwable)
     {
         List<PropertyDescriptor> descriptors =
             getNonstandardPropertyDescriptors(throwable);
         if (descriptors.isEmpty())
         {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
         else
         {
@@ -35,23 +41,69 @@ public class ExceptionDetailsExtractor
     }
 
 
-    private List<String> getDetails(
+    private Map<String, Object> getDetails(
         Throwable throwable,
         List<PropertyDescriptor> propertyDescriptors)
     {
-        List<String> details = Lists.newArrayList();
+        Map<String, Object> details = new HashMap<>();
         String summary = RedEggStrings.truncate(throwable.toString(), 100, "...");
-        details.add(summary);
+        details.put("summary", summary);
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors)
         {
-            details.add(
-                "  " +
-                propertyDescriptor.getDisplayName() +
-                ": " +
-                readProperty(throwable, propertyDescriptor));
+            details.put(
+                propertyDescriptor.getDisplayName(),
+                toPseudoJson(readProperty(throwable, propertyDescriptor)));
         }
         return details;
     }
+
+    /**
+     * Returns a structure of objects understood by {@link com.rollbar.utilities.RollbarSerializer}.
+     */
+    private Object toPseudoJson(Object value)
+    {
+        if (value == null) {
+            return null;
+        }
+        else if (value instanceof Boolean) {
+            return value;
+        }
+        else if (value instanceof Number) {
+            return value;
+        }
+        else if (value instanceof String) {
+            return value;
+        }
+        else if (value instanceof Map) {
+            return mapToPseudoJson((Map) value);
+        }
+        else if (value instanceof Collection) {
+            return collectionToPseudoJson((Collection) value);
+        }
+        else if (value instanceof Object[]) {
+            return collectionToPseudoJson(Arrays.asList((Object[]) value));
+        }
+        else {
+            return value.toString();
+        }
+    }
+
+    private Object collectionToPseudoJson(Collection<?> input)
+    {
+        return input.stream()
+            .map(this::toPseudoJson)
+            .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> mapToPseudoJson(Map<?, ?> input) {
+        return input.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                entry -> entry.getKey().toString(),
+                entry -> toPseudoJson(entry.getValue())
+            ));
+    }
+
 
     /** gets properties that are not boring ones, like getClass(), getMessage(), getCause(), etc */
     private List<PropertyDescriptor> getNonstandardPropertyDescriptors(Throwable throwable)
