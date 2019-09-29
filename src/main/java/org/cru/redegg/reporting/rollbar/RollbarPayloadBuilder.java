@@ -42,6 +42,7 @@ import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
 import org.cru.redegg.util.RedEggStrings;
 import org.cru.redegg.util.RedEggVersion;
+import java.util.stream.IntStream;
 
 /**
  * @author Matt Drees
@@ -187,12 +188,10 @@ class RollbarPayloadBuilder
         List<Throwable> thrown = report.getThrown();
         if (thrown.size() > 1)
         {
-            List<String> otherTraceChains = Lists.newArrayList();
-            for (int i = 1; i < thrown.size(); i++)
-            {
-                Throwable throwable = thrown.get(i);
-                otherTraceChains.add(Throwables.getStackTraceAsString(throwable));
-            }
+            List<String> otherTraceChains = IntStream.range(1, thrown.size())
+                .mapToObj(thrown::get)
+                .map(Throwables::getStackTraceAsString)
+                .collect(Collectors.toList());
             customData.put("other_exceptions", Joiner.on("\n\n").join(otherTraceChains));
         }
 
