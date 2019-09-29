@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -79,16 +80,12 @@ public class RecordingReaderInterceptor implements ReaderInterceptor
      */
     private Charset guessCharset(ReaderInterceptorContext context)
     {
-        String contentType = context.getHeaders().getFirst("Content-Type");
+        String charsetFromMediaType = context.getMediaType().getParameters().get(MediaType.CHARSET_PARAMETER);
         Charset defaultGuess = Charsets.UTF_8;
-        if (contentType == null)
+        if (charsetFromMediaType == null)
             return defaultGuess;
 
-        String[] pieces = contentType.split("; charset=");
-        if (pieces.length < 2)
-            return defaultGuess;
-
-        return Charset.forName(pieces[1]);
+        return Charset.forName(charsetFromMediaType);
     }
 
     public void setFactory(RecorderFactory recorderFactory)
