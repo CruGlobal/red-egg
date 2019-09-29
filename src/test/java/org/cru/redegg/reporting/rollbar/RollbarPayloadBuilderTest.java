@@ -59,12 +59,6 @@ public class RollbarPayloadBuilderTest
         when(context.getResource("/WEB-INF/classes/org/cru/redegg/reporting/TestExceptions.class"))
             .thenReturn(new URL("file:dummy"));
 
-
-//        Map<String, Object> src = payload.asJson();
-//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        gson.toJson(src, writer);
-//
-
         String json = new JsonSerializerImpl(true).toJson(payload);
 
         checkJsonContent(json);
