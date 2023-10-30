@@ -4,11 +4,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import org.cru.redegg.reporting.api.ErrorLink;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,20 +18,8 @@ import com.rollbar.api.payload.data.Server;
 import com.rollbar.api.payload.data.body.Body;
 import com.rollbar.api.payload.data.body.BodyContent;
 import com.rollbar.api.payload.data.body.Message;
-import com.rollbar.api.payload.data.body.TraceChain;
 import com.rollbar.notifier.util.BodyFactory;
-import org.cru.redegg.recording.api.NotificationLevel;
-import org.cru.redegg.reporting.ErrorReport;
-import org.cru.redegg.reporting.ExceptionDetailsExtractor;
-import org.cru.redegg.reporting.WebContext;
-import org.cru.redegg.reporting.common.Reporters;
-import org.cru.redegg.util.RedEggCollections;
-import org.cru.redegg.util.RedEggStrings;
-import org.cru.redegg.util.RedEggVersion;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
-import javax.annotation.Nullable;
+import com.rollbar.notifier.wrapper.RollbarThrowableWrapper;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,6 +29,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.cru.redegg.recording.api.NotificationLevel;
+import org.cru.redegg.reporting.ErrorReport;
+import org.cru.redegg.reporting.ExceptionDetailsExtractor;
+import org.cru.redegg.reporting.WebContext;
+import org.cru.redegg.reporting.api.ErrorLink;
+import org.cru.redegg.reporting.common.Reporters;
+import org.cru.redegg.util.RedEggCollections;
+import org.cru.redegg.util.RedEggStrings;
+import org.cru.redegg.util.RedEggVersion;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 /**
  * @author Matt Drees
@@ -54,8 +48,8 @@ class RollbarPayloadBuilder
 {
     private static final Joiner COMMA_JOINER = Joiner.on(",");
 
-    private RollbarConfig config;
-    private ErrorReport report;
+    private final RollbarConfig config;
+    private final ErrorReport report;
 
     RollbarPayloadBuilder(
         RollbarConfig config,
@@ -84,34 +78,34 @@ class RollbarPayloadBuilder
         if (errorLink != null)
         {
             RollbarErrorLink rollbarErrorLink = (RollbarErrorLink) errorLink;
-            data = data.uuid(rollbarErrorLink.getId().toString());
+            data.uuid(rollbarErrorLink.getId().toString());
         }
 
         if (report.getContext().containsKey("framework"))
         {
             String framework =
                 RedEggCollections.flatten(report.getContext()).get("framework").toString();
-            data = data.framework(framework);
+            data.framework(framework);
         }
 
         // request data
         Request request = getRequestData();
         if (request != null)
         {
-            data = data.request(request)
+            data.request(request)
                 .context(getContext());
         }
 
         // custom data
-        data = data.custom(getCustomData());
+        data.custom(getCustomData());
 
         // person data
         Person personData = getPersonData();
         if (personData != null) {
-            data = data.person(personData);
+            data.person(personData);
         }
 
-        data = data.server(getServerData())
+        data.server(getServerData())
             .notifier(getNotifierData())
             .codeVersion(config.getCodeVersion());
 
@@ -230,7 +224,7 @@ class RollbarPayloadBuilder
 
         Request.Builder requestData = new Request.Builder();
 
-        requestData = requestData.url(webContext.getUrl().toString())
+        requestData.url(webContext.getUrl().toString())
             .method(webContext.getMethod())
             .headers(flattenToCommaSeparatedValues(webContext.getHeaders()));
 
@@ -238,19 +232,19 @@ class RollbarPayloadBuilder
 //        requestData.params();
 
         // params
-        requestData = requestData.get(getQueryParametersAsMapOfLists(webContext));
+        requestData.get(getQueryParametersAsMapOfLists(webContext));
 
-        requestData = requestData.post(Collections.<String, Object>unmodifiableMap(
+        requestData.post(Collections.unmodifiableMap(
             flattenToCommaSeparatedValues(webContext.getPostParameters())));
 
-        requestData = requestData.queryString(webContext.getQueryString());
+        requestData.queryString(webContext.getQueryString());
 
         if (!Strings.isNullOrEmpty(webContext.getRemoteIpAddress()))
         {
             try
             {
                 InetAddress address = InetAddress.getByName(webContext.getRemoteIpAddress());
-                requestData = requestData.userIp(address.toString());
+                requestData.userIp(address.toString());
             }
             catch (UnknownHostException e)
             {
@@ -262,7 +256,7 @@ class RollbarPayloadBuilder
 
         // TODO: requestId ?
 
-        requestData = requestData.body(webContext.getEntityRepresentation());
+        requestData.body(webContext.getEntityRepresentation());
 
         DateTime start = webContext.getStart();
         DateTime finish = webContext.getFinish();
@@ -284,7 +278,7 @@ class RollbarPayloadBuilder
             "unknown" :
             webContext.getResponseStatus().toString();
         metadata.put("response_status_code", responseStatus);
-        requestData = requestData.metadata(metadata);
+        requestData.metadata(metadata);
 
         return requestData.build();
     }
@@ -303,14 +297,7 @@ class RollbarPayloadBuilder
 
     private Map<String, String> flattenToCommaSeparatedValues(Multimap<String, String> multimap)
     {
-        return Maps.transformValues(multimap.asMap(), new Function<Collection<String>, String>()
-        {
-            @Nullable
-            public String apply(Collection<String> input)
-            {
-                return COMMA_JOINER.join(input);
-            }
-        });
+        return Maps.transformValues(multimap.asMap(), COMMA_JOINER::join);
     }
 
     private Person getPersonData()
@@ -331,18 +318,18 @@ class RollbarPayloadBuilder
         {
             if (entry.getKey().equals("email"))
             {
-                personData = personData.email(entry.getValue());
+                personData.email(entry.getValue());
             }
             else if (entry.getKey().equals("username"))
             {
-                personData = personData.username(entry.getValue());
+                personData.username(entry.getValue());
             }
             else if (!entry.getKey().equals("id"))
             {
                 metadata.put(entry.getKey(), entry.getValue());
             }
         }
-        personData = personData.metadata(metadata);
+        personData.metadata(metadata);
         return personData.build();
     }
 
