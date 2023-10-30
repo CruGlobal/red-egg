@@ -18,6 +18,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j2.version>2.11.1</log4j2.version>
+    <rollbar-java.version>1.10.0</rollbar-java.version>
   </properties>
 
   <dependencyManagement>
@@ -62,14 +63,14 @@
 
     <dependency>
       <groupId>com.rollbar</groupId>
-      <artifactId>rollbar-payload</artifactId>
-      <version>0.5.3-crufork-1</version>
+      <artifactId>rollbar-api</artifactId>
+      <version>${rollbar-java.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.rollbar</groupId>
-      <artifactId>rollbar-sender</artifactId>
-      <version>0.5.3-crufork-1</version>
+      <artifactId>rollbar-java</artifactId>
+      <version>${rollbar-java.version}</version>
     </dependency>
 
     <dependency>
@@ -322,12 +323,14 @@
             <version>1.0.2.Final</version>
             <configuration>
               <version>${wildfly.arquillian.version}</version>
+              <!--suppress MavenModelInspection - because intellij doesn't recognize build helper plugin -->
               <jvmArgs>
                 -Djboss.management.http.port=${jboss.management.http.port}
                 -Djboss.management.native.port=${jboss.management.native.port}
                 -Djboss.http.port=${jboss.http.port}
                 -XX:MaxPermSize=512m
               </jvmArgs>
+              <!--suppress MavenModelInspection - because intellij doesn't recognize build helper plugin -->
               <port>${jboss.management.http.port}</port>
             </configuration>
             <executions>
@@ -343,6 +346,7 @@
         </plugins>
       </build>
       <properties>
+        <!-- because intellij doesn't recognize build helper plugin, and doesn't give a way to supress this -->
         <arquillian.management.port>${jboss.management.http.port}</arquillian.management.port>
       </properties>
     </profile>

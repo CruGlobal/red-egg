@@ -8,18 +8,23 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.rollbar.payload.Payload;
-import com.rollbar.payload.data.Data;
-import com.rollbar.payload.data.Level;
-import com.rollbar.payload.data.Notifier;
-import com.rollbar.payload.data.Person;
-import com.rollbar.payload.data.Request;
-import com.rollbar.payload.data.Server;
-import com.rollbar.payload.data.body.Body;
-import com.rollbar.payload.data.body.BodyContents;
-import com.rollbar.payload.data.body.Message;
-import com.rollbar.payload.data.body.TraceChain;
 import org.cru.redegg.reporting.api.ErrorLink;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.rollbar.api.payload.Payload;
+import com.rollbar.api.payload.data.Data;
+import com.rollbar.api.payload.data.Level;
+import com.rollbar.api.payload.data.Notifier;
+import com.rollbar.api.payload.data.Person;
+import com.rollbar.api.payload.data.Request;
+import com.rollbar.api.payload.data.Server;
+import com.rollbar.api.payload.data.body.Body;
+import com.rollbar.api.payload.data.body.BodyContent;
+import com.rollbar.api.payload.data.body.Message;
+import com.rollbar.api.payload.data.body.TraceChain;
+import com.rollbar.notifier.util.BodyFactory;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.ExceptionDetailsExtractor;
@@ -65,18 +70,21 @@ class RollbarPayloadBuilder
 
     Payload build() {
 
-        Body body = new Body(getBody());
+        Body.Builder body = new Body.Builder();
+        body.bodyContent(getBody());
         Level level = determineLevel(report.getNotificationLevel());
-        Data data = new Data(config.getEnvironmentName(), body)
+        Data.Builder data = new Data.Builder();
+        data.environment(config.getEnvironmentName());
+        data.body(body.build())
             .level(level)
             .platform(config.getPlatform())
             .language(NOTIFIER_LANGUAGE)
-            .timestamp(getErrorTimestamp());
+            .timestamp(toJavaTimestamp(getErrorTimestamp()));
         final ErrorLink errorLink = report.getErrorLink();
         if (errorLink != null)
         {
             RollbarErrorLink rollbarErrorLink = (RollbarErrorLink) errorLink;
-            data = data.uuid(rollbarErrorLink.getId());
+            data = data.uuid(rollbarErrorLink.getId().toString());
         }
 
         if (report.getContext().containsKey("framework"))
@@ -107,7 +115,15 @@ class RollbarPayloadBuilder
             .notifier(getNotifierData())
             .codeVersion(config.getCodeVersion());
 
-        return new Payload(config.getAccessToken(), data);
+        return new Payload.Builder()
+            .accessToken(config.getAccessToken())
+            .data(data.build())
+            .build();
+    }
+
+    private long toJavaTimestamp(Date date)
+    {
+        return date.getTime();
     }
 
     private Level determineLevel(NotificationLevel notificationLevel)
@@ -174,7 +190,7 @@ class RollbarPayloadBuilder
     private Date getErrorTimestamp()
     {
         // TODO: record time of actual error.
-        // However, rollbar only uses second-level precision, so it's not very helpful to be accurate.
+        // Note: rollbar uses unix timestamps, but it accepts fractional second values.
 
         if (report.getWebContext() != null && report.getWebContext().getFinish() != null)
         {
@@ -187,17 +203,20 @@ class RollbarPayloadBuilder
     }
 
 
-    private BodyContents getBody() {
+    private BodyContent getBody() {
         List<Throwable> thrown = report.getThrown();
         if (!thrown.isEmpty()) {
+            return new BodyFactory().from(thrown.get(0), null).getContents();
 
-            //TODO: make this use a FilenameResolver, so that we can get github file links
-            return TraceChain.fromThrowable(thrown.get(0));
+//            //TODO: make this use a FilenameResolver, so that we can get github file links
+//            return TraceChain.fromThrowable(thrown.get(0));
 
             //TODO: can we use this instead? pass the corresponding error log message?
 //            return TraceChain.fromThrowable(report.getRootException(), description);
         } else {
-            return new Message(report.getRootErrorMessage().or("(message not available)"));
+            return new Message.Builder()
+                .body(report.getRootErrorMessage().or("(message not available)"))
+                .build();
         }
     }
 
@@ -209,7 +228,7 @@ class RollbarPayloadBuilder
             return null;
         }
 
-        Request requestData = new Request();
+        Request.Builder requestData = new Request.Builder();
 
         requestData = requestData.url(webContext.getUrl().toString())
             .method(webContext.getMethod())
@@ -219,7 +238,7 @@ class RollbarPayloadBuilder
 //        requestData.params();
 
         // params
-        requestData = requestData.setGet(flattenToCommaSeparatedValues(webContext.getQueryParameters()));
+        requestData = requestData.get(getQueryParametersAsMapOfLists(webContext));
 
         requestData = requestData.post(Collections.<String, Object>unmodifiableMap(
             flattenToCommaSeparatedValues(webContext.getPostParameters())));
@@ -231,7 +250,7 @@ class RollbarPayloadBuilder
             try
             {
                 InetAddress address = InetAddress.getByName(webContext.getRemoteIpAddress());
-                requestData = requestData.userIp(address);
+                requestData = requestData.userIp(address.toString());
             }
             catch (UnknownHostException e)
             {
@@ -250,7 +269,7 @@ class RollbarPayloadBuilder
 
         Duration  duration = new Duration(start, finish);
 
-        Map<String, String> timing = new HashMap<>();
+        Map<String, String > timing = new HashMap<>();
         timing.put("start", start.toString());
         if (finish != null)
         {
@@ -258,14 +277,28 @@ class RollbarPayloadBuilder
         }
         timing.put("duration", duration.toString());
 
-        requestData = requestData.put("timing", timing);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("timing", timing);
 
         String responseStatus = webContext.getResponseStatus() == null ?
             "unknown" :
             webContext.getResponseStatus().toString();
-        requestData = requestData.put("response_status_code", responseStatus);
+        metadata.put("response_status_code", responseStatus);
+        requestData = requestData.metadata(metadata);
 
-        return requestData;
+        return requestData.build();
+    }
+
+    private Map<String, List<String>> getQueryParametersAsMapOfLists(WebContext webContext)
+    {
+        ArrayListMultimap<String, String> listMultimap =
+            ArrayListMultimap.create(webContext.getQueryParameters());
+
+        // two-step cast since the compiler can't do it in one step it seems
+        Map<String, ?> rawMap = listMultimap.asMap();
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> mapOfLists = (Map<String, List<String>>) rawMap;
+        return mapOfLists;
     }
 
     private Map<String, String> flattenToCommaSeparatedValues(Multimap<String, String> multimap)
@@ -291,8 +324,9 @@ class RollbarPayloadBuilder
         {
             return null;
         }
-        Person personData = new Person(id);
+        Person.Builder personData = new Person.Builder().id(id);
 
+        Map<String, Object> metadata = new HashMap<>();
         for (Map.Entry<String, String> entry : user.entrySet())
         {
             if (entry.getKey().equals("email"))
@@ -305,10 +339,11 @@ class RollbarPayloadBuilder
             }
             else if (!entry.getKey().equals("id"))
             {
-                personData = personData.put(entry.getKey(), entry.getValue());
+                metadata.put(entry.getKey(), entry.getValue());
             }
         }
-        return personData;
+        personData = personData.metadata(metadata);
+        return personData.build();
     }
 
     private String determineId(Map<String, String> user)
@@ -340,18 +375,22 @@ class RollbarPayloadBuilder
 
 
     private Notifier getNotifierData() {
-        return new Notifier()
+        return new Notifier.Builder()
             .name("red-egg")
-            .version(RedEggVersion.get());
+            .version(RedEggVersion.get())
+            .build();
     }
 
     private Server getServerData() {
-        return new Server()
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("hostAddress", report.getLocalHostAddress());
+        metadata.put("system_properties", report.getSystemProperties());
+        metadata.put("environment_variables", report.getEnvironmentVariables());
+        return new Server.Builder()
             .host(report.getLocalHostName())
             .branch(config.getBranch())
-            .put("hostAddress", report.getLocalHostAddress())
-            .put("system_properties", report.getSystemProperties())
-            .put("environment_variables", report.getEnvironmentVariables());
+            .metadata(metadata)
+            .build();
     }
 
 }
