@@ -21,9 +21,9 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeatureValue;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class ParameterCategorizerTest
@@ -187,7 +187,7 @@ public class ParameterCategorizerTest
     {
         return when(sanitizer.sanitizeQueryStringParameter(
             parameterMatcher,
-            anyListOf(String.class)
+            anyList()
         ));
     }
 

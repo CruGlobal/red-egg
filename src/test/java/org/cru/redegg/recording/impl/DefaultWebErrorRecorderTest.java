@@ -21,7 +21,7 @@ import javax.ws.rs.InternalServerErrorException;
 
 import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
 import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.verify;
 
 /**

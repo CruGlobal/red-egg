@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import java.util.logging.LogRecord;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 
