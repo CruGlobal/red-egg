@@ -206,7 +206,7 @@ class RollbarPayloadBuilder
     private BodyContent getBody() {
         List<Throwable> thrown = report.getThrown();
         if (!thrown.isEmpty()) {
-            return new BodyFactory().from(thrown.get(0), null).getContents();
+            return new BodyFactory().from(new RollbarThrowableWrapper(thrown.get(0)), null).getContents();
 
 //            //TODO: make this use a FilenameResolver, so that we can get github file links
 //            return TraceChain.fromThrowable(thrown.get(0));
