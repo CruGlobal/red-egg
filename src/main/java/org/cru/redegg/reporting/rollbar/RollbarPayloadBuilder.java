@@ -1,5 +1,6 @@
 package org.cru.redegg.reporting.rollbar;
 
+import com.google.common.base.Ascii;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.ExceptionDetailsExtractor;
@@ -69,6 +71,7 @@ class RollbarPayloadBuilder
         Data.Builder data = new Data.Builder();
         data.environment(config.getEnvironmentName());
         data.body(body.build())
+            .title(buildTitle())
             .level(level)
             .platform(config.getPlatform())
             .language(NOTIFIER_LANGUAGE)
@@ -112,6 +115,33 @@ class RollbarPayloadBuilder
             .accessToken(config.getAccessToken())
             .data(data.build())
             .build();
+    }
+
+    /**
+     * Builds a more useful title from the exception chain than what Rollbar builds by default.
+     * By default, it seems to just use the outer-most exception's class and message, separated by a colon.
+     * The message is truncated after 255 characters.
+     * Generally, the inner-most exception is more useful, and is what this logic prioritizes.
+     */
+    private String buildTitle() {
+        final List<Throwable> thrown = report.getThrown();
+        if (thrown.isEmpty())
+        {
+            return null;
+        }
+        Throwable first = thrown.get(0);
+        List<Throwable> chain = Throwables.getCausalChain(first);
+        final String title = Lists.reverse(chain)
+            .stream()
+            .map(this::shrinkThrowableString)
+            .collect(Collectors.joining("; caused: "));
+
+        return Ascii.truncate(title, 255, "...");
+    }
+
+    /** Strips out the package prefix from the throwable's class name, if it's there. */
+    private String shrinkThrowableString(Throwable throwable) {
+        return throwable.toString().replaceFirst("([a-z]+\\.)+(?=[A-Z])", "");
     }
 
     private long toJavaTimestamp(Instant date)

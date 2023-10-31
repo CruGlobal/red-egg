@@ -106,6 +106,9 @@ public class RollbarPayloadBuilderTest
         assertThat(json, containsString("\"guid\": \"ABE4234-FASFA\""));
         assertThat(json, containsString("\"id\": \"ABE4234-FASFA\""));
         assertThat(json, containsString("\"framework\": \"[resteasy-jaxrs-3.0.5.Final, weld-core-1.1.16]\""));
+
+        // title
+        assertThat(json, containsString("\"title\": \"NullPointerException; caused: RuntimeException: something bad happened\""));
         assertThat(json, endsWith("}"));
     }
 }
