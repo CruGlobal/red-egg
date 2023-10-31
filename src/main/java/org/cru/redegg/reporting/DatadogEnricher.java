@@ -8,6 +8,14 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
+/**
+ * Builds a useful link to datadog's Log Explorer UI, and adds it to the context.
+ * Datadog's agent adds a special 'dd.trace_id' to the MDC for every log event,
+ * which we can leverage here.
+ * This also copies the trace id to the 'trace_id' address, because the rollbar docs recommend
+ * this value.
+ * Maybe someday it'll be useful in the Rollbar UI.
+ */
 public class DatadogEnricher
 {
     private final Clock clock;
@@ -31,6 +39,9 @@ public class DatadogEnricher
             if (traceIds.size() == 1)
             {
                 String traceId = Iterables.getOnlyElement(traceIds);
+
+                report.getContext().put("trace_id", traceId);
+
                 report.getContext().put("dd.trace.link", traceLink(traceId));
                 final Instant start;
                 final Instant finish;

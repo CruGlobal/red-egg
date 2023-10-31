@@ -1,5 +1,7 @@
 package org.cru.redegg.reporting.rollbar;
 
+import java.time.Clock;
+import org.cru.redegg.reporting.DatadogEnricher;
 import org.cru.redegg.reporting.DummyReportBuilder;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.util.RedEggVersion;
@@ -21,6 +23,8 @@ public class RollbarInterfaceTest
     {
         RollbarReporter reporter = configReporter(key);
         ErrorReport report = new DummyReportBuilder().buildDummyReport();
+        DatadogEnricher enricher = new DatadogEnricher(Clock.systemDefaultZone());
+        enricher.enrich(report);
         reporter.send(report);
     }
 

@@ -1,8 +1,10 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -44,12 +46,12 @@ public class DummyReportBuilder
             ImmutableList.<Throwable>of(
                 TestExceptions.runtimeWrappingNullPointer()
             ));
-        report.setContext(
-            ImmutableMultimap.of(
-                "framework", "resteasy-jaxrs-3.0.5.Final",
-                "framework", "weld-core-1.1.16",
-                "conferenceId", "10912"
-            ));
+        Multimap<String, String> context = ArrayListMultimap.create();
+        context.put("framework", "resteasy-jaxrs-3.0.5.Final");
+        context.put("framework", "weld-core-1.1.16");
+        context.put("conferenceId", "10912");
+        context.put("dd.trace_id", "4280747157143919621");
+        report.setContext(context);
 
         try
         {
