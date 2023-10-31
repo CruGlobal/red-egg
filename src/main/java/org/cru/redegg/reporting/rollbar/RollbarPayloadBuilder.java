@@ -113,7 +113,7 @@ class RollbarPayloadBuilder
 
         return new Payload.Builder()
             .accessToken(config.getAccessToken())
-            .data(data.build())
+            .data(new TraceChainInverter().transform(data.build()))
             .build();
     }
 
