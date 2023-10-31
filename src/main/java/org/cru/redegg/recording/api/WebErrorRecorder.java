@@ -1,7 +1,7 @@
 package org.cru.redegg.recording.api;
 
 import com.google.common.collect.Multimap;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -34,7 +34,7 @@ public interface WebErrorRecorder extends ErrorRecorder {
      */
     WebErrorRecorder recordComponent(Method method);
 
-    WebErrorRecorder recordRequestStart(DateTime dateTime);
+    WebErrorRecorder recordRequestStart(Instant dateTime);
 
     WebErrorRecorder recordHeaders(Multimap<String, String> headers);
 
@@ -74,5 +74,5 @@ public interface WebErrorRecorder extends ErrorRecorder {
      *
      * @param dateTime when the request completed
      */
-    void recordRequestComplete(DateTime dateTime);
+    void recordRequestComplete(Instant dateTime);
 }

@@ -3,7 +3,7 @@ package org.cru.redegg.reporting;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -18,13 +18,13 @@ public class WebContext implements Cloneable {
 
     private URI url;
     private String queryString;
-    private DateTime start;
+    private Instant start;
     private Multimap<String, String> headers;
     private String method;
     private Multimap<String, String> queryParameters;
     private Multimap<String, String> postParameters;
     private String entityRepresentation;
-    private DateTime finish;
+    private Instant finish;
     private Integer responseStatus;
     private Method component;
     private String remoteIpAddress;
@@ -86,11 +86,11 @@ public class WebContext implements Cloneable {
         return queryString;
     }
 
-    public void setStart(DateTime start) {
+    public void setStart(Instant start) {
         this.start = start;
     }
 
-    public DateTime getStart() {
+    public Instant getStart() {
         return start;
     }
 
@@ -126,11 +126,11 @@ public class WebContext implements Cloneable {
         return postParameters;
     }
 
-    public void setFinish(DateTime finish) {
+    public void setFinish(Instant finish) {
         this.finish = finish;
     }
 
-    public DateTime getFinish() {
+    public Instant getFinish() {
         return finish;
     }
 

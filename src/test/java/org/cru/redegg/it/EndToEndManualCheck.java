@@ -1,6 +1,7 @@
 package org.cru.redegg.it;
 
 import com.google.gson.JsonObject;
+import java.time.Duration;
 import org.cru.redegg.recording.StuckThreadMonitorConfig;
 import org.cru.redegg.reporting.rollbar.RollbarConfig;
 import org.cru.redegg.test.DefaultDeployment;
@@ -9,7 +10,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.joda.time.Period;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -145,7 +145,7 @@ public class EndToEndManualCheck
         public StuckThreadMonitorConfig buildStuckThreadMonitorConfig()
         {
             StuckThreadMonitorConfig config = new StuckThreadMonitorConfig();
-            config.setThreshold(Period.seconds(1));
+            config.setThreshold(Duration.ofSeconds(1));
             config.setPeriod(100L);
             config.setPeriodTimeUnit(TimeUnit.MILLISECONDS);
 

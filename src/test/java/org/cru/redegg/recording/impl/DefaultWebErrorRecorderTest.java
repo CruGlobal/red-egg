@@ -1,5 +1,6 @@
 package org.cru.redegg.recording.impl;
 
+import java.time.Instant;
 import org.cru.redegg.recording.StuckThreadMonitor;
 import org.cru.redegg.recording.api.EntitySanitizer;
 import org.cru.redegg.recording.api.NotificationLevel;
@@ -10,7 +11,6 @@ import org.cru.redegg.util.ErrorLog;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -64,7 +64,7 @@ public class DefaultWebErrorRecorderTest
     {
         recorder.recordThrown(new InternalServerErrorException());
         recorder.recordResponseStatus(500);
-        recorder.recordRequestComplete(new DateTime());
+        recorder.recordRequestComplete(Instant.now());
 
         verify(queue).enqueue(argThat(isServerError()));
     }
@@ -73,7 +73,7 @@ public class DefaultWebErrorRecorderTest
     {
         recorder.recordThrown(new BadRequestException());
         recorder.recordResponseStatus(400);
-        recorder.recordRequestComplete(new DateTime());
+        recorder.recordRequestComplete(Instant.now());
 
         verify(queue).enqueue(argThat(isUserError()));
     }
@@ -84,7 +84,7 @@ public class DefaultWebErrorRecorderTest
         recorder.recordThrown(new BadRequestException());
         recorder.recordResponseStatus(400);
         recorder.error();
-        recorder.recordRequestComplete(new DateTime());
+        recorder.recordRequestComplete(Instant.now());
 
         verify(queue).enqueue(argThat(isUserError()));
     }

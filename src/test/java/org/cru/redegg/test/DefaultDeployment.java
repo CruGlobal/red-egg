@@ -3,6 +3,7 @@ package org.cru.redegg.test;
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.RecorderFactory;
+import org.cru.redegg.recording.cdi.ClockProducer;
 import org.cru.redegg.recording.cdi.RequestMatcherProducer;
 import org.cru.redegg.recording.cdi.SanitizerProducer;
 import org.cru.redegg.recording.impl.HyperConservativeEntitySanitizer;
@@ -16,8 +17,7 @@ import org.cru.redegg.reporting.LoggingReporter;
 import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.RedEggServletListener;
-import org.cru.redegg.util.Clock;
-import org.jboss.shrinkwrap.api.Archive;
+import org.cru.redegg.util.RedEggVersion;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
@@ -25,9 +25,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Matt Drees
@@ -65,11 +62,19 @@ public class DefaultDeployment {
 
     public static DefaultDeployment withCdi(String archiveName)
     {
-        DefaultDeployment deployment = new DefaultDeployment(archiveName);
-        deployment.addBeansXml();
+        DefaultDeployment deployment = withBeansXml(archiveName);
         deployment.getArchive()
             .addClass(ActionRecordingInterceptor.class)
+            .addClass(ClockProducer.class)
             .addPackage(qualifier());
+        return deployment;
+    }
+
+    /** Adds beans.xml, but no cdi-related classes. */
+    public static DefaultDeployment withBeansXml(String archiveName)
+    {
+        DefaultDeployment deployment = new DefaultDeployment(archiveName);
+        deployment.addBeansXml();
         return deployment;
     }
 
@@ -93,8 +98,7 @@ public class DefaultDeployment {
         addLibraries(
            "org.mockito:mockito-core",
            "uk.co.datumedge:hamcrest-json",
-           "com.google.guava:guava",
-           "joda-time:joda-time"
+           "com.google.guava:guava"
         );
 
     }
@@ -232,7 +236,7 @@ public class DefaultDeployment {
 
     private Package util()
     {
-        return Clock.class.getPackage();
+        return RedEggVersion.class.getPackage();
     }
 
     private Package recordingApi()

@@ -2,17 +2,14 @@ package org.cru.redegg;
 
 
 import org.apache.logging.log4j.LogManager;
-import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.reporting.LoggingReporter;
-import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
-import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
+import org.cru.redegg.util.RedEggVersion;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -41,7 +38,7 @@ public class RedEggLog4j2AppenderIntegrationTest
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
             .addClass(ErrorLog.class)
-            .addPackage(Clock.class.getPackage())
+            .addPackage(RedEggVersion.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
 

@@ -1,6 +1,7 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Multimap;
+import java.time.Instant;
 import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.StuckThreadMonitor;
 import org.cru.redegg.recording.api.EntitySanitizer;
@@ -12,7 +13,6 @@ import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.ProxyConstructor;
-import org.joda.time.DateTime;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -120,7 +120,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
-    public WebErrorRecorder recordRequestStart(DateTime start) {
+    public WebErrorRecorder recordRequestStart(Instant start) {
         checkState(!completed);
         webContext.setStart(start);
         return this;
@@ -180,7 +180,7 @@ public class DefaultWebErrorRecorder implements WebErrorRecorder {
     }
 
     @Override
-    public void recordRequestComplete(DateTime finish) {
+    public void recordRequestComplete(Instant finish) {
         checkState(!completed);
         completed = true;
 

@@ -1,19 +1,19 @@
 package org.cru.redegg.reporting;
 
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import org.cru.redegg.qualifier.Fallback;
-import org.cru.redegg.reporting.api.ErrorLink;
-import org.cru.redegg.reporting.api.ErrorReporter;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.cru.redegg.qualifier.Fallback;
+import org.cru.redegg.reporting.api.ErrorLink;
+import org.cru.redegg.reporting.api.ErrorReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -87,13 +87,11 @@ public class LoggingReporter implements ErrorReporter
         }
     }
 
-    private final DateTimeFormatter formatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
-
 
     public void addRequestInfo(WebContext webContext, ReportStringBuilder builder)
     {
-        builder.appendLine("request started", formatter.print(webContext.getStart()));
-        builder.appendLine("request finished", formatter.print(webContext.getFinish()));
+        builder.appendLine("request started", ISO_ZONED_DATE_TIME.format(webContext.getStart().atZone(ZoneId.systemDefault())));
+        builder.appendLine("request finished", ISO_ZONED_DATE_TIME.format(webContext.getFinish().atZone(ZoneId.systemDefault())));
         builder.appendBreak();
 
         builder.appendLine("Method", webContext.getMethod());

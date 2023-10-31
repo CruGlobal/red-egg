@@ -1,18 +1,14 @@
 package org.cru.redegg.reporting;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Date;
 
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -34,8 +30,8 @@ public class DatadogEnricherTest
     public void testNormalWebRequest()
     {
         final WebContext webContext = new WebContext();
-        webContext.setStart(new DateTime(Date.from(testNow.minusSeconds(10))));
-        webContext.setFinish(new DateTime(Date.from(testNow.minusSeconds(6))));
+        webContext.setStart(testNow.minusSeconds(10));
+        webContext.setFinish(testNow.minusSeconds(6));
         report.addWebContext(webContext);
         final HashMultimap<String, String> context = HashMultimap.create();
         context.put("dd.trace_id", "9219263634118187777");
@@ -50,7 +46,7 @@ public class DatadogEnricherTest
     public void testUnfinishedWebRequest()
     {
         final WebContext webContext = new WebContext();
-        webContext.setStart(new DateTime(Date.from(testNow.minusSeconds(10))));
+        webContext.setStart(testNow.minusSeconds(10));
         report.addWebContext(webContext);
         final HashMultimap<String, String> context = HashMultimap.create();
         context.put("dd.trace_id", "9219263634118187777");

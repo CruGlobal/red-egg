@@ -1,8 +1,8 @@
 package org.cru.redegg.recording.api;
 
 import com.google.common.collect.Multimap;
+import java.time.Instant;
 import org.cru.redegg.reporting.api.ErrorLink;
-import org.joda.time.DateTime;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -52,7 +52,7 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
-    public WebErrorRecorder recordRequestStart(DateTime dateTime)
+    public WebErrorRecorder recordRequestStart(Instant dateTime)
     {
         return this;
     }
@@ -110,7 +110,7 @@ class NullWebErrorRecorder implements WebErrorRecorder
     }
 
     @Override
-    public void recordRequestComplete(DateTime dateTime)
+    public void recordRequestComplete(Instant dateTime)
     {
     }
 

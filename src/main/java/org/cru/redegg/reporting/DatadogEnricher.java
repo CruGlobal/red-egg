@@ -1,7 +1,6 @@
 package org.cru.redegg.reporting;
 
 import com.google.common.collect.Iterables;
-import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.time.Clock;
@@ -38,8 +37,8 @@ public class DatadogEnricher
                 final WebContext webContext = report.getWebContext();
                 if (webContext != null)
                 {
-                    start = toInstant(webContext.getStart());
-                    finish = toInstant(webContext.getFinish());
+                    start = webContext.getStart();
+                    finish = webContext.getFinish();
                 }
                 else
                 {
@@ -51,9 +50,9 @@ public class DatadogEnricher
         }
     }
 
-    private Instant toInstant(DateTime date)
+    private Instant toInstant(ZonedDateTime date)
     {
-        return date == null ? null : Instant.ofEpochMilli(date.toInstant().getMillis());
+        return date == null ? null : date.toInstant();
     }
 
     private String traceLink(final String traceId) {

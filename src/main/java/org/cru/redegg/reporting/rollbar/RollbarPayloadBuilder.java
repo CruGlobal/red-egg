@@ -1,6 +1,5 @@
 package org.cru.redegg.reporting.rollbar;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -23,9 +22,11 @@ import com.rollbar.notifier.wrapper.RollbarThrowableWrapper;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,6 @@ import org.cru.redegg.reporting.common.Reporters;
 import org.cru.redegg.util.RedEggCollections;
 import org.cru.redegg.util.RedEggStrings;
 import org.cru.redegg.util.RedEggVersion;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 /**
  * @author Matt Drees
@@ -115,9 +114,9 @@ class RollbarPayloadBuilder
             .build();
     }
 
-    private long toJavaTimestamp(Date date)
+    private long toJavaTimestamp(Instant date)
     {
-        return date.getTime();
+        return date.toEpochMilli();
     }
 
     private Level determineLevel(NotificationLevel notificationLevel)
@@ -181,18 +180,18 @@ class RollbarPayloadBuilder
         return customData;
     }
 
-    private Date getErrorTimestamp()
+    private Instant getErrorTimestamp()
     {
         // TODO: record time of actual error.
         // Note: rollbar uses unix timestamps, but it accepts fractional second values.
 
         if (report.getWebContext() != null && report.getWebContext().getFinish() != null)
         {
-            return report.getWebContext().getFinish().toDate();
+            return report.getWebContext().getFinish();
         }
         else
         {
-            return new Date();
+            return Instant.now();
         }
     }
 
@@ -258,18 +257,18 @@ class RollbarPayloadBuilder
 
         requestData.body(webContext.getEntityRepresentation());
 
-        DateTime start = webContext.getStart();
-        DateTime finish = webContext.getFinish();
-
-        Duration  duration = new Duration(start, finish);
+        ZonedDateTime start = ZonedDateTime.ofInstant(webContext.getStart(), ZoneId.systemDefault());
 
         Map<String, String > timing = new HashMap<>();
         timing.put("start", start.toString());
-        if (finish != null)
+        if (webContext.getFinish() != null)
         {
+            ZonedDateTime finish = ZonedDateTime.ofInstant(webContext.getFinish(), ZoneId.systemDefault());
+
+            Duration duration = Duration.between(start, finish);
             timing.put("finish", finish.toString());
+            timing.put("duration", duration.toString());
         }
-        timing.put("duration", duration.toString());
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("timing", timing);

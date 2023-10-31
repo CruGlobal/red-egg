@@ -9,8 +9,6 @@ import org.cru.redegg.qualifier.EntityStreamPreservation;
 import org.cru.redegg.recording.api.RequestMatcher;
 import org.cru.redegg.recording.api.RequestMatchers;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.reporting.LoggingReporter;
-import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
 import org.cru.redegg.test.TestApplication;
