@@ -42,7 +42,7 @@ public class DatadogEnricher
 
                 report.getContext().put("trace_id", traceId);
 
-                report.getContext().put("dd.trace.link", traceLink(traceId));
+                report.getContext().put("trace_link", traceLink(traceId));
                 final Instant start;
                 final Instant finish;
                 final WebContext webContext = report.getWebContext();
@@ -56,7 +56,7 @@ public class DatadogEnricher
                     start = null;
                     finish = null;
                 }
-                report.getContext().put("dd.logs.link", logsLink(traceId, start, finish));
+                report.getContext().put("dd_logs_link", logsLink(traceId, start, finish));
             }
         }
     }
@@ -67,9 +67,15 @@ public class DatadogEnricher
     }
 
     private String traceLink(final String traceId) {
-        return String.format("https://app.datadoghq.com/apm/trace/%s", traceId);
+        return String.format("https://app.datadoghq.com/apm/trace/%s?spanViewType=logs", traceId);
     }
 
+    /**
+     * Builds something like
+     * https://app.datadoghq.com/logs?query=trace_id%3A4280747157143919621&from_ts=1698791125829&to_ts=1698793127886&live=false
+     * which should redirect to something like
+     * https://app.datadoghq.com/logs?query=trace_id%3A4280747157143919621&cols=%40http.url_details.path%2C%40network.client.ip&index=%2A&messageDisplay=inline&stream_sort=desc&viz=stream&from_ts=1698791125829&to_ts=1698793127886&live=false
+     */
     private String logsLink(final String traceId, Instant start, Instant finish) {
         final ZonedDateTime dateTime = ZonedDateTime.now(clock);
 
@@ -78,25 +84,22 @@ public class DatadogEnricher
         // we will just use a plus or minus 20 minute buffer to find log entries for this trace.
         // This is roughly consistent with what the datadog UI does,
         // when clicking on the logs link on a trace page.
-        final long fromTimestampMillis = useOrDefault(start, dateTime.minusMinutes(20))
+        final long fromTimestamp = useOrDefault(start, dateTime.minusMinutes(20))
             .minusSeconds(30)
             .toEpochMilli();
-        final long toTimestampMillis = useOrDefault(finish, dateTime.plusMinutes(20))
+        final long toTimestamp = useOrDefault(finish, dateTime.plusMinutes(20))
             .plusSeconds(30)
             .toEpochMilli();
 
-        // I am not sure what these suffixes are, except maybe nanoseconds.
-        // The rollbar UI seems to use four decimal places.
-        final String fromTimestamp = fromTimestampMillis + ".0000";
-        final String toTimestamp = toTimestampMillis + ".0000";
-
         // avoiding String.format() to avoid having to escape percent symbols
-        return "https://app.datadoghq.com/logs?from_ts=" +
-               fromTimestamp +
-               "&index=main&live=false&query=trace_id%3A" +
-               traceId +
-               "&stream_sort=desc&to_ts=" +
-               toTimestamp;
+        return "https://app.datadoghq.com/logs?" +
+                "query=trace_id%3A" +
+                traceId +
+                "&from_ts=" +
+                fromTimestamp +
+                "&to_ts=" +
+                toTimestamp +
+                "&live=false";
     }
 
     private Instant useOrDefault(Instant optionalInstant, ZonedDateTime defaultDateTime)

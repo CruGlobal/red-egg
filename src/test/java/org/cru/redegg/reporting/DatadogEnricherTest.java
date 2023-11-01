@@ -19,7 +19,7 @@ public class DatadogEnricherTest
     ErrorReport report = new ErrorReport();
 
     private final ZoneOffset testZone = ZoneOffset.UTC;
-    private Instant testNow = LocalDate.of(2018, 2, 14)
+    private final Instant testNow = LocalDate.of(2018, 2, 14)
         .atStartOfDay()
         .toInstant(testZone);
 
@@ -38,8 +38,8 @@ public class DatadogEnricherTest
         report.setContext(context);
 
         new DatadogEnricher(clock).enrich(report);
-        assertThat(report.getContext().get("dd.trace.link"), is(equalTo(singleton("https://app.datadoghq.com/apm/trace/9219263634118187777"))));
-        assertThat(report.getContext().get("dd.logs.link"), is(equalTo(singleton("https://app.datadoghq.com/logs?from_ts=1518566360000.0000&index=main&live=false&query=trace_id%3A9219263634118187777&stream_sort=desc&to_ts=1518566424000.0000"))));
+        checkSpanLink();
+        assertThat(report.getContext().get("dd_logs_link"), is(equalTo(singleton("https://app.datadoghq.com/logs?query=trace_id%3A9219263634118187777&from_ts=1518566360000&to_ts=1518566424000&live=false"))));
     }
 
     @Test
@@ -53,8 +53,8 @@ public class DatadogEnricherTest
         report.setContext(context);
 
         new DatadogEnricher(clock).enrich(report);
-        assertThat(report.getContext().get("dd.trace.link"), is(equalTo(singleton("https://app.datadoghq.com/apm/trace/9219263634118187777"))));
-        assertThat(report.getContext().get("dd.logs.link"), is(equalTo(singleton("https://app.datadoghq.com/logs?from_ts=1518566360000.0000&index=main&live=false&query=trace_id%3A9219263634118187777&stream_sort=desc&to_ts=1518567630000.0000"))));
+        checkSpanLink();
+        assertThat(report.getContext().get("dd_logs_link"), is(equalTo(singleton("https://app.datadoghq.com/logs?query=trace_id%3A9219263634118187777&from_ts=1518566360000&to_ts=1518567630000&live=false"))));
     }
 
     @Test
@@ -65,7 +65,11 @@ public class DatadogEnricherTest
         report.setContext(context);
 
         new DatadogEnricher(clock).enrich(report);
-        assertThat(report.getContext().get("dd.trace.link"), is(equalTo(singleton("https://app.datadoghq.com/apm/trace/9219263634118187777"))));
-        assertThat(report.getContext().get("dd.logs.link"), is(equalTo(singleton("https://app.datadoghq.com/logs?from_ts=1518565170000.0000&index=main&live=false&query=trace_id%3A9219263634118187777&stream_sort=desc&to_ts=1518567630000.0000"))));
+        checkSpanLink();
+        assertThat(report.getContext().get("dd_logs_link"), is(equalTo(singleton("https://app.datadoghq.com/logs?query=trace_id%3A9219263634118187777&from_ts=1518565170000&to_ts=1518567630000&live=false"))));
+    }
+
+    private void checkSpanLink() {
+        assertThat(report.getContext().get("trace_link"), is(equalTo(singleton("https://app.datadoghq.com/apm/trace/9219263634118187777?spanViewType=logs"))));
     }
 }
