@@ -1,9 +1,11 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimaps;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.StuckThreadMonitor;
 import org.cru.redegg.recording.StuckThreadMonitorConfig;
@@ -11,16 +13,9 @@ import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.api.ErrorQueue;
-import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.MoreExecutors;
 import org.cru.redegg.util.ProxyConstructor;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.format.PeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +53,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         new ScheduledThreadPoolExecutor(1);
 
 
-    private ReadablePeriod threshold;
+    private TemporalAmount threshold;
     private long period;
     private TimeUnit periodTimeUnit;
 
@@ -81,7 +76,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
 
     @Inject
     public DefaultStuckThreadMonitor(
-        Clock clock,
+        @Selected Clock clock,
         ErrorQueue errorQueue,
         @Selected StuckThreadMonitorConfig config,
         ErrorLog errorLog)
@@ -142,13 +137,13 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
 
 
     private class Request {
-        final DateTime deadline;
+        final Instant deadline;
         final WebContext webContext;
         final Thread processingThread;
         final AtomicBoolean notified = new AtomicBoolean();
 
         Request(
-            DateTime deadline,
+            Instant deadline,
             WebContext webContext,
             Thread processingThread)
         {
@@ -163,7 +158,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         @Override
         public void run()
         {
-            DateTime now = clock.dateTime();
+            Instant now = Instant.now(clock);
             for (Map.Entry<WebContext, Request> entry : currentlyActiveRequests.entrySet())
             {
                 Request request = entry.getValue();
@@ -179,7 +174,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         private void reportOverdue(
             Request request,
             WebContext webContext,
-            DateTime now)
+            Instant now)
         {
             errorQueue.enqueue(buildReport(request, webContext, now));
         }
@@ -187,7 +182,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         private ErrorReport buildReport(
             Request request,
             WebContext webContext,
-            DateTime now)
+            Instant now)
         {
             ErrorReport report = new ErrorReport();
             report.setWebContext(webContext);
@@ -209,7 +204,7 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         private Throwable buildStandInException(
             WebContext webContext,
             Request request,
-            DateTime now)
+            Instant now)
         {
             return new StuckThreadException(
                 webContext.getStart(),
@@ -231,8 +226,8 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
     {
 
         StuckThreadException(
-            DateTime start,
-            DateTime now,
+            Instant start,
+            Instant now,
             Thread thread)
         {
             super(String.format(
@@ -244,13 +239,12 @@ public class DefaultStuckThreadMonitor implements StuckThreadMonitor
         }
 
         private static String getRelativeTimePhrase(
-            DateTime now,
-            DateTime start)
+            Instant now,
+            Instant start)
         {
             Preconditions.checkArgument(start.isBefore(now));
-            Period period = new Period(start, now, PeriodType.standard());
-            PeriodFormatter periodFormatter = PeriodFormat.getDefault();
-            return periodFormatter.print(period);
+            Duration period = Duration.between(start, now);
+            return period.toString();
         }
 
         // don't fill in the current thread's stack trace; see constructor

@@ -1,6 +1,6 @@
 package org.cru.redegg.reporting.rollbar;
 
-import com.rollbar.sender.PayloadSender;
+import com.rollbar.notifier.sender.SyncSender;
 import org.cru.redegg.reporting.errbit.Empty;
 
 import java.net.URI;
@@ -30,7 +30,7 @@ public class RollbarConfig
     {
         try
         {
-            endpoint = new URI(PayloadSender.DEFAULT_API_ENDPOINT);
+            endpoint = new URI(SyncSender.DEFAULT_API_ENDPOINT);
         }
         catch (URISyntaxException e)
         {

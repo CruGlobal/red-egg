@@ -1,12 +1,16 @@
 package org.cru.redegg.reporting;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
-import org.joda.time.DateTime;
+import com.google.common.collect.Multimap;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.cru.redegg.recording.api.NotificationLevel.ERROR;
 import static org.cru.redegg.recording.api.NotificationLevel.WARNING;
@@ -42,12 +46,12 @@ public class DummyReportBuilder
             ImmutableList.<Throwable>of(
                 TestExceptions.runtimeWrappingNullPointer()
             ));
-        report.setContext(
-            ImmutableMultimap.of(
-                "framework", "resteasy-jaxrs-3.0.5.Final",
-                "framework", "weld-core-1.1.16",
-                "conferenceId", "10912"
-            ));
+        Multimap<String, String> context = ArrayListMultimap.create();
+        context.put("framework", "resteasy-jaxrs-3.0.5.Final");
+        context.put("framework", "weld-core-1.1.16");
+        context.put("conferenceId", "10912");
+        context.put("dd.trace_id", "4280747157143919621");
+        report.setContext(context);
 
         try
         {
@@ -65,8 +69,14 @@ public class DummyReportBuilder
         WebContext context = new WebContext();
         context.setComponent(TestResource.class.getMethod("doSomething", String.class));
         context.setEntityRepresentation("{\"color\": \"blue\", \"size\":12}");
-        context.setStart(new DateTime(2013, 12, 13, 14, 23, 37, 493));
-        context.setFinish(new DateTime(2013, 12, 13, 14, 23, 37, 724));
+        context.setStart(ZonedDateTime.of(
+            LocalDate.of(2013, 12, 13),
+            LocalTime.of(14, 23, 37, 493_000),
+            ZoneId.systemDefault()).toInstant());
+        context.setFinish(ZonedDateTime.of(
+            LocalDate.of(2013, 12, 13),
+            LocalTime.of(14, 23, 37, 724_000),
+            ZoneId.systemDefault()).toInstant());
         context.setHeaders(ImmutableMultimap.of(
             "Accept", "application/json",
             "Content-Type", "application/json",

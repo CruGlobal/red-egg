@@ -233,6 +233,7 @@ This will launch a wildfly instance, run the tests on it, and shut it down after
 If you are running tests from your IDE,
 generally you will want to instead activate the `arq-wildfly-remote` profile.
 This requires that you fire up wildfly yourself in a terminal window.
+(Download from https://download.jboss.org/wildfly/8.2.1.Final/wildfly-8.2.1.Final.tar.gz into `server` and run via `bin/standalone.sh`.)
 This will run the tests faster and give you quicker feedback as you develop.
 Note: if you have run the `arq-wildfly-managed` profile recently,
 you may need to run `mvn resources:testResources -Parq-wildfly-managed`

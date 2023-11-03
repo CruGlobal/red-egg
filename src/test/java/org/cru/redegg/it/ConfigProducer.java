@@ -1,9 +1,9 @@
 package org.cru.redegg.it;
 
+import java.time.Duration;
 import org.cru.redegg.recording.StuckThreadMonitorConfig;
 import org.cru.redegg.reporting.rollbar.RollbarConfig;
 import org.cru.redegg.test.WebTargetBuilder;
-import org.joda.time.Period;
 
 import javax.enterprise.inject.Produces;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +27,7 @@ public class ConfigProducer
     public StuckThreadMonitorConfig buildStuckThreadMonitorConfig()
     {
         StuckThreadMonitorConfig config = new StuckThreadMonitorConfig();
-        config.setThreshold(Period.seconds(1));
+        config.setThreshold(Duration.ofSeconds(1));
         config.setPeriod(100L);
         config.setPeriodTimeUnit(TimeUnit.MILLISECONDS);
 

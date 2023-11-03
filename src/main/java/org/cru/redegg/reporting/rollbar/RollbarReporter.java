@@ -1,9 +1,13 @@
 package org.cru.redegg.reporting.rollbar;
 
 import com.google.common.base.Throwables;
-import com.rollbar.sender.PayloadSender;
-import com.rollbar.sender.RollbarResponse;
 import org.cru.redegg.reporting.api.ErrorLink;
+import com.rollbar.api.payload.Payload;
+import com.rollbar.notifier.sender.Sender;
+import com.rollbar.notifier.sender.SyncSender;
+import com.rollbar.notifier.sender.exception.SenderException;
+import com.rollbar.notifier.sender.listener.SenderListener;
+import com.rollbar.notifier.sender.result.Response;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorReporter;
 
@@ -19,14 +23,17 @@ public class RollbarReporter implements ErrorReporter
 
 
     private final RollbarConfig config;
-    private final PayloadSender sender;
+    private final Sender sender;
 
     public RollbarReporter(RollbarConfig config)
     {
         this.config = config;
         try
         {
-            this.sender = new PayloadSender(config.getEndpoint().toURL());
+            this.sender = new SyncSender.Builder()
+                .url(config.getEndpoint().toURL())
+                .build();
+            sender.addListener(new Listener());
         }
         catch (MalformedURLException e)
         {
@@ -39,11 +46,23 @@ public class RollbarReporter implements ErrorReporter
     public void send(ErrorReport report)
     {
         RollbarPayloadBuilder builder = new RollbarPayloadBuilder(config, report);
+        sender.send(builder.build());
+    }
 
-        RollbarResponse response = sender.send(builder.build());
-        if (!response.isSuccessful())
+    private class Listener implements SenderListener
+    {
+        @Override
+        public void onResponse(Payload payload, Response response) { }
+
+        @Override
+        public void onError(Payload payload, Exception e)
         {
-            throw new RuntimeException("unsuccessful attempt to send rollbar report: " + response.errorMessage());
+            if (e instanceof SenderException && e.getCause() instanceof RuntimeException)
+            {
+                throw (RuntimeException) e.getCause();
+            }
+            Throwables.propagateIfPossible(e);
+            throw new RuntimeException(e);
         }
     }
 

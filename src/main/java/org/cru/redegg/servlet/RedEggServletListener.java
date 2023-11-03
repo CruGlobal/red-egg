@@ -2,14 +2,14 @@ package org.cru.redegg.servlet;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import java.time.Clock;
+import java.time.Instant;
 import org.cru.redegg.boot.Initializer;
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.qualifier.Selected;
 import org.cru.redegg.recording.api.ParameterSanitizer;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.util.Clock;
-import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
@@ -35,6 +35,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
     RecorderFactory recorderFactory;
 
     @Inject
+    @Selected
     Clock clock;
 
     @Inject
@@ -74,7 +75,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
         }
 
         // capture the current time as early as possible
-        DateTime requestStart = clock.dateTime();
+        Instant requestStart = Instant.now(clock);
 
         lifecycle.beginRequest();
         WebErrorRecorder recorder = recorderFactory.getWebRecorder()
@@ -121,7 +122,7 @@ public class RedEggServletListener implements ServletContextListener, ServletReq
             setAsyncContext(sre.getServletRequest(), true);
             recorder.suspendRequestProcessing();
         } else {
-            recorder.recordRequestComplete(clock.dateTime());
+            recorder.recordRequestComplete(Instant.now(clock));
             lifecycle.endRequest();
             setAsyncContext(sre.getServletRequest(), false);
         }

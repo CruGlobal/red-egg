@@ -33,7 +33,7 @@ public class EndToEndWithCdiIT extends AbstractEndToEndIT
     @Deployment
     public static WebArchive deployment()  {
 
-        return DefaultDeployment.withCdi("end-to-end-test.war")
+        return DefaultDeployment.withBeansXml("end-to-end-test.war")
             .addAllRuntimeDependenciesExceptLog4j2()
             .getArchive()
             .addAsLibraries(RedEggDistribution.getJarFile())

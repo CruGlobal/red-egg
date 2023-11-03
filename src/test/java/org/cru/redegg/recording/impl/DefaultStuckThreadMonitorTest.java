@@ -1,6 +1,9 @@
 package org.cru.redegg.recording.impl;
 
 import com.google.common.collect.Lists;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import org.cru.redegg.recording.StuckThreadMonitorConfig;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.impl.DefaultStuckThreadMonitor.StuckThreadException;
@@ -8,13 +11,11 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
 import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
-import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.joda.time.Period;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class DefaultStuckThreadMonitorTest
 
     DefaultStuckThreadMonitor monitor;
 
-    Clock clock = Clock.system();
+    Clock clock = Clock.systemDefaultZone();
 
     ErrorQueueStub queue = new ErrorQueueStub();
 
@@ -93,7 +94,7 @@ public class DefaultStuckThreadMonitorTest
     public void setUp()
     {
         StuckThreadMonitorConfig config =  new StuckThreadMonitorConfig();
-        config.setThreshold(Period.millis(TEST_THRESHOLD_MILLIS));
+        config.setThreshold(Duration.ofMillis(TEST_THRESHOLD_MILLIS));
         config.setPeriod(TEST_PERIOD_MILLIS);
         config.setPeriodTimeUnit(TimeUnit.MILLISECONDS);
         monitor = new DefaultStuckThreadMonitor(clock, queue, config, new ErrorLog());
@@ -119,7 +120,7 @@ public class DefaultStuckThreadMonitorTest
     private WebContext createWebContext()
     {
         WebContext webContext = new WebContext();
-        webContext.setStart(clock.dateTime());
+        webContext.setStart(Instant.now(clock));
         webContext.setUrl(URI.create("https://example.com/test"));
         return webContext;
     }

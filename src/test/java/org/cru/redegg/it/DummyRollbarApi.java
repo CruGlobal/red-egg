@@ -33,7 +33,16 @@ public class DummyRollbarApi
 
     public static class SuccessResponse
     {
+        private Integer err = 0;
         private String uuid = UUID.randomUUID().toString();
+
+        public Integer getErr() {
+            return err;
+        }
+
+        public void setErr(Integer err) {
+            this.err = err;
+        }
 
         public String getUuid()
         {

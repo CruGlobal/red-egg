@@ -1,18 +1,12 @@
 package org.cru.redegg;
 
 
-import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.recording.api.RecorderFactory;
 import org.cru.redegg.recording.api.WebErrorRecorder;
-import org.cru.redegg.recording.jul.RedEggHandler;
-import org.cru.redegg.recording.log4j.RedEggLog4jAppender;
-import org.cru.redegg.reporting.LoggingReporter;
-import org.cru.redegg.reporting.api.ErrorReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggServletListener;
 import org.cru.redegg.test.AnswerWithSelf;
 import org.cru.redegg.test.DefaultDeployment;
-import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
 import org.cru.redegg.util.RedEggVersion;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -25,7 +19,7 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import java.util.logging.LogRecord;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 
@@ -43,7 +37,7 @@ public class RedEggLog4jAppenderIntegrationTest
             .addClass(RedEggServletListener.class)
             .addClass(ParameterCategorizer.class)
             .addClass(ErrorLog.class)
-            .addPackage(Clock.class.getPackage())
+            .addPackage(RedEggVersion.class.getPackage())
 
             .addPackage(RecorderFactory.class.getPackage())
 

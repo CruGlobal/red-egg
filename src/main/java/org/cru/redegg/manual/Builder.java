@@ -1,5 +1,6 @@
 package org.cru.redegg.manual;
 
+import java.time.Clock;
 import org.cru.redegg.boot.Lifecycle;
 import org.cru.redegg.jaxrs.RecordingReaderInterceptor;
 import org.cru.redegg.recording.StuckThreadMonitorConfig;
@@ -27,7 +28,6 @@ import org.cru.redegg.reporting.rollbar.RollbarReporter;
 import org.cru.redegg.servlet.ParameterCategorizer;
 import org.cru.redegg.servlet.RedEggFilter;
 import org.cru.redegg.servlet.RedEggServletListener;
-import org.cru.redegg.util.Clock;
 import org.cru.redegg.util.ErrorLog;
 
 /**
@@ -83,7 +83,7 @@ public class Builder
 
     private Clock getClock()
     {
-        return Clock.system();
+        return Clock.systemDefaultZone();
     }
 
     ParameterCategorizer buildParameterCategorizer()

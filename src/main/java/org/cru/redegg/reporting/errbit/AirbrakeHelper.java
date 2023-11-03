@@ -1,13 +1,14 @@
 package org.cru.redegg.reporting.errbit;
 
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.time.ZoneId;
 import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.WebContext;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,11 +80,11 @@ public class AirbrakeHelper
         Map<String, Object> otherWebDetails = Maps.newHashMap();
         if (webContext.getStart() != null)
         {
-            otherWebDetails.put("Request Started", formatter.print(webContext.getStart()));
+            otherWebDetails.put("Request Started", ISO_ZONED_DATE_TIME.format(webContext.getStart().atZone(ZoneId.systemDefault())));
         }
         if (webContext.getFinish() != null)
         {
-            otherWebDetails.put("Request Finished", formatter.print(webContext.getFinish()));
+            otherWebDetails.put("Request Finished", ISO_ZONED_DATE_TIME.format(webContext.getFinish().atZone(ZoneId.systemDefault())));
         }
         if (webContext.getMethod() != null)
         {
@@ -100,8 +101,6 @@ public class AirbrakeHelper
 
         return otherWebDetails;
     }
-
-    private final DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 
 
     Map<String, Object> prefixKeys(String prefix, Map<String, ?> map)

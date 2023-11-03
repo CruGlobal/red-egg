@@ -1,8 +1,8 @@
 package org.cru.redegg.recording;
 
+import java.time.Duration;
+import java.time.temporal.TemporalAmount;
 import org.cru.redegg.qualifier.Fallback;
-import org.joda.time.Minutes;
-import org.joda.time.ReadablePeriod;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,21 +10,21 @@ import java.util.concurrent.TimeUnit;
 public class StuckThreadMonitorConfig
 {
 
-    private static final ReadablePeriod DEFAULT_THRESHOLD = Minutes.minutes(30);
+    private static final Duration DEFAULT_THRESHOLD = Duration.ofMinutes(30);
     private static final long DEFAULT_PERIOD_MINUTES = 5;
 
-    private ReadablePeriod threshold = DEFAULT_THRESHOLD;
+    private Duration threshold = DEFAULT_THRESHOLD;
 
     private Long period = DEFAULT_PERIOD_MINUTES;
 
     private TimeUnit periodTimeUnit = TimeUnit.MINUTES;
 
-    public ReadablePeriod getThreshold()
+    public TemporalAmount getThreshold()
     {
         return threshold;
     }
 
-    public void setThreshold(ReadablePeriod threshold)
+    public void setThreshold(Duration threshold)
     {
         this.threshold = threshold;
     }

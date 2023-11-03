@@ -8,6 +8,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import org.cru.redegg.recording.api.ErrorRecorder;
 import org.cru.redegg.recording.api.NotificationLevel;
 import org.cru.redegg.recording.api.Serializer;
@@ -15,7 +19,6 @@ import org.cru.redegg.reporting.ErrorReport;
 import org.cru.redegg.reporting.api.ErrorLink;
 import org.cru.redegg.reporting.api.ErrorQueue;
 import org.cru.redegg.util.RedEggStrings;
-import org.joda.time.format.ISODateTimeFormat;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -384,8 +387,8 @@ public class DefaultErrorRecorder implements ErrorRecorder {
 
     private String buildHeader(LogRecord logRecord)
     {
-        long millis = logRecord.getMillis();
-        return ISODateTimeFormat.time().print(millis) + " " + logRecord.getLoggerName();
+        ZonedDateTime dateTime = Instant.ofEpochMilli(logRecord.getMillis()).atZone(ZoneId.systemDefault());
+        return DateTimeFormatter.ISO_ZONED_DATE_TIME.format(dateTime) + " " + logRecord.getLoggerName();
     }
 
     private NotificationLevel logLevelToNotificationLevel(LogRecord logRecord)
