@@ -26,7 +26,16 @@ public class Lifecycle
      */
     private final Set<String> ignoredLoggers = ImmutableSet.of(
         ErrorLog.name(),
-        LoggingReporter.name()
+        LoggingReporter.name(),
+
+        // TODO: It'd be be more architecturally clean for this to be added
+        // by some rollbar-specific code, but it'll do for now.
+        "com.rollbar.notifier.Rollbar",
+        "com.rollbar.notifier.sender.SyncSender",
+        "com.rollbar.notifier.sender.BufferedSender",
+        "com.rollbar.notifier.sender.queue.DiskQueue",
+        "com.rollbar.notifier.util.ObjectsUtils",
+        "ConfigProviderHelper" // used in com.rollbar.notifier.config.ConfigProviderHelper
     );
 
     @Inject
